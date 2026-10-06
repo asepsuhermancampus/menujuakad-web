@@ -77,4 +77,5 @@ Integrasi belum diimplementasikan. Targetnya ialah adapter provider di `src/serv
 ## Deployment
 
 Build menggunakan output `standalone` agar dapat dikemas untuk VPS. Belum ada deployment, perubahan DNS, atau perubahan reverse proxy. Sebelum tahap produksi, inspeksi VPS yang sudah ada, gunakan proxy yang sesuai, terapkan migrasi terkontrol, dan verifikasi HTTPS serta `/api/health`. Rencana: [deployment](docs/deployment.md).
+
 # menujuakad

@@ -1,0 +1,3726 @@
+MENUJU AKAD
+MASTER AGENT SPECIFICATION
+Architecture + Routing + Database ERD + Prisma/Neon + Mayar Payment + VPS/Domain + Figma MCP + Coding Standards
+
+VERSION: 1.0
+PURPOSE: Give this file to the coding agent as the repository-level technical source of truth.
+
+============================================================
+0. AGENT MANDATE
+============================================================
+
+You are the lead software architect, senior Next.js engineer, database architect, payment integration engineer, DevOps engineer, UX implementation engineer, and code-quality reviewer for the Menuju Akad project.
+
+The product is a premium digital wedding invitation platform.
+
+The existing Figma design is the visual source of truth for UI implementation when a relevant Figma frame exists.
+
+The product specification describes the intended business/domain behavior.
+
+The repository code is the current technical source of truth for existing implementation details.
+
+NEVER blindly rewrite an existing project.
+
+Before changing architecture, inspect the repository and preserve working code where possible.
+
+The main objective is:
+
+- clean architecture
+- modular code
+- small readable files
+- clear domain ownership
+- no spaghetti code
+- no giant React files
+- safe payment processing
+- scalable PostgreSQL data model
+- maintainable Next.js application
+- development flow compatible with AI/vibe coding
+- production deployment on a VPS
+- Figma-to-code workflow through Figma MCP
+
+============================================================
+1. NON-NEGOTIABLE ARCHITECTURE
+============================================================
+
+Use:
+
+NEXT.JS APP ROUTER
++
+TYPESCRIPT
++
+MODULAR MONOLITH
++
+FEATURE-BASED ARCHITECTURE
++
+SHARED DESIGN SYSTEM
++
+SEPARATED SERVER / INTEGRATION LAYERS
++
+POSTGRESQL ON NEON
++
+PRISMA ORM
++
+MAYAR PAYMENT INTEGRATION
++
+FIGMA MCP FOR DESIGN CONTEXT
+
+Do NOT introduce microservices unless there is a demonstrated operational need.
+
+Do NOT create a monorepo only for the sake of architecture.
+
+Prefer one well-structured Next.js application with clear domain boundaries.
+
+============================================================
+2. CORE ARCHITECTURE PRINCIPLE
+============================================================
+
+Separate:
+
+ROUTING
+UI
+FEATURE LOGIC
+BUSINESS LOGIC
+VALIDATION
+DATA ACCESS
+EXTERNAL INTEGRATIONS
+CONFIGURATION
+ASSETS
+
+Recommended dependency direction:
+
+APP ROUTE
+    ↓
+FEATURE UI
+    ↓
+HOOK / ACTION / QUERY
+    ↓
+DOMAIN SERVICE
+    ↓
+REPOSITORY / PROVIDER INTEGRATION
+    ↓
+DATABASE / EXTERNAL SERVICE
+
+UI must not directly access the database.
+
+UI must not contain Mayar API calls.
+
+UI must not contain raw SQL.
+
+UI must not contain large business algorithms.
+
+============================================================
+3. REPOSITORY STRUCTURE
+============================================================
+
+Recommended structure:
+
+/
+├── AGENTS.md
+├── README.md
+├── CHANGELOG.md
+├── package.json
+├── tsconfig.json
+├── next.config.ts
+├── eslint.config.mjs
+├── prettier.config.mjs
+├── .env.example
+├── .gitignore
+│
+├── docs/
+│   ├── architecture.md
+│   ├── design-system.md
+│   ├── product-domains.md
+│   ├── routing.md
+│   ├── database.md
+│   ├── payment.md
+│   ├── deployment.md
+│   └── adr/
+│
+├── skills/
+│   ├── frontend-architecture/
+│   │   └── SKILL.md
+│   ├── figma-to-nextjs/
+│   │   └── SKILL.md
+│   ├── database-prisma/
+│   │   └── SKILL.md
+│   ├── payment-mayar/
+│   │   └── SKILL.md
+│   ├── vps-deployment/
+│   │   └── SKILL.md
+│   └── refactor-large-files/
+│       └── SKILL.md
+│
+├── prisma/
+│   ├── schema.prisma
+│   ├── seed.ts
+│   └── migrations/
+│
+├── public/
+│   ├── images/
+│   ├── icons/
+│   ├── ornaments/
+│   ├── templates/
+│   └── uploads/
+│
+├── deploy/
+│   ├── docker/
+│   ├── Caddyfile
+│   ├── docker-compose.production.yml
+│   └── scripts/
+│
+└── src/
+    ├── app/
+    ├── components/
+    ├── features/
+    ├── server/
+    ├── hooks/
+    ├── lib/
+    ├── config/
+    ├── schemas/
+    ├── types/
+    ├── constants/
+    ├── assets/
+    └── generated/
+
+IMPORTANT:
+Do not create every possible directory before it is needed.
+Create feature directories as their domains are implemented.
+
+============================================================
+4. NEXT.JS APP DIRECTORY
+============================================================
+
+src/app is primarily for routing, layouts, metadata, loading, error boundaries, and page composition.
+
+Do NOT turn page.tsx into a business-logic container.
+
+Recommended:
+
+src/app/
+├── (public)/
+├── (customer)/
+├── (admin)/
+├── invitation/
+├── api/
+├── globals.css
+├── layout.tsx
+├── error.tsx
+├── loading.tsx
+└── not-found.tsx
+
+Use route groups to separate public/customer/admin experiences without changing URL structure.
+
+============================================================
+5. PUBLIC ROUTING
+============================================================
+
+Recommended routes:
+
+/
+ /templates
+ /templates/[slug]
+ /demo/[templateSlug]
+ /pricing
+ /faq
+ /blog
+ /blog/[slug]
+ /inspiration
+ /contact
+ /login
+ /register
+ /forgot-password
+ /reset-password
+ /verify-email
+
+Public routes should not require authentication.
+
+============================================================
+6. CUSTOMER ROUTING
+============================================================
+
+Recommended:
+
+/dashboard
+
+/dashboard/invitations
+/dashboard/invitations/new
+/dashboard/invitations/[invitationId]
+/dashboard/invitations/[invitationId]/editor
+/dashboard/invitations/[invitationId]/preview
+/dashboard/invitations/[invitationId]/guests
+/dashboard/invitations/[invitationId]/rsvp
+/dashboard/invitations/[invitationId]/wishes
+/dashboard/invitations/[invitationId]/gifts
+/dashboard/invitations/[invitationId]/analytics
+/dashboard/invitations/[invitationId]/settings
+
+/dashboard/billing/packages
+/dashboard/billing/checkout/[orderId]
+/dashboard/billing/payment/[paymentId]
+/dashboard/billing/transactions
+/dashboard/billing/transactions/[transactionId]
+/dashboard/billing/invoices/[invoiceId]
+/dashboard/billing/renew/[invitationId]
+
+/dashboard/notifications
+/dashboard/profile
+/dashboard/settings
+/dashboard/support
+/dashboard/support/[ticketId]
+
+============================================================
+7. WEDDING INVITATION ROUTING
+============================================================
+
+Customer-facing invitations should support clean URLs:
+
+https://menujuakad.com/asep-kirana
+
+Internally use a dedicated route:
+
+/invitation/[slug]
+
+Use middleware or equivalent route resolution to map:
+
+/asep-kirana
+
+to:
+
+/invitation/asep-kirana
+
+Reserved public paths must never be treated as invitation slugs.
+
+Reserved paths include at minimum:
+
+login
+register
+forgot-password
+reset-password
+dashboard
+admin
+templates
+demo
+pricing
+faq
+blog
+inspiration
+contact
+api
+invitation
+
+The invitation experience must remain mobile-first.
+
+============================================================
+8. CUSTOM DOMAIN PREPARATION
+============================================================
+
+The architecture must be prepared for future custom domains.
+
+Example:
+
+asepkirana.com
+
+The invitation should resolve to the correct invitation based on hostname.
+
+Do not implement custom-domain purchasing automatically unless explicitly required.
+
+Design the domain resolver so it can later support:
+
+primary hostname
+www hostname
+custom customer hostname
+default Menuju Akad slug
+
+Store custom domain information in the database.
+
+Suggested domain entity:
+
+CustomDomain
+- id
+- invitationId
+- hostname
+- status
+- verificationToken
+- verifiedAt
+- sslStatus
+- createdAt
+- updatedAt
+
+============================================================
+9. FEATURE DOMAINS
+============================================================
+
+Business domains:
+
+src/features/
+
+auth/
+templates/
+invitations/
+guests/
+rsvp/
+wishes/
+gifts/
+gallery/
+story/
+events/
+music/
+video/
+analytics/
+notifications/
+billing/
+payments/
+coupons/
+wedding/
+support/
+referrals/
+domains/
+memory/
+checkin/
+seating/
+
+Each feature may contain:
+
+components/
+hooks/
+actions/
+queries/
+services/
+schemas/
+types/
+constants/
+utils/
+
+Only add the directories actually required.
+
+============================================================
+10. SHARED COMPONENTS
+============================================================
+
+Generic visual components:
+
+src/components/ui/
+
+Examples:
+
+Button
+Input
+Textarea
+Select
+Checkbox
+Radio
+Switch
+Dialog
+Drawer
+Popover
+Tooltip
+Tabs
+Badge
+Card
+Table
+Pagination
+Calendar
+Progress
+Stepper
+Toast
+Alert
+Skeleton
+Avatar
+Separator
+
+Business-neutral shared components:
+
+src/components/shared/
+
+Examples:
+
+PageHeader
+EmptyState
+ConfirmDialog
+SearchInput
+FileUploader
+DateRangePicker
+ResponsiveContainer
+
+Customer-specific:
+
+src/components/customer/
+
+Admin-specific:
+
+src/components/admin/
+
+Guest invitation-specific:
+
+src/components/invitation/
+
+Do not place business-specific components in components/ui.
+
+============================================================
+11. FILE SIZE RULES
+============================================================
+
+Use warning thresholds:
+
+page.tsx:
+target < 120 lines
+
+React component:
+target < 200 lines
+
+hook:
+target < 200 lines
+
+service:
+target < 300 lines
+
+If approaching these limits, look for extraction opportunities.
+
+NEVER intentionally create a 1000+ line React file.
+
+If a file reaches approximately 400 lines, stop and evaluate decomposition.
+
+============================================================
+12. NO SPAGHETTI CODE
+============================================================
+
+Before adding substantial code to an existing file, ask internally:
+
+Can this become a component?
+Can this become a hook?
+Can this become an action?
+Can this become a query?
+Can this become a service?
+Can this become a schema?
+Can this become a repository?
+Can this become a utility?
+Can this become a type?
+Can this become a configuration object?
+
+Prefer small focused modules.
+
+Never create:
+
+DashboardEverything.tsx
+InvitationEditorEverything.tsx
+PaymentEverything.tsx
+UtilsFinal.ts
+HelperNew.ts
+
+============================================================
+13. PAGE COMPOSITION RULE
+============================================================
+
+Example:
+
+src/app/(customer)/dashboard/page.tsx
+
+should be similar to:
+
+import { DashboardOverview } from "@/features/dashboard/components/DashboardOverview";
+
+export default function DashboardPage() {
+  return <DashboardOverview />;
+}
+
+Do not put all dashboard logic inside page.tsx.
+
+============================================================
+14. DESIGN SYSTEM IMPLEMENTATION
+============================================================
+
+The existing Figma design has the Menuju Akad visual identity.
+
+Preserve the existing:
+
+- ivory / warm neutral direction
+- olive / botanical accents
+- editorial typography
+- romantic visual language
+- generous whitespace
+- premium card treatment
+- subtle borders
+- elegant ornaments
+
+Do not redesign the UI during slicing.
+
+The implementation objective is visual fidelity plus maintainable code.
+
+============================================================
+15. SVG ORNAMENT SYSTEM
+============================================================
+
+Store reusable wedding ornaments in:
+
+public/ornaments/
+
+or follow existing repository convention.
+
+Families:
+
+botanical
+floral
+romantic
+premium
+wedding
+islamic
+nusantara
+editorial
+background
+corners
+dividers
+frames
+
+Prefer reusable SVG assets rather than embedding giant SVG strings repeatedly inside JSX.
+
+Create an Ornament component where appropriate.
+
+Examples:
+
+<Ornament type="botanical" position="top-right" size="md" />
+
+<Ornament type="floral" variant="divider" />
+
+Use ornaments more richly in guest-facing invitations.
+
+Use ornaments sparingly in dashboards.
+
+============================================================
+16. DATA MODEL / ERD
+============================================================
+
+PostgreSQL is the canonical database.
+
+Provider:
+
+NEON
+
+ORM:
+
+PRISMA
+
+Logical ERD:
+
+USER
+  │
+  ├──< INVITATION_MEMBER >── INVITATION
+  │                           │
+  │                           ├── TEMPLATE
+  │                           ├── PACKAGE / ENTITLEMENT
+  │                           ├── COUPLE_PROFILE
+  │                           ├── INVITATION_SECTION
+  │                           ├── EVENT
+  │                           ├── STORY_ITEM
+  │                           ├── MEDIA_ASSET
+  │                           ├── GUEST
+  │                           │      │
+  │                           │      ├── GUEST_INVITATION
+  │                           │      ├── RSVP_RESPONSE
+  │                           │      ├── WISH
+  │                           │      └── GUEST_PHOTO
+  │                           │
+  │                           ├── GIFT_METHOD
+  │                           ├── ANALYTICS_EVENT
+  │                           ├── CUSTOM_DOMAIN
+  │                           └── INVITATION_ACTIVITY
+  │
+  ├──< ORDER
+  │       │
+  │       ├── ORDER_ITEM
+  │       ├── PAYMENT
+  │       │      ├── PAYMENT_WEBHOOK_EVENT
+  │       │      └── REFUND
+  │       └── INVOICE
+  │
+  ├──< COUPON_REDEMPTION >── COUPON
+  │
+  ├──< NOTIFICATION
+  ├──< SUPPORT_TICKET
+  │       └── SUPPORT_MESSAGE
+  │
+  ├──< REFERRAL
+  │
+  └──< AUDIT_LOG
+
+TEMPLATE
+  ├──< TEMPLATE_TAG
+  └──< TEMPLATE_FEATURE
+
+PACKAGE
+  └──< PACKAGE_FEATURE
+
+============================================================
+17. CORE DATABASE ENTITIES
+============================================================
+
+USER
+
+Purpose:
+Account owner / customer / admin.
+
+Suggested fields:
+
+id
+email
+emailVerifiedAt
+passwordHash if password auth is used
+name
+phone
+avatarUrl
+role
+status
+createdAt
+updatedAt
+lastLoginAt
+
+Roles:
+
+CUSTOMER
+SUPERADMIN
+
+If Auth.js or another auth solution is already present, preserve its required models.
+
+Do not mix authentication provider-specific assumptions into business entities unnecessarily.
+
+------------------------------------------------------------
+
+INVITATION
+
+Purpose:
+A wedding invitation owned by a customer.
+
+Fields:
+
+id
+ownerUserId
+templateId
+slug
+title
+status
+weddingDate
+timezone
+isPublished
+publishedAt
+startsAt
+expiresAt
+createdAt
+updatedAt
+
+Statuses:
+
+DRAFT
+PENDING_PAYMENT
+ACTIVE
+EXPIRING_SOON
+EXPIRED
+SUSPENDED
+ARCHIVED
+
+Unique:
+
+owner + slug rules must prevent collisions.
+
+Global slug uniqueness is recommended for default Menuju Akad URLs.
+
+------------------------------------------------------------
+
+INVITATION_MEMBER
+
+Purpose:
+Couple collaboration.
+
+Fields:
+
+id
+invitationId
+userId or invitedEmail
+role
+status
+createdAt
+updatedAt
+
+Roles:
+
+OWNER
+EDITOR
+VIEWER
+
+------------------------------------------------------------
+
+TEMPLATE
+
+Fields:
+
+id
+name
+slug
+description
+thumbnailUrl
+previewUrl
+category
+status
+isPremium
+usageCount
+createdAt
+updatedAt
+
+Statuses:
+
+DRAFT
+PUBLISHED
+HIDDEN
+ARCHIVED
+
+------------------------------------------------------------
+
+TEMPLATE_FEATURE
+
+Fields:
+
+templateId
+featureKey
+
+Feature examples:
+
+story
+gallery
+video
+music
+rsvp
+gift
+guestbook
+live-stream
+custom-domain
+
+------------------------------------------------------------
+
+PACKAGE
+
+Fields:
+
+id
+name
+slug
+description
+price
+currency
+durationDays
+status
+isFeatured
+sortOrder
+createdAt
+updatedAt
+
+Statuses:
+
+DRAFT
+ACTIVE
+INACTIVE
+ARCHIVED
+
+------------------------------------------------------------
+
+PACKAGE_FEATURE
+
+Fields:
+
+packageId
+featureKey
+
+------------------------------------------------------------
+
+COUPLE_PROFILE
+
+Fields:
+
+id
+invitationId
+groomFullName
+groomNickname
+groomParents
+groomBio
+groomPhoto
+groomSocial
+brideFullName
+brideNickname
+brideParents
+brideBio
+bridePhoto
+brideSocial
+createdAt
+updatedAt
+
+Keep sensitive or unnecessarily personal data out of analytics.
+
+------------------------------------------------------------
+
+INVITATION_SECTION
+
+Purpose:
+Flexible section configuration.
+
+Fields:
+
+id
+invitationId
+type
+title
+sortOrder
+isEnabled
+configJson
+createdAt
+updatedAt
+
+Types:
+
+COVER
+OPENING
+COUPLE
+STORY
+EVENT
+COUNTDOWN
+LOCATION
+GALLERY
+VIDEO
+MUSIC
+RSVP
+WISHES
+GIFT
+DRESS_CODE
+FAQ
+LIVE_STREAM
+HASHTAG
+CONTACT
+ADDITIONAL_INFO
+CLOSING
+
+Use JSON configuration for presentation-specific fields.
+
+Do not put core relational business entities only into JSON when they need querying.
+
+------------------------------------------------------------
+
+EVENT
+
+Fields:
+
+id
+invitationId
+name
+description
+eventDate
+startTime
+endTime
+timezone
+venueName
+address
+mapsUrl
+latitude
+longitude
+sortOrder
+createdAt
+updatedAt
+
+Examples:
+
+Akad Nikah
+Resepsi
+
+------------------------------------------------------------
+
+STORY_ITEM
+
+Fields:
+
+id
+invitationId
+year
+date
+title
+description
+imageUrl
+sortOrder
+createdAt
+updatedAt
+
+------------------------------------------------------------
+
+MEDIA_ASSET
+
+Fields:
+
+id
+ownerUserId
+invitationId nullable
+type
+storageKey
+url
+mimeType
+fileSize
+width
+height
+altText
+createdAt
+updatedAt
+
+Types:
+
+IMAGE
+VIDEO
+AUDIO
+OTHER
+
+Media quotas must be enforced according to the package.
+
+------------------------------------------------------------
+
+GUEST
+
+Fields:
+
+id
+invitationId
+name
+phone
+email nullable
+category
+guestCountAllowed
+notes
+status
+createdAt
+updatedAt
+
+Categories:
+
+FAMILY
+FRIEND
+WORK
+VIP
+VENDOR
+OTHER
+
+------------------------------------------------------------
+
+GUEST_INVITATION
+
+Purpose:
+Personalized invitation and activity tracking.
+
+Fields:
+
+id
+guestId
+invitationId
+personalToken
+personalSlug if needed
+sentAt
+openedAt
+lastOpenedAt
+lastDevice
+createdAt
+updatedAt
+
+Unique token required.
+
+Do not expose sequential database IDs in public personalized URLs.
+
+------------------------------------------------------------
+
+RSVP_RESPONSE
+
+Fields:
+
+id
+invitationId
+guestId
+status
+guestCount
+phone
+message
+respondedAt
+updatedAt
+
+Statuses:
+
+ATTENDING
+NOT_ATTENDING
+MAYBE
+PENDING
+
+Recommended unique constraint:
+
+invitationId + guestId
+
+------------------------------------------------------------
+
+WISH
+
+Fields:
+
+id
+invitationId
+guestId nullable
+name
+message
+status
+createdAt
+moderatedAt
+moderatedBy
+
+Statuses:
+
+PENDING
+APPROVED
+HIDDEN
+REJECTED
+
+------------------------------------------------------------
+
+GUEST_PHOTO
+
+Fields:
+
+id
+invitationId
+guestId nullable
+mediaAssetId
+status
+createdAt
+moderatedAt
+moderatedBy
+
+Statuses:
+
+PENDING
+APPROVED
+HIDDEN
+REJECTED
+
+------------------------------------------------------------
+
+GIFT_METHOD
+
+Purpose:
+Customer-configured digital gift option.
+
+Fields:
+
+id
+invitationId
+type
+label
+providerName
+accountName
+accountNumberMasked
+accountReferenceEncrypted if needed
+qrImageUrl
+address
+isEnabled
+sortOrder
+createdAt
+updatedAt
+
+Types:
+
+BANK
+EWALLET
+QRIS
+ADDRESS
+
+Do not assume Menuju Akad owns the guest gift money.
+
+This is a display/configuration feature unless a separate payment product is implemented.
+
+------------------------------------------------------------
+
+ANALYTICS_EVENT
+
+Fields:
+
+id
+invitationId
+guestId nullable
+eventType
+sessionId
+deviceType
+source
+path
+metadataJson
+createdAt
+
+Do not store unnecessary raw personal data.
+
+For high scale, build rollup tables later:
+
+INVITATION_DAILY_STATS
+
+------------------------------------------------------------
+18. BILLING / PAYMENT DATABASE
+------------------------------------------------------------
+
+ORDER
+
+Fields:
+
+id
+orderNumber
+userId
+invitationId nullable
+status
+currency
+subtotalAmount
+discountAmount
+feeAmount
+totalAmount
+couponId nullable
+expiresAt
+paidAt
+createdAt
+updatedAt
+
+Statuses:
+
+PENDING
+PROCESSING
+PAID
+FAILED
+EXPIRED
+CANCELLED
+REFUNDED
+
+Amount values must be stored in integer smallest currency unit appropriate for IDR.
+
+Do not rely on floating point money calculations.
+
+------------------------------------------------------------
+
+ORDER_ITEM
+
+Fields:
+
+id
+orderId
+packageId
+nameSnapshot
+quantity
+unitPrice
+totalPrice
+metadataJson
+
+Store snapshots of purchased product information so historical invoices remain stable even if package data later changes.
+
+------------------------------------------------------------
+
+PAYMENT
+
+Fields:
+
+id
+orderId
+provider
+method
+status
+providerPaymentId
+providerReference
+amount
+currency
+checkoutUrl nullable
+qrData nullable
+qrImageUrl nullable
+expiresAt
+paidAt
+failureCode nullable
+failureMessage nullable
+metadataJson
+createdAt
+updatedAt
+
+Provider:
+
+MAYAR
+
+Methods:
+
+QRIS
+EWALLET
+VIRTUAL_ACCOUNT
+BANK_TRANSFER
+CARD
+OTHER
+
+The provider-specific values must remain isolated from the general domain.
+
+------------------------------------------------------------
+
+PAYMENT_WEBHOOK_EVENT
+
+Fields:
+
+id
+provider
+providerEventId
+eventType
+orderId nullable
+paymentId nullable
+signatureVerified
+payloadJson
+status
+processedAt
+errorMessage nullable
+receivedAt
+
+Statuses:
+
+RECEIVED
+VERIFIED
+PROCESSED
+IGNORED
+FAILED
+
+Must support idempotency.
+
+Unique provider event key where available.
+
+------------------------------------------------------------
+
+INVOICE
+
+Fields:
+
+id
+orderId
+invoiceNumber
+status
+issuedAt
+dueAt
+paidAt
+pdfUrl nullable
+snapshotJson
+createdAt
+updatedAt
+
+Keep an immutable historical snapshot.
+
+------------------------------------------------------------
+
+REFUND
+
+Fields:
+
+id
+paymentId
+amount
+reason
+status
+providerRefundId nullable
+requestedAt
+processedAt
+createdAt
+updatedAt
+
+Statuses:
+
+REQUESTED
+APPROVED
+PROCESSING
+REFUNDED
+FAILED
+REJECTED
+
+============================================================
+19. COUPON DATABASE
+============================================================
+
+COUPON
+
+Fields:
+
+id
+code
+type
+value
+maxDiscountAmount nullable
+minOrderAmount nullable
+maxUsage nullable
+usedCount
+startsAt
+endsAt
+isActive
+packageId nullable
+createdAt
+updatedAt
+
+Types:
+
+PERCENTAGE
+FIXED
+
+------------------------------------------------------------
+
+COUPON_REDEMPTION
+
+Fields:
+
+id
+couponId
+userId
+orderId
+discountAmount
+createdAt
+
+Unique:
+
+couponId + orderId
+
+============================================================
+20. NOTIFICATIONS
+============================================================
+
+NOTIFICATION
+
+Fields:
+
+id
+userId
+type
+title
+message
+dataJson
+readAt
+createdAt
+
+Types:
+
+PAYMENT
+INVITATION
+GUEST
+RSVP
+WISH
+GIFT
+EXPIRATION
+SUPPORT
+SYSTEM
+
+============================================================
+21. SUPPORT
+============================================================
+
+SUPPORT_TICKET
+
+Fields:
+
+id
+userId
+subject
+category
+status
+priority
+createdAt
+updatedAt
+resolvedAt
+
+Categories:
+
+ACCOUNT
+INVITATION
+TEMPLATE
+PAYMENT
+QRIS
+GUEST
+RSVP
+DOMAIN
+GIFT
+TECHNICAL
+CUSTOM_REQUEST
+
+Statuses:
+
+OPEN
+IN_PROGRESS
+WAITING_CUSTOMER
+RESOLVED
+CLOSED
+
+SUPPORT_MESSAGE:
+
+id
+ticketId
+senderUserId nullable
+message
+attachmentUrl nullable
+createdAt
+
+============================================================
+22. REFERRAL
+============================================================
+
+REFERRAL_CODE
+
+id
+userId
+code
+status
+createdAt
+
+REFERRAL_REDEMPTION
+
+id
+referralCodeId
+referredUserId
+rewardStatus
+createdAt
+
+Do not build intrusive gamification.
+
+============================================================
+23. AUDIT LOG
+============================================================
+
+AUDIT_LOG
+
+Fields:
+
+id
+actorUserId nullable
+action
+entityType
+entityId
+beforeJson
+afterJson
+metadataJson
+createdAt
+
+Examples:
+
+INVITATION_UPDATED
+PAYMENT_VERIFIED
+PACKAGE_PRICE_CHANGED
+WEBHOOK_RECEIVED
+ADMIN_CHANGED_SETTINGS
+
+Never store secrets in audit logs.
+
+============================================================
+24. CUSTOM DOMAIN
+============================================================
+
+CUSTOM_DOMAIN
+
+Fields:
+
+id
+invitationId
+hostname
+status
+verificationToken
+verifiedAt
+sslStatus
+createdAt
+updatedAt
+
+Statuses:
+
+PENDING
+VERIFIED
+ACTIVE
+FAILED
+DISABLED
+
+============================================================
+25. SYSTEM / ADMIN
+============================================================
+
+FEATURE_FLAG
+
+id
+key
+enabled
+description
+updatedAt
+
+SYSTEM_SETTING
+
+id
+key
+valueJson
+updatedAt
+
+Do not store highly sensitive secrets in generic SYSTEM_SETTING.
+
+Secrets belong in environment variables or a proper secret manager.
+
+============================================================
+26. PRISMA + NEON RULES
+============================================================
+
+Use PostgreSQL on Neon.
+
+Use Prisma ORM.
+
+Before implementation:
+
+1. inspect installed Prisma version
+2. read the current Prisma documentation relevant to the installed version
+3. do not mix Prisma v6 and Prisma v7 configuration styles
+4. keep Prisma schema in prisma/schema.prisma
+5. keep migrations under prisma/migrations
+6. generate Prisma client according to current Prisma version
+7. use a singleton Prisma client for server runtime
+8. avoid creating a new PrismaClient per request
+
+For Neon:
+
+Use pooled runtime connection for application traffic.
+
+Use direct connection for CLI/migrations where required by the chosen Prisma/Neon setup.
+
+Recommended environment concept:
+
+DATABASE_URL=pooled runtime URL
+DIRECT_URL=direct migration URL
+
+Do not commit secrets.
+
+Create:
+
+.env.example
+
+with variable names only.
+
+The agent must adapt exact Prisma/Neon configuration to the versions already installed.
+
+============================================================
+27. PRISMA DATABASE WORKFLOW
+============================================================
+
+Development workflow:
+
+edit schema
+↓
+format
+↓
+validate
+↓
+migration
+↓
+generate client
+↓
+typecheck
+↓
+tests
+
+Never use prisma db push against production as a casual deployment mechanism.
+
+Production schema changes must be managed through controlled migrations.
+
+Before destructive migrations:
+
+create backup / verify restore capability.
+
+============================================================
+28. DATABASE INDEXING
+============================================================
+
+Create appropriate indexes for:
+
+User.email
+Invitation.slug
+Invitation.ownerUserId
+Invitation.status
+Invitation.expiresAt
+Invitation.weddingDate
+Guest.invitationId
+Guest.phone where useful
+GuestInvitation.personalToken
+RsvpResponse.invitationId
+RsvpResponse.guestId
+Order.orderNumber
+Order.userId
+Order.status
+Order.createdAt
+Payment.orderId
+Payment.providerPaymentId
+Payment.status
+PaymentWebhookEvent.providerEventId
+Notification.userId + readAt
+AuditLog.entityType + entityId
+CustomDomain.hostname
+
+Do not create indexes blindly.
+Review query patterns.
+
+============================================================
+29. MAYAR PAYMENT ARCHITECTURE
+============================================================
+
+Use Mayar as the external payment provider.
+
+IMPORTANT:
+
+The frontend must never be the source of truth for payment status.
+
+The system must trust only verified server-side payment confirmation.
+
+Recommended architecture:
+
+Customer UI
+    ↓
+Create internal Order
+    ↓
+Server Payment Service
+    ↓
+Mayar API
+    ↓
+Payment / QRIS
+    ↓
+Customer pays
+    ↓
+Mayar webhook
+    ↓
+Webhook endpoint
+    ↓
+Signature / authenticity verification
+    ↓
+Idempotency check
+    ↓
+Payment update
+    ↓
+Order update
+    ↓
+Activation / entitlement update
+    ↓
+Notification
+    ↓
+Customer dashboard refresh
+
+============================================================
+30. MAYAR INTEGRATION DIRECTORY
+============================================================
+
+Use:
+
+src/server/integrations/mayar/
+
+Recommended:
+
+client.ts
+payments.ts
+invoices.ts
+qris.ts
+webhooks.ts
+types.ts
+errors.ts
+
+Then:
+
+src/features/payments/
+
+components/
+hooks/
+actions/
+queries/
+services/
+schemas/
+types/
+constants/
+
+The Mayar integration layer should not leak provider-specific implementation into UI components.
+
+============================================================
+31. MAYAR PAYMENT STATES
+============================================================
+
+Internal normalized payment states:
+
+PENDING
+PROCESSING
+PAID
+FAILED
+EXPIRED
+CANCELLED
+REFUNDED
+
+Map Mayar provider states into this internal enum.
+
+Do not let provider-specific status strings spread throughout the frontend.
+
+============================================================
+32. QRIS FLOW
+============================================================
+
+Customer flow:
+
+Choose Package
+↓
+Checkout
+↓
+Create Order
+↓
+Create Mayar Payment
+↓
+Select QRIS
+↓
+Display QRIS
+↓
+Pending
+↓
+Payment Provider Confirms
+↓
+Webhook Received
+↓
+Verify
+↓
+Idempotency Check
+↓
+Mark Payment Paid
+↓
+Mark Order Paid
+↓
+Activate Invitation Package
+↓
+Generate / finalize Invoice
+↓
+Notify Customer
+↓
+Show Success UI
+
+QRIS screen must show:
+
+- amount
+- QRIS code
+- instructions
+- expiration
+- timer
+- payment status
+- transaction reference
+- support action
+
+No manual screenshot verification.
+
+============================================================
+33. QRIS UI STATES
+============================================================
+
+Create UI for:
+
+1. PENDING
+"Menunggu pembayaran"
+
+2. PROCESSING
+"Pembayaran sedang diperiksa"
+
+3. PAID
+"Pembayaran berhasil"
+
+4. FAILED
+"Pembayaran belum berhasil"
+
+5. EXPIRED
+"QRIS telah kedaluwarsa"
+
+6. CANCELLED
+"Pembayaran dibatalkan"
+
+7. REFUNDED
+"Pembayaran telah dikembalikan"
+
+Each state must have:
+
+icon
+status label
+explanation
+next action
+
+Do not communicate status by color alone.
+
+============================================================
+34. PAYMENT WEBHOOK SECURITY
+============================================================
+
+Webhook endpoint:
+
+POST /api/webhooks/mayar
+
+The route must:
+
+1. read raw request body when signature verification requires it
+2. verify provider authenticity using the current official Mayar webhook mechanism
+3. reject invalid signatures
+4. identify the payment/order
+5. check idempotency
+6. store webhook event
+7. process status transition safely
+8. update order/payment
+9. activate entitlement only once
+10. record failures
+11. return appropriate 2xx only after accepted processing semantics
+
+Do not log secret values.
+
+Do not expose webhook payloads to customers.
+
+Do not trust frontend success redirects as proof of payment.
+
+============================================================
+35. PAYMENT IDENTITY / PRICE SECURITY
+============================================================
+
+Never trust:
+
+- product price from frontend
+- payment amount from browser
+- payment status from browser
+- arbitrary order status from URL
+- screenshot of transfer
+- client-provided "paid=true"
+
+Server must obtain authoritative order/package price from database.
+
+Server creates the order amount.
+
+Provider confirmation is validated server-side.
+
+============================================================
+36. PAYMENT IDEMPOTENCY
+============================================================
+
+Repeated webhook delivery must not cause:
+
+two orders
+two invoices
+two package activations
+two entitlements
+two rewards
+
+Use provider event identifiers or stable payment references.
+
+Store processed webhook events.
+
+Make order/payment status transitions idempotent.
+
+============================================================
+37. PAYMENT RETRY
+============================================================
+
+When QRIS expires or payment fails:
+
+Do not mutate the historical payment attempt into a successful one.
+
+Create a new payment attempt or payment record while preserving historical state.
+
+Customer sees:
+
+Previous payment:
+EXPIRED
+
+New action:
+
+"Bayar Kembali"
+
+============================================================
+38. MAYAR DEVELOPMENT TOOLING
+============================================================
+
+If useful to the coding agent, Mayar currently provides:
+
+- REST API
+- CLI
+- SKILL.md
+- MCP server
+
+Use the current official Mayar API documentation as source of truth for request schemas and endpoint details.
+
+Do not make application runtime dependent on Mayar MCP.
+
+MCP/CLI is a developer-agent aid.
+
+Application runtime should use a proper server-side integration layer.
+
+============================================================
+39. MAYAR QRIS
+============================================================
+
+Prefer dynamic QRIS where appropriate for one-time customer package payments.
+
+Store only necessary QR/payment metadata.
+
+Respect provider expiration.
+
+Do not generate a fake QRIS in production.
+
+If the provider API is unavailable in development, use a mocked provider adapter.
+
+============================================================
+40. PAYMENT PROVIDER ABSTRACTION
+============================================================
+
+Keep business logic provider-neutral.
+
+Example:
+
+interface PaymentProvider {
+  createPayment(...)
+  getPayment(...)
+  verifyWebhook(...)
+  parseWebhook(...)
+  createRefund(...)
+}
+
+Implement:
+
+MayarPaymentProvider
+
+This makes future provider replacement possible without rewriting the billing domain.
+
+============================================================
+41. CUSTOMER BILLING ROUTES
+============================================================
+
+UI:
+
+/dashboard/billing/packages
+/dashboard/billing/checkout/[orderId]
+/dashboard/billing/payment/[paymentId]
+/dashboard/billing/transactions
+/dashboard/billing/transactions/[transactionId]
+/dashboard/billing/invoices/[invoiceId]
+/dashboard/billing/renew/[invitationId]
+
+============================================================
+42. INVITATION ACTIVATION
+============================================================
+
+Payment success alone is not the only condition.
+
+Activation requires:
+
+valid order
++
+valid paid payment
++
+matching amount
++
+matching customer
++
+matching package
++
+not already fulfilled
+
+Then create/update invitation entitlement.
+
+Record activation timestamp.
+
+============================================================
+43. CUSTOMER DASHBOARD
+============================================================
+
+Dashboard should show:
+
+Wedding countdown
+Active invitation
+Invitation status
+Completion percentage
+Next best action
+Guest count
+RSVP
+Visits
+Wishes
+Gift activity
+Payment status
+Expiration
+Recent activity
+Notifications
+
+Use one primary "Next Best Action".
+
+Examples:
+
+"Lengkapi Cerita Cinta"
+"Tambahkan foto"
+"Publish Undangan"
+"Kirim reminder RSVP"
+
+============================================================
+44. INVITATION EDITOR
+============================================================
+
+Editor sections:
+
+Cover
+Opening
+Couple
+Story
+Events
+Countdown
+Location
+Gallery
+Video
+Music
+RSVP
+Wishes
+Gift
+Dress Code
+FAQ
+Live Streaming
+Hashtag
+Contact
+Additional Information
+Closing
+
+Editor capabilities:
+
+edit
+save
+autosave
+preview
+hide/show
+reorder
+duplicate
+delete
+
+Do not store all editor behavior inside one component.
+
+============================================================
+45. SMART CONTENT ASSISTANCE
+============================================================
+
+Optional AI content helpers:
+
+Bantu Tulis
+Rapikan Kalimat
+Lebih Romantis
+Lebih Formal
+Lebih Islami
+Lebih Singkat
+
+Keep AI assistance optional.
+
+Never block ordinary editing.
+
+============================================================
+46. GUEST MANAGEMENT
+============================================================
+
+Support:
+
+add
+edit
+delete
+search
+filter
+segments
+categories
+import CSV
+import spreadsheet
+export
+personalized link
+QR
+WhatsApp sharing
+sent status
+opened status
+RSVP status
+check-in
+
+============================================================
+47. RSVP
+============================================================
+
+Support:
+
+attendance
+guest count
+event selection when enabled
+message
+special needs when enabled
+
+Customer statistics:
+
+attending
+not attending
+pending
+
+Guest success state:
+
+"Terima kasih, jawaban Anda telah kami terima."
+
+============================================================
+48. ANALYTICS
+============================================================
+
+Track:
+
+views
+unique visitors where appropriate
+personalized link opens
+RSVP conversion
+device
+source
+wishes
+gift interaction
+
+Create actionable insights.
+
+Example:
+
+"34 tamu belum RSVP."
+
+CTA:
+
+"Kirim Pengingat"
+
+Do not build analytics that is only decorative.
+
+============================================================
+49. WEDDING PREPARATION
+============================================================
+
+Optional future-ready modules:
+
+wedding checklist
+wedding timeline
+seating
+event check-in
+memory mode
+post-wedding guestbook
+
+Keep these modular so they can be enabled by feature flag or package.
+
+============================================================
+50. PUBLIC MARKETING
+============================================================
+
+Public pages:
+
+Landing
+Templates
+Template Detail
+Demo
+Pricing
+FAQ
+Blog
+Inspiration
+Contact
+
+Landing must feel like a premium wedding brand.
+
+Not like a generic software landing page.
+
+============================================================
+51. ADMIN ROUTING
+============================================================
+
+/admin
+/admin/customers
+/admin/customers/[id]
+/admin/invitations
+/admin/invitations/[id]
+/admin/templates
+/admin/templates/[id]
+/admin/packages
+/admin/orders
+/admin/transactions
+/admin/transactions/[id]
+/admin/payments
+/admin/payments/[id]
+/admin/qris
+/admin/webhooks
+/admin/coupons
+/admin/content
+/admin/blog
+/admin/analytics
+/admin/support
+/admin/moderation
+/admin/audit-logs
+/admin/system
+/admin/system/health
+/admin/system/features
+/admin/settings
+
+============================================================
+52. ADMIN RESPONSIBILITY
+============================================================
+
+Superadmin can manage:
+
+customers
+invitations
+templates
+packages
+transactions
+payments
+QRIS
+webhooks
+coupons
+content
+blog
+analytics
+support
+moderation
+audit
+system health
+feature flags
+settings
+
+Admin UI is desktop-first.
+
+============================================================
+53. PAYMENT ADMIN
+============================================================
+
+Admin payment detail should show:
+
+customer
+order
+invoice
+package
+amount
+method
+provider
+provider payment ID
+status
+created
+expires
+paid
+webhook status
+verification
+timeline
+
+Use normalized internal states.
+
+============================================================
+54. PAYMENT RECONCILIATION
+============================================================
+
+Admin can inspect:
+
+Matched
+Mismatch
+Pending Verification
+Duplicate
+Webhook Issue
+
+Compare:
+
+internal order
+internal payment
+provider reference
+provider amount
+provider status
+webhook history
+
+Provide a safe resolution workflow.
+
+Never silently overwrite historical payment data.
+
+============================================================
+55. WEBHOOK MONITORING
+============================================================
+
+Admin view:
+
+received
+verified
+processed
+failed
+ignored
+
+Show:
+
+event ID
+type
+provider
+received time
+related payment
+processing time
+error if any
+
+Provide retry action when supported and safe.
+
+============================================================
+56. VPS DEPLOYMENT
+============================================================
+
+The project will be deployed on an existing VPS.
+
+Domain:
+
+menujuakad.com
+
+Do not assume the VPS is empty.
+
+FIRST inspect:
+
+- OS
+- existing Docker
+- existing Nginx
+- existing Caddy
+- existing containers
+- existing services
+- open ports
+- firewall
+- DNS
+- current domain usage
+- existing reverse proxy
+- CPU
+- RAM
+- disk
+- Node/Docker versions
+
+Do not destroy existing configuration.
+
+============================================================
+57. RECOMMENDED PRODUCTION STACK
+============================================================
+
+Preferred if the VPS is suitable:
+
+Docker Compose
++
+Next.js production container
++
+Caddy or existing Nginx reverse proxy
++
+HTTPS
++
+Neon PostgreSQL
+
+If Caddy is already present, reuse it.
+
+If Nginx is already established, reuse Nginx.
+
+Do not run two competing reverse proxies on the same port.
+
+============================================================
+58. PRODUCTION SERVICES
+============================================================
+
+Application:
+
+Next.js
+
+Database:
+
+Neon PostgreSQL
+
+Payment:
+
+Mayar
+
+Reverse proxy:
+
+Caddy OR Nginx
+
+HTTPS:
+
+Let's Encrypt / reverse proxy managed TLS
+
+Storage:
+
+Use existing configured object storage or provider where applicable.
+
+Do not store large customer photos directly in the application container filesystem as the only copy.
+
+============================================================
+59. DOMAIN CONFIGURATION
+============================================================
+
+Primary:
+
+https://menujuakad.com
+
+Recommended DNS:
+
+A @ → VPS IPv4
+CNAME www → @
+
+If IPv6 is intentionally configured, add AAAA accordingly.
+
+Do not change DNS records without access.
+
+If the agent cannot access the DNS provider, report exactly which records the owner must create.
+
+============================================================
+60. DOMAIN / HTTPS VERIFICATION
+============================================================
+
+After deployment verify:
+
+https://menujuakad.com
+https://www.menujuakad.com if enabled
+
+Verify:
+
+TLS
+redirect behavior
+HTTP → HTTPS
+www canonical behavior
+security headers
+application health
+
+Do not expose internal app port directly to the Internet when a reverse proxy is used.
+
+============================================================
+61. PRODUCTION ENVIRONMENT
+============================================================
+
+Create .env.example.
+
+Expected variables may include:
+
+NODE_ENV
+DATABASE_URL
+DIRECT_URL
+NEXT_PUBLIC_APP_URL
+SESSION_SECRET / AUTH_SECRET depending on auth system
+MAYAR_API_KEY
+MAYAR_API_BASE_URL if supported
+MAYAR_WEBHOOK_SECRET or verification key if required by the current provider setup
+STORAGE variables if used
+EMAIL variables if used
+
+NEVER commit real secrets.
+
+NEVER place secrets in frontend code.
+
+============================================================
+62. VPS DEPLOYMENT WORKFLOW
+============================================================
+
+Preferred deployment flow:
+
+Git push
+↓
+build
+↓
+tests
+↓
+docker image build
+↓
+deploy
+↓
+database migration
+↓
+health check
+↓
+traffic continues
+
+If using a CI/CD pipeline, use environment secrets.
+
+If deploying manually:
+
+pull
+build
+run migration
+restart app
+health check
+
+Do not migrate after starting a partially incompatible application.
+
+Use backward-compatible migrations where practical.
+
+============================================================
+63. HEALTH CHECK
+============================================================
+
+Add:
+
+GET /api/health
+
+Check at minimum:
+
+application
+database connectivity
+
+Do not expose secret values.
+
+Optional:
+
+/api/health/ready
+/api/health/live
+
+============================================================
+64. LOGGING
+============================================================
+
+Logs must include enough context for debugging.
+
+Do not log:
+
+passwords
+API keys
+secret tokens
+raw payment secrets
+private financial data
+
+Payment logs may include:
+
+order ID
+payment ID
+provider reference
+status
+timestamp
+
+============================================================
+65. ERROR BOUNDARIES
+============================================================
+
+Create meaningful:
+
+global error
+customer error
+admin error
+invitation error
+
+Customer-facing messages must be human-friendly.
+
+Never show stack traces to customers.
+
+============================================================
+66. SECURITY
+============================================================
+
+Minimum:
+
+secure password hashing if applicable
+session security
+CSRF protection where applicable
+XSS prevention
+input validation
+file validation
+upload limits
+rate limiting
+authorization
+RBAC
+webhook verification
+audit logging
+secure headers
+secret isolation
+
+Every admin route must enforce admin authorization.
+
+Every customer resource must enforce ownership or invitation membership.
+
+Never allow IDOR.
+
+============================================================
+67. AUTHORIZATION
+============================================================
+
+Authorization must be checked server-side.
+
+Customer:
+
+can access only their own account and authorized invitations.
+
+Invitation collaborators:
+
+only according to OWNER / EDITOR / VIEWER role.
+
+Superadmin:
+
+global access according to role.
+
+Never trust a role supplied by the client.
+
+============================================================
+68. MEDIA UPLOAD SECURITY
+============================================================
+
+Validate:
+
+file type
+mime
+size
+dimensions
+extension
+
+Do not trust client-provided filename or MIME only.
+
+Consider content validation and safe storage.
+
+Use random storage keys.
+
+Do not expose internal storage paths.
+
+============================================================
+69. Figma MCP
+============================================================
+
+Figma MCP is a developer-agent integration, not an application runtime dependency.
+
+When the coding agent is connected to Figma MCP:
+
+Use it to inspect:
+
+frames
+layout
+components
+variables
+design tokens
+assets
+responsive intent
+
+Do not make the production application depend on Figma MCP.
+
+============================================================
+70. FIGMA MCP CODEx SETUP
+============================================================
+
+For Codex CLI, use the current official Figma remote MCP setup.
+
+Command:
+
+codex mcp add figma --url https://mcp.figma.com/mcp
+
+Authenticate when prompted.
+
+Verify with:
+
+codex mcp list
+
+The agent must recognize whether Figma MCP is actually available before claiming it can inspect Figma.
+
+If not connected:
+
+DO NOT pretend.
+
+Report:
+
+"Figma MCP is not available in this Codex session."
+
+Then provide the exact command and authentication step required.
+
+============================================================
+71. FIGMA-TO-CODE WORKFLOW
+============================================================
+
+When given a Figma URL or design frame:
+
+1. inspect the Figma design
+2. identify existing code components
+3. identify reusable Figma components
+4. map Figma component → code component
+5. inspect assets
+6. inspect responsive variants
+7. identify missing components
+8. implement feature
+9. compare against Figma
+10. run validation
+
+Do not blindly convert every frame into one React component.
+
+============================================================
+72. FIGMA SOURCE OF TRUTH
+============================================================
+
+For UI:
+
+Figma is visual source of truth.
+
+For business logic:
+
+product/domain specification is source of truth.
+
+For existing technical behavior:
+
+repository code is source of truth until intentionally migrated.
+
+For database:
+
+Prisma schema is source of truth after migration.
+
+For payment provider behavior:
+
+current Mayar official documentation is source of truth.
+
+For infrastructure:
+
+actual VPS configuration is source of truth.
+
+============================================================
+73. CODING AGENT SKILLS
+============================================================
+
+Create and maintain:
+
+skills/frontend-architecture/SKILL.md
+skills/figma-to-nextjs/SKILL.md
+skills/database-prisma/SKILL.md
+skills/payment-mayar/SKILL.md
+skills/vps-deployment/SKILL.md
+skills/refactor-large-files/SKILL.md
+
+Each skill must have:
+
+- YAML front matter
+- name
+- description
+- focused instructions
+- decision rules
+- validation checklist
+
+Skills must be narrow and task-oriented.
+
+Do not put the entire product specification inside every skill.
+
+============================================================
+74. FRONTEND ARCHITECTURE SKILL
+============================================================
+
+Must enforce:
+
+- thin pages
+- feature boundaries
+- UI/business separation
+- reusable components
+- typed contracts
+- small files
+- no giant components
+- no duplicate logic
+- server/client boundary discipline
+
+============================================================
+75. FIGMA-TO-NEXTJS SKILL
+============================================================
+
+Must enforce:
+
+Figma
+↓
+inspect
+↓
+component mapping
+↓
+asset mapping
+↓
+responsive mapping
+↓
+implementation
+↓
+visual verification
+
+It must never generate a giant page component by default.
+
+============================================================
+76. DATABASE-PRISMA SKILL
+============================================================
+
+Must enforce:
+
+- inspect Prisma version
+- current Prisma docs
+- migration discipline
+- typed queries
+- transaction safety
+- indexes
+- relation ownership
+- no raw queries without reason
+- Neon-compatible connection handling
+
+============================================================
+77. PAYMENT-MAYAR SKILL
+============================================================
+
+Must enforce:
+
+- current official Mayar docs
+- provider abstraction
+- server-side price calculation
+- webhook verification
+- idempotency
+- normalized statuses
+- audit trail
+- retry behavior
+- no frontend trust
+- no secret leakage
+
+============================================================
+78. VPS DEPLOYMENT SKILL
+============================================================
+
+Must enforce:
+
+- inspect existing VPS
+- do not destroy configuration
+- backup before risky changes
+- reverse proxy reuse
+- TLS
+- health check
+- logs
+- safe restart
+- migration discipline
+- rollback awareness
+
+============================================================
+79. REFACTOR-LARGE-FILES SKILL
+============================================================
+
+When a file is too large:
+
+1. identify responsibilities
+2. extract components
+3. extract hooks
+4. extract actions
+5. extract services
+6. extract schemas/types
+7. preserve behavior
+8. typecheck
+9. test
+10. visually verify
+
+Do not rewrite the entire feature without reason.
+
+============================================================
+80. DOCUMENTATION FILES
+============================================================
+
+Maintain:
+
+docs/architecture.md
+docs/routing.md
+docs/database.md
+docs/payment.md
+docs/deployment.md
+docs/design-system.md
+
+Update documentation when architecture changes materially.
+
+============================================================
+81. ROUTING DOCUMENT
+============================================================
+
+Document all:
+
+public routes
+customer routes
+admin routes
+guest invitation routes
+webhook routes
+health routes
+
+Also document reserved slug paths.
+
+============================================================
+82. DATABASE MIGRATION POLICY
+============================================================
+
+Before migration:
+
+- inspect current production state
+- create safe migration
+- test locally
+- verify rollback strategy where possible
+
+Never casually delete production data.
+
+For changes to financial records, prefer append-only history over destructive edits.
+
+============================================================
+83. MONEY / FINANCIAL DATA
+============================================================
+
+Money is integer-based.
+
+Example for IDR:
+
+149000
+
+Never use binary floating point for monetary calculations.
+
+Store:
+
+subtotal
+discount
+fee
+total
+
+separately.
+
+Invoices preserve historical values.
+
+============================================================
+84. ORDER STATUS TRANSITIONS
+============================================================
+
+Allowed conceptual transitions:
+
+PENDING → PROCESSING
+PENDING → EXPIRED
+PENDING → CANCELLED
+PROCESSING → PAID
+PROCESSING → FAILED
+PAID → REFUNDED
+
+Do not allow arbitrary state jumps.
+
+Centralize transition rules.
+
+============================================================
+85. INVITATION STATUS TRANSITIONS
+============================================================
+
+Draft:
+
+DRAFT
+↓
+PENDING_PAYMENT
+↓
+ACTIVE
+↓
+EXPIRING_SOON
+↓
+EXPIRED
+
+Additional:
+
+ACTIVE
+→ SUSPENDED
+→ ACTIVE
+
+Draft may be edited.
+
+Expired data is not automatically deleted.
+
+============================================================
+86. CUSTOMER EXPERIENCE QUALITY
+============================================================
+
+Customer should always understand:
+
+where they are
+what is done
+what remains
+whether changes are saved
+whether payment is complete
+whether invitation is active
+when invitation expires
+what to do next
+
+Use warm Indonesian microcopy.
+
+============================================================
+87. ACCESSIBILITY
+============================================================
+
+Use:
+
+semantic HTML
+accessible labels
+focus states
+keyboard support where appropriate
+large tap targets
+sufficient contrast
+status + icon + text
+reduced-motion consideration
+
+Do not depend on color alone.
+
+============================================================
+88. PERFORMANCE
+============================================================
+
+Priority:
+
+fast initial load
+optimized images
+lazy loading
+progressive gallery
+lightweight invitation
+minimal JavaScript
+appropriate caching
+responsive media
+sensible animation
+
+Principle:
+
+"ELEGANT, NOT HEAVY."
+
+============================================================
+89. TEST STRATEGY
+============================================================
+
+Implement tests appropriate to:
+
+validation
+business rules
+payment status mapping
+webhook idempotency
+authorization
+important services
+critical UI interactions
+
+At minimum before declaring a significant feature complete:
+
+typecheck
+lint
+tests
+build
+manual UI verification
+
+============================================================
+90. DEFINITION OF DONE
+============================================================
+
+A feature is not complete because the page renders.
+
+It is complete when:
+
+- UI exists
+- responsive behavior exists
+- loading exists
+- empty exists
+- error exists
+- success exists
+- authorization exists
+- validation exists
+- server/business logic is separated
+- types are correct
+- tests are present where appropriate
+- typecheck passes
+- lint passes
+- build passes
+- visual comparison is checked
+- no obvious duplicated code exists
+- no giant file was introduced
+
+============================================================
+91. AGENT WORKFLOW FOR EVERY LARGE TASK
+============================================================
+
+Before coding:
+
+1. inspect repository
+2. inspect relevant Figma
+3. inspect existing components
+4. inspect existing feature
+5. inspect database schema
+6. inspect API/integration
+7. create implementation plan
+8. identify files to add/change
+9. implement smallest safe increment
+10. test
+11. review architecture
+12. refactor if necessary
+13. verify UI
+14. update docs if required
+
+============================================================
+92. DO NOT MODIFY UNRELATED FEATURES
+============================================================
+
+For example:
+
+Task:
+"Implement customer QRIS checkout."
+
+Do not simultaneously rewrite:
+
+template system
+dashboard
+admin
+guest management
+
+unless the implementation truly requires it.
+
+Keep changes scoped.
+
+============================================================
+93. NO DUPLICATED BUSINESS LOGIC
+============================================================
+
+Do not duplicate:
+
+price calculation
+coupon calculation
+payment status mapping
+slug validation
+permission checks
+RSVP rules
+package feature rules
+
+Centralize each business rule.
+
+============================================================
+94. CONFIGURATION
+============================================================
+
+Centralize non-secret configuration:
+
+src/config/
+
+Examples:
+
+routes
+feature defaults
+package display metadata
+invitation limits
+upload limits
+status labels
+
+Never hardcode business values in many unrelated files.
+
+============================================================
+95. STATUS LABEL SYSTEM
+============================================================
+
+Internal enum values stay stable.
+
+UI labels can be localized.
+
+Example:
+
+Internal:
+PAID
+
+Customer:
+"Pembayaran berhasil"
+
+Admin:
+"Paid"
+
+Do not use UI strings as database enum values.
+
+============================================================
+96. LOCALIZATION PREPARATION
+============================================================
+
+Current UI language:
+
+Bahasa Indonesia.
+
+Code should avoid embedding language-specific strings deep inside business logic.
+
+Keep reusable UI copy close to presentation/configuration.
+
+Future English support should remain possible.
+
+============================================================
+97. SEO
+============================================================
+
+Public pages need:
+
+title
+description
+Open Graph metadata
+Twitter/social preview where useful
+canonical URL
+
+Invitation pages should have social preview:
+
+couple name
+wedding date
+cover photo
+invitation title
+
+Do not leak private guest information into public SEO metadata.
+
+============================================================
+98. INVITATION PRIVACY
+============================================================
+
+Personalized guest names should not accidentally become indexable public content.
+
+Consider noindex behavior for personalized invitation URLs where appropriate.
+
+Avoid exposing guest lists publicly.
+
+============================================================
+99. OBSERVABILITY
+============================================================
+
+Track critical system events:
+
+order created
+payment created
+payment webhook received
+payment verified
+payment failed
+invitation activated
+invitation published
+invitation expired
+
+Use structured logging.
+
+============================================================
+100. BUSINESS FUNNEL
+============================================================
+
+Product funnel:
+
+Landing Visitor
+↓
+Template Viewer
+↓
+Template Selected
+↓
+Register
+↓
+Invitation Created
+↓
+Editor Completion
+↓
+Checkout
+↓
+Payment
+↓
+Invitation Published
+↓
+Invitation Shared
+↓
+Guest Opens
+↓
+RSVP
+
+Design analytics to measure each step.
+
+============================================================
+101. GROWTH FEATURES
+============================================================
+
+Useful growth mechanisms:
+
+template recommendation
+favorite templates
+template comparison
+personalized template quiz
+referral
+share flows
+social proof
+post-wedding memory mode
+couple collaboration
+reminder center
+smart next actions
+
+No dark patterns.
+
+============================================================
+102. OPTIONAL PREMIUM FEATURES
+============================================================
+
+Future/premium:
+
+custom domain
+AI writing helper
+guestbook
+guest photo
+live streaming
+QR check-in
+seating arrangement
+wedding checklist
+wedding timeline
+advanced analytics
+WhatsApp automation
+memory mode
+
+Features should be modular and feature-flag capable.
+
+============================================================
+103. FIRST IMPLEMENTATION PHASE
+============================================================
+
+If the repository is not yet structured:
+
+PHASE 1
+Inspect repository and preserve existing stack.
+
+PHASE 2
+Install / verify:
+
+Next.js
+TypeScript
+Prisma
+Neon driver/adapter as required
+validation library
+testing tools appropriate to stack
+
+PHASE 3
+Create architecture directories.
+
+PHASE 4
+Create AGENTS.md if absent.
+
+PHASE 5
+Create architecture docs.
+
+PHASE 6
+Set up Prisma schema and Neon connection.
+
+PHASE 7
+Seed development data.
+
+PHASE 8
+Set up authentication/authorization.
+
+PHASE 9
+Implement shared UI primitives.
+
+PHASE 10
+Connect Figma MCP.
+
+PHASE 11
+Implement public pages.
+
+PHASE 12
+Implement customer dashboard.
+
+PHASE 13
+Implement invitation editor.
+
+PHASE 14
+Implement guest/RSVP.
+
+PHASE 15
+Implement billing/payment/QRIS.
+
+PHASE 16
+Implement admin.
+
+PHASE 17
+Deploy to VPS.
+
+Do not attempt to implement everything in one giant coding operation.
+
+============================================================
+104. FIRST TASK FOR THE CODING AGENT
+============================================================
+
+Before creating major application code, inspect the repository.
+
+Output:
+
+A. Existing stack
+B. Existing routes
+C. Existing components
+D. Existing database
+E. Existing auth
+F. Existing payment
+G. Existing deployment
+H. Existing Figma MCP status if accessible
+I. Architecture gaps
+J. Refactor risks
+
+Then propose the smallest safe migration plan.
+
+If the repository is empty, scaffold the project according to this specification.
+
+If the repository is partially built, integrate into it.
+
+============================================================
+105. FIGMA MCP STATUS CHECK
+============================================================
+
+When the user provides a Figma URL:
+
+First verify whether Figma MCP is available to the current Codex session.
+
+If available:
+
+inspect the design.
+
+If unavailable:
+
+state clearly:
+
+"Figma MCP is not connected in this session."
+
+Do not fabricate Figma observations.
+
+Recommended Codex command:
+
+codex mcp add figma --url https://mcp.figma.com/mcp
+
+Then authenticate.
+
+Verify:
+
+codex mcp list
+
+============================================================
+106. MCP SEPARATION PRINCIPLE
+============================================================
+
+Figma MCP:
+
+developer/design context
+
+Mayar MCP/CLI:
+
+developer/payment tooling if useful
+
+Application runtime:
+
+REST/API integrations and application services
+
+Do not make production requests through an agent-only MCP connection.
+
+============================================================
+107. DEPLOYMENT SAFETY
+============================================================
+
+Before changing VPS configuration:
+
+inspect first.
+
+Before replacing reverse proxy:
+
+backup configuration.
+
+Before changing DNS:
+
+inspect current records.
+
+Before migration:
+
+validate schema and backup strategy.
+
+Before restart:
+
+build and health-check.
+
+Never wipe an existing server just to make deployment easier.
+
+============================================================
+108. ROLLBACK PRINCIPLE
+============================================================
+
+Every production deployment should have a rollback strategy.
+
+Possible:
+
+previous image
+previous commit
+database migration rollback strategy
+reverse proxy previous config
+
+Do not claim rollback is possible unless it is actually prepared.
+
+============================================================
+109. README REQUIREMENTS
+============================================================
+
+README must contain:
+
+what Menuju Akad is
+stack
+local setup
+environment variables
+database setup
+migration
+seed
+development
+testing
+build
+deployment
+Figma MCP setup
+Mayar integration overview
+
+============================================================
+110. FINAL QUALITY BAR
+============================================================
+
+Menuju Akad must feel like:
+
+premium wedding product
++
+modern SaaS
++
+simple UX
++
+strong engineering
+
+The code must feel:
+
+organized
+predictable
+typed
+modular
+testable
+documented
+safe
+
+The UI must feel:
+
+romantic
+elegant
+warm
+premium
+fast
+personal
+
+============================================================
+111. MASTER RULE
+============================================================
+
+WHENEVER THERE IS A CHOICE BETWEEN:
+
+ONE HUGE FILE
+
+and
+
+SEVERAL SMALL, WELL-OWNED FILES
+
+choose the modular solution.
+
+WHENEVER THERE IS A CHOICE BETWEEN:
+
+DUPLICATING LOGIC
+
+and
+
+REUSING A WELL-NAMED MODULE
+
+reuse the module.
+
+WHENEVER THERE IS A CHOICE BETWEEN:
+
+GUESSING
+
+and
+
+INSPECTING THE EXISTING CODE / Figma / DATABASE / PROVIDER DOCS
+
+inspect first.
+
+WHENEVER THERE IS A CHOICE BETWEEN:
+
+FAST HACK
+
+and
+
+SAFE EXTENSIBLE IMPLEMENTATION
+
+choose the safe implementation unless the task explicitly calls for a prototype.
+
+============================================================
+112. IMPORTANT AGENT RESPONSE BEHAVIOR
+============================================================
+
+For large changes, provide concise progress updates.
+
+Do not ask the user to repeat information already present in this file.
+
+Do not claim:
+
+"implemented"
+
+until the code has actually been changed and validated.
+
+Do not claim:
+
+"Figma connected"
+
+until the current Codex session can actually access Figma tools.
+
+Do not claim:
+
+"payment integrated"
+
+until the server-side integration, webhook path, normalized status handling, and tests/checks exist.
+
+Do not claim:
+
+"production deployed"
+
+until the deployment and health check are actually verified.
+
+============================================================
+113. CURRENT PRODUCT SOURCE
+============================================================
+
+The original Menuju Akad product specification defines the product as a digital wedding invitation experience with the core journey:
+
+Pilih desain
+→ isi data
+→ personalisasi
+→ preview
+→ bayar
+→ aktifkan
+→ bagikan
+→ kelola tamu
+→ pantau RSVP
+
+It also defines customer modules such as dashboard, invitation editor, gallery, story, event, RSVP, guest management, wishes, gift, music, analytics, payment, invoice, expiration, and settings.
+
+Public modules include landing page, template catalog, template detail/demo, pricing, FAQ, blog, and contact.
+
+Superadmin modules include dashboard, customer management, invitations, templates, packages, transactions, payments, coupons, content, analytics, support, audit logs, settings, payment settings, webhook monitoring, maintenance, and feature control.
+
+Preserve this product scope while implementing the architecture above.
+
+============================================================
+114. FINAL IMPLEMENTATION ORDER
+============================================================
+
+Recommended order:
+
+1. Repository audit
+2. AGENTS.md
+3. Architecture docs
+4. Design system primitives
+5. Prisma + Neon
+6. Auth + RBAC
+7. Public website
+8. Templates
+9. Customer dashboard
+10. Invitation creation
+11. Invitation editor
+12. Guest management
+13. RSVP
+14. Wishes
+15. Gift configuration
+16. Analytics
+17. Billing
+18. Mayar
+19. QRIS
+20. Webhooks
+21. Invoice
+22. Renewal
+23. Notifications
+24. Support
+25. Admin
+26. Domain resolver
+27. VPS deployment
+28. Production verification
+29. Final architecture refactor
+30. Documentation update
+
+============================================================
+115. COMPLETION CRITERIA
+============================================================
+
+The project is considered production-ready only when:
+
+[ ] Architecture is modular
+[ ] No giant page/component files
+[ ] TypeScript passes
+[ ] Lint passes
+[ ] Tests pass
+[ ] Build passes
+[ ] Prisma schema is migrated
+[ ] Neon connection works
+[ ] Authentication works
+[ ] Authorization works
+[ ] Customer flows work
+[ ] Invitation guest flow works
+[ ] RSVP works
+[ ] Billing works
+[ ] QRIS works
+[ ] Mayar webhook works
+[ ] Webhook idempotency works
+[ ] Invoice works
+[ ] Admin payment monitoring works
+[ ] Public domain works
+[ ] HTTPS works
+[ ] Health check works
+[ ] Error handling works
+[ ] Logs work
+[ ] Assets are optimized
+[ ] SVG ornament library is reusable
+[ ] Figma MCP is verified or clearly documented as unavailable
+[ ] Figma-to-code workflow is documented
+[ ] Deployment is reproducible
+[ ] Documentation is current
+
+END OF MASTER AGENT SPECIFICATION
+

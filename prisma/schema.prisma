@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  SUPERADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum InvitationStatus {
+  DRAFT
+  PENDING_PAYMENT
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  SUSPENDED
+  ARCHIVED
+}
+
+enum InvitationMemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum TemplateStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
+enum PackageStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum InvitationSectionType {
+  COVER
+  OPENING
+  COUPLE
+  STORY
+  EVENT
+  COUNTDOWN
+  LOCATION
+  GALLERY
+  VIDEO
+  MUSIC
+  RSVP
+  WISHES
+  GIFT
+  DRESS_CODE
+  FAQ
+  LIVE_STREAM
+  HASHTAG
+  CONTACT
+  ADDITIONAL_INFO
+  CLOSING
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique
+  emailVerifiedAt DateTime?  @db.Timestamptz(3)
+  name            String?
+  phone           String?
+  avatarUrl       String?
+  role            UserRole   @default(CUSTOMER)
+  status          UserStatus @default(ACTIVE)
+  lastLoginAt     DateTime?  @db.Timestamptz(3)
+  createdAt       DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime   @updatedAt @db.Timestamptz(3)
+
+  invitations Invitation[]
+  memberships InvitationMember[]
+}
+
+model Template {
+  id           String         @id @default(cuid())
+  name         String
+  slug         String         @unique
+  description  String?
+  thumbnailUrl String?
+  previewUrl   String?
+  category     String?
+  status       TemplateStatus @default(DRAFT)
+  isPremium    Boolean        @default(false)
+  usageCount   Int            @default(0)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(3)
+
+  features    TemplateFeature[]
+  invitations Invitation[]
+}
+
+model TemplateFeature {
+  templateId String
+  featureKey String
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@id([templateId, featureKey])
+}
+
+model Package {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  price        Int
+  currency     String        @default("IDR") @db.VarChar(3)
+  durationDays Int
+  status       PackageStatus @default(DRAFT)
+  isFeatured   Boolean       @default(false)
+  sortOrder    Int           @default(0)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+
+  features PackageFeature[]
+}
+
+model PackageFeature {
+  packageId  String
+  featureKey String
+  package    Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@id([packageId, featureKey])
+}
+
+model Invitation {
+  id          String           @id @default(cuid())
+  ownerUserId String
+  templateId  String
+  slug        String           @unique @db.VarChar(80)
+  title       String
+  status      InvitationStatus @default(DRAFT)
+  weddingDate DateTime?        @db.Date
+  timezone    String           @default("Asia/Jakarta")
+  isPublished Boolean          @default(false)
+  publishedAt DateTime?        @db.Timestamptz(3)
+  startsAt    DateTime?        @db.Timestamptz(3)
+  expiresAt   DateTime?        @db.Timestamptz(3)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(3)
+
+  owner         User                @relation(fields: [ownerUserId], references: [id], onDelete: Restrict)
+  template      Template            @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  members       InvitationMember[]
+  coupleProfile CoupleProfile?
+  sections      InvitationSection[]
+
+  @@index([ownerUserId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model InvitationMember {
+  id           String               @id @default(cuid())
+  invitationId String
+  userId       String
+  role         InvitationMemberRole @default(VIEWER)
+  createdAt    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamptz(3)
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([invitationId, userId])
+  @@index([userId])
+}
+
+model CoupleProfile {
+  id            String   @id @default(cuid())
+  invitationId  String   @unique
+  groomFullName String?
+  groomNickname String?
+  groomParents  String?
+  groomBio      String?
+  groomPhoto    String?
+  groomSocial   String?
+  brideFullName String?
+  brideNickname String?
+  brideParents  String?
+  brideBio      String?
+  bridePhoto    String?
+  brideSocial   String?
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+}
+
+model InvitationSection {
+  id           String                @id @default(cuid())
+  invitationId String
+  type         InvitationSectionType
+  title        String?
+  sortOrder    Int                   @default(0)
+  isEnabled    Boolean               @default(true)
+  configJson   Json                  @default("{}")
+  createdAt    DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime              @updatedAt @db.Timestamptz(3)
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId, sortOrder])
+}

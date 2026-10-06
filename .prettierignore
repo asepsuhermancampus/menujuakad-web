@@ -1,0 +1,10 @@
+node_modules
+.next
+src/generated
+package-lock.json
+MENUJU_AKAD_AGENT_MASTER_SPEC.txt
+prisma/migrations
+playwright-report
+test-results
+coverage
+next-env.d.ts
