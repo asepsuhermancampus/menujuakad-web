@@ -1,0 +1,11 @@
+# TEMPLATE BERSYARAT: impor hanya sesudah audit Caddy VPS target selesai.
+# Jangan menimpa Caddyfile utama atau menyalakan proxy kedua.
+# Ganti port sesuai rilis kandidat (3100 atau 3101).
+menujuakad.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3100
+}
+
+www.menujuakad.com {
+	redir https://menujuakad.com{uri} permanent
+}

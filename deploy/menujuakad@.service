@@ -1,0 +1,35 @@
+[Unit]
+Description=Menuju Akad Next.js standalone (%i)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=menujuakad
+Group=menujuakad
+WorkingDirectory=/opt/menujuakad/releases/%i
+# Rahasia dan port per rilis berada di luar repository.
+EnvironmentFile=/etc/menujuakad/runtime.env
+EnvironmentFile=/etc/menujuakad/releases/%i.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=NEXT_TELEMETRY_DISABLED=1
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+# Buat direktori ini sebelum start. ISR memerlukan evaluasi izin tambahan.
+ReadWritePaths=/opt/menujuakad/releases/%i/.next/cache
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

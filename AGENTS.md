@@ -5,7 +5,7 @@
 - Komunikasi dan dokumentasi menggunakan Bahasa Indonesia.
 - Proyek implementasi aktif berada di `/home/ubuntu/menujuakad-web`. Folder `/home/ubuntu/menujuakad-rancangan` menyimpan rancangan, brief, aset sumber, dan ingatan proyek. Jangan menganggap `MenujuAkad.com` atau `HariKita-Web` sebagai folder proyek ini; keduanya disebut pada panduan global, bukan target pekerjaan ini.
 - Baca `../menujuakad-rancangan/MENUJU_AKAD_AGENT_MASTER_SPEC.txt` sebagai spesifikasi teknis dan produk utama. Jangan mengubahnya tanpa kebutuhan yang jelas.
-- Desain Figma yang relevan menjadi acuan visual setelah frame benar-benar dapat diakses. Jangan mengarang hasil inspeksi Figma.
+- Acuan visual aktif adalah proyek Stitch `MENUJU-AKAD-UIUX` (`12559574101879777472`), design system Editorial Ivory & Gold, dengan Noto Serif untuk display dan Manrope untuk UI/body, sesuai keputusan user 7 Oktober 2026. Snapshot token berada di `../menujuakad-rancangan/docs/design-system.md`. Figma V4 dan Cormorant adalah riwayat; jangan mengarang hasil inspeksi desain. User telah memberikan izin eksplisit pada 7 Oktober 2026 untuk melanjutkan slicing seluruh UI/UX Stitch yang tersedia dan publikasi ke `menujuakad.com`; izin ini menggantikan batas brainstorming sebelumnya. Cakupan aktif adalah frontend slicing, preview sintetis, pengujian dan rilis publik, bukan backend lengkap. Rencana pelaksanaan berada di `docs/03-pm-rencana-slicing.md`.
 - Panduan role tersedia di `/home/ubuntu/.dev-tools/app-dev-template/roles/`.
 
 ## Protokol memulai dan melanjutkan
@@ -46,6 +46,20 @@
 - Untuk perubahan alur UI penting, jalankan `npm run test:e2e` setelah build dan lakukan inspeksi visual. Chromium perlu diinstal melalui `npx playwright install chromium`.
 - Perubahan database memerlukan pemeriksaan migrasi dan pengujian terhadap database pengembangan sebelum penerapan ke layanan aktif.
 - Catat keterbatasan validasi eksternal secara jujur; Figma tools tersedia tidak berarti desain tertentu sudah dibaca.
+
+## Standar pengembangan yang ditegaskan user — 7 Oktober 2026
+
+- Terapkan standar senior engineer dengan mempertimbangkan arsitektur, UI/UX, keamanan, database, pembayaran, QA, dan operasional sesuai domain yang dikerjakan. Sebutan role tidak berarti review atau pengujian sudah dilakukan.
+- Satu modul memiliki satu tanggung jawab. Pisahkan presentasi, interaksi/hook, validasi, aturan bisnis, akses data, dan integrasi. Saat fitur berkembang, ekstrak bagian yang memiliki fungsi jelas; jangan terus menumpuk revisi di satu file.
+- Gunakan kembali primitive, layout, dan logika domain yang benar-benar sama. Hindari komponen universal dengan banyak flag, utility campuran, ketergantungan melingkar, serta pemecahan file yang tidak memberi batas tanggung jawab berguna.
+- Pisahkan area publik, customer, dan superadmin: routing, shell/navigation, komponen khusus peran, serta entry point action/query. Aturan bisnis yang sama dapat dibagi melalui service domain; akses customer dan SUPERADMIN tetap diverifikasi di server pada setiap operasi terlindungi.
+- Bedakan customer sebagai peran pengguna dari Client Component sebagai mode eksekusi React. Gunakan Server Component secara default dan tempatkan `use client` pada komponen interaktif yang memerlukannya; hook UI tidak mengakses rahasia atau repository.
+- Konfigurasi publik berada di `src/config`, konfigurasi rahasia di modul server yang tervalidasi. Jangan mengirim rahasia melalui `NEXT_PUBLIC_*`, props, respons API, log, dokumentasi, fixture, screenshot, `public/`, commit, atau push. `.env.example` hanya memuat nama variabel dan placeholder aman; periksa diff yang akan dipublikasikan.
+- Nama file mengikuti konvensi yang sudah ada; dokumentasi Bahasa Indonesia menjelaskan tanggung jawab modul, kontrak input/output, batas izin, cara menjalankan, hasil validasi, dan keterbatasan. Komentar menjelaskan alasan keputusan yang tidak jelas dari kode.
+- Catat hasil dan status terpisah: rancangan, kode tersedia, teruji lokal, terhubung layanan, terverifikasi produksi. Ikuti usulan struktur dan pembagian fungsi dalam `docs/architecture.md` setelah disetujui user.
+- Instruksi aktif: slicing frontend seluruh layar UI/UX Stitch yang tersedia serta publikasi `menujuakad.com` sudah diizinkan user. Jangan meminta izin slicing ulang. Pertahankan scaffold dan dependency existing; tambah hanya yang diperlukan cakupan ini. Neon/auth/Mayar belum tersedia; jangan mengklaim backend atau integrasi aktif.
+- Rute aktual `/dashboard` dan `/admin` wajib menolak/redirect login sampai sesi terverifikasi nyata tersedia. `/preview-ui/*` boleh menampilkan UI lintas peran hanya dengan whitelist fixture sintetis, label data contoh dan noindex; tanpa akses DB/provider/mutasi asli. Form Google/auth visual, harga contoh dan QRIS tidak dianggap autentikasi atau pembayaran komersial nyata.
+- Deployment menunggu hasil build/test/visual final dan akses VPS tujuan terverifikasi yang sudah diminta; ini hambatan akses, bukan izin yang belum diberikan. DNS apex `172.104.187.4` dan www sudah sesuai audit; workspace ber-IP keluar `43.173.15.136` tidak boleh diasumsikan VPS target. Layanan/proxy/DNS existing hanya diubah setelah inspeksi, backup dan rencana pemulihan.
 
 ## Larangan dan konsistensi output
 
