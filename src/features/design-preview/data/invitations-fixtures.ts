@@ -1,6 +1,8 @@
 import { previewContext } from "./fixture-context";
 
-export type InvitationStatus = "DRAFT" | "PUBLISHED" | "EXPIRED";
+/** Lifecycle produk; publikasi berada pada isPublished, bukan status ini. */
+export type InvitationStatus =
+  "DRAFT" | "PENDING_PAYMENT" | "ACTIVE" | "EXPIRING_SOON" | "EXPIRED" | "SUSPENDED" | "ARCHIVED";
 export type TemplatePreviewDto = Readonly<{
   id: string;
   slug: string;
@@ -25,6 +27,7 @@ export type InvitationPreviewDto = Readonly<{
   partnerOne: string;
   partnerTwo: string;
   status: InvitationStatus;
+  isPublished: boolean;
   templateId: string;
   eventDate: string;
   updatedAt: string;
@@ -70,6 +73,7 @@ export const invitationFixture: InvitationPreviewDto = {
   partnerOne: "Sarah Contoh",
   partnerTwo: "Dimas Contoh",
   status: "DRAFT",
+  isPublished: false,
   templateId: "demo-template-01",
   eventDate: "2026-12-12T02:00:00.000Z",
   updatedAt: "2026-10-07T07:30:00.000Z",
@@ -107,4 +111,16 @@ export const invitationFixture: InvitationPreviewDto = {
     },
   ],
 };
-export const invitationsFixture: readonly InvitationPreviewDto[] = [invitationFixture];
+/** Lifecycle ACTIVE tidak otomatis membuat undangan dipublikasikan. */
+export const activeUnpublishedInvitationFixture: InvitationPreviewDto = {
+  ...invitationFixture,
+  id: "demo-invitation-02",
+  slug: "undangan-aktif-belum-terbit-contoh",
+  title: "Undangan aktif belum terbit (contoh)",
+  status: "ACTIVE",
+  isPublished: false,
+};
+export const invitationsFixture: readonly InvitationPreviewDto[] = [
+  invitationFixture,
+  activeUnpublishedInvitationFixture,
+];

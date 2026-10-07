@@ -9,6 +9,8 @@ import {
   rsvpFixture,
   wishesFixture,
   accountFixture,
+  invitationsFixture,
+  rsvpStatusLabels,
 } from "./fixtures";
 
 describe("kontrak preview sintetis", () => {
@@ -98,6 +100,18 @@ describe("kontrak preview sintetis", () => {
       expect(guestsFixture.some((guest) => guest.id === wish.guestId)).toBe(true);
       expect(wish.createdAt).toBe(new Date(wish.createdAt).toISOString());
     }
+  });
+
+  it("uses_product_rsvp_status_for_twenty_absent_guests", () => {
+    expect(guestsFixture.filter((guest) => guest.rsvpStatus === "NOT_ATTENDING")).toHaveLength(20);
+    expect(rsvpStatusLabels.NOT_ATTENDING).toBe("Tidak hadir");
+    expect(rsvpFixture.declining).toBe(20);
+  });
+
+  it("active_invitation_can_be_unpublished", () => {
+    const active = invitationsFixture.find((invitation) => invitation.status === "ACTIVE");
+    expect(active).toMatchObject({ status: "ACTIVE", isPublished: false });
+    expect(invitationFixture).toMatchObject({ status: "DRAFT", isPublished: false });
   });
 
   it("maybe_is_not_pending", () => {

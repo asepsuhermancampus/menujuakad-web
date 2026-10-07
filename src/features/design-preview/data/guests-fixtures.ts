@@ -1,6 +1,6 @@
 import { previewContext } from "./fixture-context";
 
-export type RsvpStatus = "ATTENDING" | "DECLINING" | "MAYBE" | "PENDING";
+export type RsvpStatus = "ATTENDING" | "NOT_ATTENDING" | "MAYBE" | "PENDING";
 export type GuestPreviewDto = Readonly<{
   id: string;
   invitationId: string;
@@ -24,7 +24,13 @@ export type RsvpSummaryDto = Readonly<{
 export const guestsFixture: readonly GuestPreviewDto[] = Array.from({ length: 120 }, (_, index) => {
   const number = index + 1;
   const rsvpStatus: RsvpStatus =
-    number <= 68 ? "ATTENDING" : number <= 88 ? "DECLINING" : number <= 100 ? "MAYBE" : "PENDING";
+    number <= 68
+      ? "ATTENDING"
+      : number <= 88
+        ? "NOT_ATTENDING"
+        : number <= 100
+          ? "MAYBE"
+          : "PENDING";
   return {
     id: `demo-guest-${String(number).padStart(3, "0")}`,
     invitationId: previewContext.invitationId,
@@ -43,14 +49,14 @@ const countStatus = (status: RsvpStatus) =>
 export const rsvpFixture: RsvpSummaryDto = {
   total: guestsFixture.length,
   attending: countStatus("ATTENDING"),
-  declining: countStatus("DECLINING"),
+  declining: countStatus("NOT_ATTENDING"),
   maybe: countStatus("MAYBE"),
   pending: countStatus("PENDING"),
   attendanceRatePercent: Math.round((countStatus("ATTENDING") / guestsFixture.length) * 100),
 };
 export const rsvpStatusLabels: Readonly<Record<RsvpStatus, string>> = {
   ATTENDING: "Hadir",
-  DECLINING: "Tidak hadir",
+  NOT_ATTENDING: "Tidak hadir",
   MAYBE: "Masih ragu",
   PENDING: "Belum menjawab",
 };
