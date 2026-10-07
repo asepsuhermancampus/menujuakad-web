@@ -6,6 +6,10 @@ Belum ada deployment, koneksi SSH baru, perubahan DNS, perubahan proxy, containe
 
 `npm run build` menyiapkan output dan aset. `npm run start` membaca environment dan menjalankan server standalone dengan bind `127.0.0.1` secara default. Gunakan `APP_HOSTNAME=0.0.0.0` di dalam container yang hanya dapat diakses melalui proxy, dan atur `PORT` sesuai konfigurasi deployment.
 
+## Direktori pengembangan
+
+Workspace implementasi sekarang `/home/ubuntu/menujuakad-web`. Jalankan build dan persiapan artifact dari folder tersebut. Pemindahan lokal ini tidak mengubah konfigurasi service, VPS, DNS, atau path deployment produksi. Folder rancangan `../menujuakad-rancangan` tidak menjadi dependency runtime/build.
+
 ## Urutan tahap produksi
 
 1. Audit VPS: OS, CPU/RAM/disk, Docker/Node, container/service aktif, port, firewall, proxy, penggunaan domain, dan DNS.

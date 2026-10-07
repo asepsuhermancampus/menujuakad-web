@@ -37,6 +37,10 @@ Schema awal memiliki `User`, `Template`, `TemplateFeature`, `Package`, `PackageF
 - Kode provider terpisah dari domain dan UI. Event webhook disimpan dan diproses idempoten.
 - Jangan menambahkan direktori kosong, monorepo, atau microservice tanpa kebutuhan.
 
+## Lokasi repository
+
+Kode dan dokumentasi teknis berada di `/home/ubuntu/menujuakad-web`. Master spec, brief, aset sumber, dan progres bersama berada di `/home/ubuntu/menujuakad-rancangan`. Pembagian ini hanya mengatur workspace pengembangan; aplikasi tetap modular monolith dengan satu `package.json`, tanpa perubahan struktur internal `src/` atau dependensi runtime lintas folder.
+
 ## Verifikasi dan keterbatasan
 
-`npm run check` menggabungkan schema validation, typecheck, lint, unit test, dan build. Browser diperiksa melalui Playwright. Koneksi Neon, migrasi pada Neon, desain resmi Figma, dan produksi memerlukan verifikasi tersendiri; hasil lokal tidak menggantikannya. Status lengkap ada di `00-progres-proyek.md`.
+`npm run check` menggabungkan schema validation, typecheck, lint, unit test, dan build. Browser diperiksa melalui Playwright. Koneksi Neon, migrasi pada Neon, desain resmi Figma, dan produksi memerlukan verifikasi tersendiri; hasil lokal tidak menggantikannya. Status lengkap ada di [progres bersama](../../menujuakad-rancangan/docs/00-progres-proyek.md).

@@ -1,8 +1,19 @@
-# Menuju Akad
+# Menuju Akad — Aplikasi Web
 
 Platform undangan pernikahan digital dengan alur pilih desain → isi data → personalisasi → preview → bayar → aktifkan → bagikan → kelola tamu dan RSVP.
 
-Implementasi dilakukan bertahap mengikuti `MENUJU_AKAD_AGENT_MASTER_SPEC.txt`. Status aktual dan langkah berikutnya berada di [catatan progres](docs/00-progres-proyek.md). Saat ini aplikasi memiliki fondasi teknis dan beranda sementara; autentikasi, editor, pembayaran, dan deployment belum tersedia.
+Implementasi dilakukan bertahap mengikuti [master spec](../menujuakad-rancangan/MENUJU_AKAD_AGENT_MASTER_SPEC.txt). Status aktual dan langkah berikutnya berada di [catatan progres proyek](../menujuakad-rancangan/docs/00-progres-proyek.md). Saat ini aplikasi memiliki fondasi teknis dan beranda sementara; autentikasi, editor, pembayaran, dan deployment belum tersedia.
+
+## Lokasi proyek dan sumber rancangan
+
+- Implementasi dan Git aplikasi: `/home/ubuntu/menujuakad-web`.
+- Rancangan produk, brief Stitch, dan aset sumber: `/home/ubuntu/menujuakad-rancangan`.
+- [Design system lengkap](../menujuakad-rancangan/docs/design-system.md), [brief web aktif](../menujuakad-rancangan/docs/11-uiux-prompt-stitch-web.txt), dan [pustaka SVG](../menujuakad-rancangan/docs/12-uiux-aset-svg.txt) berada di folder rancangan.
+- Master spec dan catatan progres memiliki satu sumber di folder rancangan; jangan membuat salinan yang diedit terpisah.
+- Dua folder adalah repositori lokal terpisah. Git aplikasi mempertahankan seluruh riwayat, memakai branch `main`, dan menggunakan remote `origin` [menujuakad-web](https://github.com/asepsuhermancampus/menujuakad-web). Repositori rancangan bersifat lokal tanpa remote dan tidak ikut dalam push aplikasi.
+- Untuk melanjutkan implementasi, buka folder `menujuakad-web`. Folder rancangan tidak dibutuhkan oleh runtime maupun build aplikasi.
+
+Tautan relatif ke rancangan memerlukan kedua folder berdampingan. Jika meng-clone aplikasi saja, dokumen rancangan harus disediakan terpisah; aplikasi tetap dapat dibangun tanpa folder tersebut.
 
 ## Stack
 
@@ -11,6 +22,7 @@ Next.js 16 App Router, React 19, TypeScript strict, Prisma 7, adapter Neon/Postg
 ## Menjalankan lokal
 
 ```bash
+cd /home/ubuntu/menujuakad-web
 npm ci
 cp .env.example .env
 npm run db:generate
@@ -68,7 +80,7 @@ Build menyalin aset publik dan static ke output standalone. `npm run start` menj
 
 ## Figma dan desain
 
-Figma MCP tersedia dan identitas akun berhasil diverifikasi pada sesi fondasi. URL frame/file belum tersedia sehingga belum ada slicing atau perbandingan visual terhadap desain resmi. Jika sesi berikutnya kehilangan koneksi, sambungkan Figma MCP sesuai pengaturan klien Codex yang digunakan. Integrasi tersebut hanya untuk konteks pengembangan, bukan dependency runtime. Panduan pemetaan dan status desain: [design system](docs/design-system.md).
+Acuan slicing aktif adalah [Menuju Akad V4](https://www.figma.com/design/5CJfAriMxIDxFgGFeQhv2q/Menuju-Akad-V4?t=a1VJtb4AWH2cJRgd-1), menggantikan URL sebelumnya sesuai instruksi user pada 7 Oktober 2026. URL tidak memuat node ID; frame target ditentukan setelah file dapat dibaca. Figma MCP tersedia, tetapi percobaan pembacaan V4 ditolak karena kuota Starter habis sehingga belum ada slicing atau perbandingan visual terhadap desain resmi. Integrasi tersebut hanya untuk konteks pengembangan, bukan dependency runtime. Panduan pemetaan dan status desain: [design system](docs/design-system.md).
 
 ## Mayar
 
@@ -77,5 +89,3 @@ Integrasi belum diimplementasikan. Targetnya ialah adapter provider di `src/serv
 ## Deployment
 
 Build menggunakan output `standalone` agar dapat dikemas untuk VPS. Belum ada deployment, perubahan DNS, atau perubahan reverse proxy. Sebelum tahap produksi, inspeksi VPS yang sudah ada, gunakan proxy yang sesuai, terapkan migrasi terkontrol, dan verifikasi HTTPS serta `/api/health`. Rencana: [deployment](docs/deployment.md).
-
-# menujuakad

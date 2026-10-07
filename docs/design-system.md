@@ -1,29 +1,17 @@
-# Design System dan Figma
+# Handoff Design System Menuju Akad
 
-## Status visual
+## Sumber rancangan
 
-Figma MCP tersedia dalam sesi fondasi dan panggilan identitas akun berhasil. Belum ada URL file/frame sehingga belum ada observasi layout, token, aset, atau responsive variant dari desain resmi. Identitas akun tidak membuktikan akses setiap file.
+[Sumber design system lengkap](../../menujuakad-rancangan/docs/design-system.md) berada di folder rancangan. Dokumen ini hanya menjelaskan pemakaiannya pada implementasi; token dan riwayat desain tidak diduplikasi di sini.
 
-Beranda sekarang adalah pengantar sementara yang menerapkan arahan ivory/warm neutral, olive/botanical, tipografi editorial, whitespace, border halus, dan kartu lembut dari master spec. Beranda ini bukan hasil slicing Figma.
+Gunakan [brief web aktif](../../menujuakad-rancangan/docs/11-uiux-prompt-stitch-web.txt), [pustaka SVG](../../menujuakad-rancangan/docs/12-uiux-aset-svg.txt), dan `../../menujuakad-rancangan/docs/assets/ivory-gold/` sebagai bahan handoff. Arahan aktif adalah Ivory & Gold dengan Cormorant Garamond dan Manrope. Brief tema sebelumnya merupakan riwayat.
 
-## Primitive saat ini
+## Status implementasi
 
-- `Button`: tap target minimal 48px, focus ring, disabled state, default type button.
-- `Input`: ukuran sentuh, focus ring, styling aria-invalid. Form nantinya tetap wajib menyediakan label dan pesan error.
-- `Card`: surface, border, radius konsisten.
-- `Ornament`: aset SVG botanical dari `public/ornaments`, dekoratif tanpa nama aksesibel yang mengganggu.
-- Token di `src/app/globals.css`: ivory, surface, olive, ink, muted, border, tipografi body/editorial, dan radius kartu.
+UI aplikasi masih fondasi sementara; token dan komponen belum disinkronkan dengan rancangan terbaru. Acuan Figma adalah Menuju Akad V4, tetapi context dan screenshot belum berhasil diakses karena kuota MCP Starter. Jangan mengklaim desain sudah diinspeksi atau slicing selesai.
 
-Font sistem digunakan sementara agar build tidak membutuhkan download font. Warna dan font akan dipetakan ke token Figma terverifikasi saat URL tersedia. Ornamen saat ini merupakan SVG awal, bukan ekspor aset Figma.
+## Penggunaan aset
 
-## Workflow implementasi desain
+Folder rancangan hanya menjadi sumber untuk pengembangan. Saat suatu aset benar-benar dipakai, salin aset tersebut ke `public/` aplikasi dan referensikan dari sana. Runtime, build, dan deployment tidak boleh bergantung pada folder rancangan di luar repository aplikasi. Jangan menyalin seluruh koleksi atau brief XML ke runtime.
 
-1. Akses frame terkait melalui Figma MCP; catat URL dan node yang berhasil diperiksa.
-2. Ambil design context, token, aset, dan screenshot.
-3. Petakan komponen desain ke primitive/fitur yang sudah ada.
-4. Tentukan perilaku responsive, empty/loading/error/success, serta aksesibilitas.
-5. Implementasikan dengan page tipis dan modul terpisah.
-6. Bandingkan screenshot desktop/mobile dengan Figma dan catat perbedaan yang belum terselesaikan.
-7. Jalankan typecheck, lint, build, dan pengujian interaksi penting.
-
-Jangan mengganti desain resmi berdasarkan perkiraan. Figma MCP hanya dipakai agent untuk pengembangan; aplikasi produksi tidak bergantung padanya.
+Status, keputusan, dan langkah berikutnya dicatat pada [progres bersama](../../menujuakad-rancangan/docs/00-progres-proyek.md).

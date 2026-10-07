@@ -1,21 +1,30 @@
-# Panduan Agent — Menuju Akad
+# Panduan Agent — Implementasi Menuju Akad
 
 ## Konteks dan sumber kebenaran
 
 - Komunikasi dan dokumentasi menggunakan Bahasa Indonesia.
-- Proyek aktif berada di `/home/ubuntu/menujuakad`. Jangan menganggap `MenujuAkad.com` atau `HariKita-Web` sebagai folder proyek ini; keduanya disebut pada panduan global, bukan target pekerjaan ini.
-- Baca `MENUJU_AKAD_AGENT_MASTER_SPEC.txt` sebagai spesifikasi teknis dan produk utama. Jangan mengubahnya tanpa kebutuhan yang jelas.
+- Proyek implementasi aktif berada di `/home/ubuntu/menujuakad-web`. Folder `/home/ubuntu/menujuakad-rancangan` menyimpan rancangan, brief, aset sumber, dan ingatan proyek. Jangan menganggap `MenujuAkad.com` atau `HariKita-Web` sebagai folder proyek ini; keduanya disebut pada panduan global, bukan target pekerjaan ini.
+- Baca `../menujuakad-rancangan/MENUJU_AKAD_AGENT_MASTER_SPEC.txt` sebagai spesifikasi teknis dan produk utama. Jangan mengubahnya tanpa kebutuhan yang jelas.
 - Desain Figma yang relevan menjadi acuan visual setelah frame benar-benar dapat diakses. Jangan mengarang hasil inspeksi Figma.
 - Panduan role tersedia di `/home/ubuntu/.dev-tools/app-dev-template/roles/`.
 
 ## Protokol memulai dan melanjutkan
 
-1. Baca `docs/00-progres-proyek.md`, `CHANGELOG.md`, dan dokumentasi terkait sebelum mengubah kode.
+1. Baca `../menujuakad-rancangan/docs/00-progres-proyek.md`, `CHANGELOG.md`, `../menujuakad-rancangan/CHANGELOG.md`, dan dokumentasi terkait sebelum mengubah kode.
 2. Periksa daftar file, konten yang sudah ada, serta status Git jika repository sudah diinisialisasi.
 3. Kerjakan langkah pertama yang belum selesai pada daftar progres. Jangan mengulang scaffold atau membuat dokumen duplikat.
 4. Buat satu increment yang dapat diuji. Kebutuhan layanan eksternal tidak menghalangi pekerjaan mandiri yang relevan.
 5. Setelah validasi, perbarui progres, hasil pengujian, hambatan, keputusan, dan langkah berikutnya dalam dokumen yang sama.
 6. Jangan menandai fitur selesai hanya karena tampilannya ada. Bedakan kode tersedia, teruji lokal, terhubung layanan, dan terverifikasi produksi.
+
+## Batas folder dan dokumentasi
+
+- Jalankan perintah aplikasi dari `/home/ubuntu/menujuakad-web`. Jangan membuat scaffold ulang.
+- Master spec, dokumen bernomor 00–12, seluruh brief Stitch, design system lengkap, dan aset sumber tetap di `../menujuakad-rancangan`. Jangan menduplikasi sumber tersebut.
+- Perbarui progres bersama di `../menujuakad-rancangan/docs/00-progres-proyek.md`. Catat perubahan aplikasi pada `CHANGELOG.md` di folder ini; perubahan rancangan pada `../menujuakad-rancangan/CHANGELOG.md`.
+- Dokumentasi teknis aplikasi berada di `docs/`; `docs/design-system.md` menjadi panduan handoff menuju sumber rancangan.
+- Git aplikasi mempertahankan riwayat sebelumnya; remote `origin` kini `https://github.com/asepsuhermancampus/menujuakad-web.git`, dengan branch utama `main`. Folder rancangan memiliki repositori lokal sendiri tanpa remote. Jangan menganggap rancangan eksternal ikut dalam commit aplikasi.
+- Tautan antarfolder hanya untuk dokumentasi; kode runtime dan build tidak boleh mengimpor berkas dari folder rancangan. Salin hanya aset yang benar-benar dipakai ke `public/` saat implementasi fiturnya.
 
 ## Arsitektur dan kualitas
 
