@@ -1,0 +1,113 @@
+.invitation-media {
+  margin: 20px 0;
+  background: linear-gradient(130deg, #e9ddcd, #c9b295);
+  aspect-ratio: 4/3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 16px;
+  position: relative;
+}
+.invitation-media figcaption {
+  font-size: 10px;
+  color: #42392f;
+  margin-top: 14px;
+}
+.media-composition {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  justify-content: center;
+  width: 100%;
+  height: 70%;
+}
+.media-arch {
+  border-radius: 70px 70px 0 0;
+  min-height: 110px;
+  height: 90%;
+  width: 35%;
+  background: #f5ece0;
+  display: grid;
+  place-items: center;
+  font: 34px var(--font-editorial);
+  color: #665745;
+}
+.media-arch + span {
+  background: #71634f;
+  color: #f7f3ed;
+  height: 100%;
+}
+.media-minimal {
+  background: #faf7f2;
+  aspect-ratio: 1/1;
+  border: 1px solid #d5c8b7;
+}
+.media-monogram {
+  width: 140px;
+  height: 140px;
+  border: 1px solid #9f8b6c;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 34px var(--font-editorial);
+}
+.media-portrait {
+  aspect-ratio: 3/4;
+  max-height: 400px;
+}
+.template-art .invitation-media {
+  min-height: 160px;
+  max-height: 230px;
+}
+.how-step {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding-block: 40px;
+}
+.how-step-reverse > div:first-child {
+  order: 2;
+}
+.how-ui {
+  min-height: 280px;
+  box-shadow: 0 12px 40px #1717170a;
+}
+.how-ui-line {
+  height: 12px;
+  background: #e9e1d5;
+  margin: 18px 0;
+  border-radius: 3px;
+}
+.how-ui-line.short {
+  width: 65%;
+}
+.how-ui-tile {
+  display: grid;
+  place-items: center;
+  min-height: 90px;
+  border: 1px solid #ddd1bf;
+  background: #fbf9f4;
+  margin-bottom: 20px;
+}
+.how-detail {
+  gap: 20px;
+}
+@media (max-width: 767px) {
+  .how-step {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .how-step-reverse > div:first-child {
+    order: initial;
+  }
+  .media-arch {
+    font-size: 28px;
+    min-height: 85px;
+  }
+  .hero-preview .invitation-media {
+    max-width: 260px;
+  }
+}

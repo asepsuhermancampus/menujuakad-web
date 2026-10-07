@@ -1,0 +1,6 @@
+import { requireSuperadminSession } from "@/server/authorization/guards";
+export default async function Page({ params }: { params: Promise<{ path: string[] }> }) {
+  const { path } = await params;
+  await requireSuperadminSession("/admin/" + path.join("/"));
+  return <main>Area terlindungi</main>;
+}

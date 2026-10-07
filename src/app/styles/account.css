@@ -1,0 +1,124 @@
+.auth-header,
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 28px;
+}
+.auth-header a,
+.auth-footer a {
+  font-size: 12px;
+}
+.auth-footer {
+  border-top: 1px solid var(--color-border);
+  font-size: 11px;
+}
+.auth-footer nav {
+  display: flex;
+  gap: 20px;
+}
+.wizard-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+}
+.wizard-paper {
+  text-align: center;
+  align-self: start;
+}
+.wizard-paper h2 {
+  font-size: 28px;
+}
+.account-settings-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 32px;
+}
+.account-settings-nav {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 24px 0;
+}
+.account-settings-nav button {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.account-settings-nav button[aria-pressed="true"] {
+  background: #efe3cc;
+}
+.notifications-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  align-items: start;
+  margin-top: 32px;
+}
+.notifications-layout > .section {
+  padding: 0;
+}
+.support-stats {
+  margin-block: 28px;
+}
+@media (max-width: 767px) {
+  .auth-header,
+  .auth-footer {
+    flex-wrap: wrap;
+  }
+  .wizard-layout,
+  .account-settings-layout,
+  .notifications-layout {
+    grid-template-columns: 1fr;
+  }
+  .account-settings-nav {
+    display: flex;
+    overflow: auto;
+    padding: 12px 0;
+  }
+  .account-settings-nav button {
+    white-space: nowrap;
+  }
+  .notifications-layout {
+    gap: 20px;
+  }
+}
+.auth-state-card {
+  border: 1px solid var(--color-border);
+  padding: 20px;
+  background: #fbf9f4;
+  text-align: center;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.auth-state-card p {
+  margin: 8px 0;
+  font-weight: 600;
+}
+.auth-card .card {
+  padding: 20px;
+}
+.auth-card h2 {
+  font-size: 22px;
+}
+.verification-symbol {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: #efe6d5;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  font-size: 38px;
+  color: #755a2a;
+}
+.auth-instructions {
+  padding-left: 20px;
+  font-size: 12px;
+  line-height: 1.9;
+}

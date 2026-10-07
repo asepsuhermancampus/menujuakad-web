@@ -1,0 +1,352 @@
+.site-header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+.wordmark {
+  font: 22px var(--font-editorial);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wordmark span {
+  color: #a8854a;
+}
+.site-header nav {
+  display: flex;
+  gap: 28px;
+  font-size: 12px;
+}
+.site-header nav a,
+.site-footer a {
+  text-decoration: none;
+}
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding-block: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.site-footer p {
+  font-size: 12px;
+  margin-top: 16px;
+}
+.site-footer nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.site-footer small {
+  grid-column: 1/-1;
+  font-size: 11px;
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding-block: 96px;
+}
+.hero h1 {
+  font-size: clamp(44px, 5.4vw, 72px);
+  line-height: 1.12;
+}
+.hero-description {
+  max-width: 470px;
+  color: var(--color-muted);
+  font-size: 16px;
+}
+.hero-notes {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.hero-preview {
+  max-width: 360px;
+  justify-self: center;
+  transform: rotate(3deg);
+  text-align: center;
+}
+.preview-paper {
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 18px 60px #17171712;
+  border: 1px solid var(--color-border);
+}
+.preview-paper h2 {
+  font-size: 26px;
+  margin-top: 20px;
+}
+.preview-paper p,
+.preview-paper a {
+  font-size: 10px;
+}
+.hero-caption {
+  display: block;
+  margin-top: 24px;
+  font-size: 11px;
+  font-style: italic;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.section-heading a {
+  font-size: 12px;
+}
+.template-art {
+  display: block;
+  padding: 28px;
+  background: #e7ded0;
+  text-align: center;
+  text-decoration: none;
+}
+.tone-botanical {
+  background: #e4e8df;
+}
+.tone-minimal {
+  background: #eeeae4;
+}
+.invitation-mini {
+  padding: 20px 12px;
+  background: #fff;
+  box-shadow: 0 8px 22px #17171714;
+}
+.invitation-mini small {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+.invitation-mini h3 {
+  font-size: 22px;
+  margin: 14px 0;
+}
+.invitation-mini .floral-art {
+  height: 160px;
+}
+.template-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.template-copy {
+  padding: 24px;
+}
+.template-copy p {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.template-copy small {
+  font-size: 10px;
+}
+.template-copy h3 {
+  margin: 12px 0;
+}
+.template-copy .button {
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.template-copy a {
+  font-size: 12px;
+}
+.feature-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.feature-section .card p {
+  font-size: 13px;
+}
+.faq {
+  max-width: 780px;
+}
+.faq h2 {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.faq details {
+  padding: 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  margin-block: 10px;
+}
+.faq summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.faq details p {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-top: 16px;
+}
+.cta {
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+}
+.cta .actions {
+  justify-content: center;
+}
+.step-number {
+  font: 32px var(--font-editorial);
+  color: #a8854a;
+  display: block;
+  margin-bottom: 24px;
+}
+.auth-wrap {
+  min-height: 72vh;
+  padding: 72px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  padding: 36px;
+  box-shadow: 0 8px 28px #17171705;
+}
+.auth-card h1 {
+  font-size: 28px;
+}
+.auth-card .button {
+  width: 100%;
+}
+.auth-card p {
+  font-size: 13px;
+}
+.auth-card .divider {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 11px;
+}
+.legal-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+}
+.legal-layout aside a {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.legal-copy section {
+  margin-bottom: 36px;
+}
+.legal-copy p {
+  font-size: 14px;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.detail-preview {
+  background: #efeae1;
+  padding: 36px;
+  text-align: center;
+}
+.detail-preview .preview-paper {
+  max-width: 380px;
+  margin: auto;
+}
+.search-field {
+  flex: 1;
+}
+.step-number + h3 {
+  font-size: 24px;
+}
+@media (max-width: 1023px) {
+  .site-header nav {
+    gap: 16px;
+  }
+  .hero {
+    gap: 40px;
+  }
+  .hero h1 {
+    font-size: 56px;
+  }
+}
+@media (max-width: 767px) {
+  .site-header {
+    flex-wrap: wrap;
+    padding-block: 20px;
+    gap: 16px;
+  }
+  .site-header nav {
+    order: 3;
+    width: 100%;
+    overflow: auto;
+    gap: 20px;
+    padding-top: 6px;
+  }
+  .site-header .actions {
+    gap: 10px;
+    font-size: 12px;
+  }
+  .site-header .button {
+    padding: 10px 14px;
+    min-height: 44px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    padding-block: 56px;
+    gap: 48px;
+  }
+  .hero h1 {
+    font-size: 44px;
+  }
+  .hero-preview {
+    max-width: 310px;
+    transform: none;
+  }
+  .feature-section,
+  .legal-layout,
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+  .section-heading {
+    align-items: start;
+  }
+  .section-heading a {
+    max-width: 100px;
+  }
+  .auth-card {
+    padding: 28px;
+  }
+  .legal-layout aside {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+.home-packages {
+  display: none;
+}
+.preview-gallery .card p {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1023px) {
+  .home-packages {
+    display: block;
+  }
+}
+@media (max-width: 767px) {
+  .home-packages .card:last-child {
+    display: none;
+  }
+}
