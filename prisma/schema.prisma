@@ -9,6 +9,8 @@ datasource db {
 
 enum UserRole {
   CUSTOMER
+  CLIENT
+  VENDOR
   SUPERADMIN
 }
 
@@ -72,19 +74,27 @@ enum InvitationSectionType {
 
 model User {
   id              String     @id @default(cuid())
-  email           String     @unique
+  email           String?    @unique
   emailVerifiedAt DateTime?  @db.Timestamptz(3)
   name            String?
-  phone           String?
+  phone           String?    @unique
+  phoneVerifiedAt DateTime?  @db.Timestamptz(3)
+  smsOtpEnabled   Boolean    @default(false)
   avatarUrl       String?
-  role            UserRole   @default(CUSTOMER)
+  role            UserRole   @default(CLIENT)
   status          UserStatus @default(ACTIVE)
   lastLoginAt     DateTime?  @db.Timestamptz(3)
   createdAt       DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime   @updatedAt @db.Timestamptz(3)
 
-  invitations Invitation[]
-  memberships InvitationMember[]
+  invitations          Invitation[]
+  memberships          InvitationMember[]
+  credential           AuthCredential?
+  sessions             UserSession[]
+  authAccounts         AuthAccount[]
+  verificationTokens   AuthVerificationToken[]
+  paymentTestRequests  PaymentTestRequest[]    @relation("PaymentTestRequester")
+  paymentsTestReviewed PaymentTestRequest[]    @relation("PaymentTestReviewer")
 }
 
 model Template {
@@ -154,11 +164,12 @@ model Invitation {
   createdAt   DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime         @updatedAt @db.Timestamptz(3)
 
-  owner         User                @relation(fields: [ownerUserId], references: [id], onDelete: Restrict)
-  template      Template            @relation(fields: [templateId], references: [id], onDelete: Restrict)
-  members       InvitationMember[]
-  coupleProfile CoupleProfile?
-  sections      InvitationSection[]
+  owner               User                 @relation(fields: [ownerUserId], references: [id], onDelete: Restrict)
+  template            Template             @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  members             InvitationMember[]
+  coupleProfile       CoupleProfile?
+  sections            InvitationSection[]
+  paymentTestRequests PaymentTestRequest[]
 
   @@index([ownerUserId, createdAt])
   @@index([status, expiresAt])
@@ -214,4 +225,102 @@ model InvitationSection {
   invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@index([invitationId, sortOrder])
+}
+
+// Credential dan sesi hanya berisi hash; plaintext tidak disimpan pada database.
+model AuthCredential {
+  userId       String @id
+  passwordHash String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserSession {
+  id                String    @id @default(cuid())
+  userId            String
+  tokenHash         String    @unique
+  expiresAt         DateTime  @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  reauthenticatedAt DateTime? @db.Timestamptz(3)
+  lastSeenAt        DateTime? @db.Timestamptz(3)
+  revokedAt         DateTime? @db.Timestamptz(3)
+  userAgent         String?   @db.VarChar(512)
+  ipHash            String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AuthLoginThrottle {
+  keyHash        String    @id
+  failedAttempts Int
+  windowStartsAt DateTime  @db.Timestamptz(3)
+  blockedUntil   DateTime? @db.Timestamptz(3)
+}
+
+// Pengujian QRIS statis; APPROVED_TEST tidak memberikan entitlement komersial.
+enum PaymentTestStatus {
+  REQUESTED
+  APPROVED_TEST
+  REJECTED
+}
+
+model PaymentTestRequest {
+  id               String            @id @default(cuid())
+  invitationId     String
+  userId           String
+  amountIdr        Int
+  packageSlug      String
+  status           PaymentTestStatus @default(REQUESTED)
+  reference        String?
+  createdAt        DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @db.Timestamptz(3)
+  reviewedAt       DateTime?         @db.Timestamptz(3)
+  reviewedByUserId String?
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  user       User       @relation("PaymentTestRequester", fields: [userId], references: [id], onDelete: Restrict)
+  reviewedBy User?      @relation("PaymentTestReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// Identitas provider ditautkan hanya setelah verifikasi server.
+model AuthAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  email             String?
+  emailVerified     Boolean  @default(false)
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+}
+
+// Token/OTP di-hash; payload rahasia harus dienkripsi oleh layanan.
+model AuthVerificationToken {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  purpose    String
+  userId     String?
+  identifier String?
+  payload    Json?
+  expiresAt  DateTime  @db.Timestamptz(3)
+  consumedAt DateTime? @db.Timestamptz(3)
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([identifier, purpose])
+  @@index([expiresAt])
 }

@@ -1,0 +1,7 @@
+# Overlay opsional. Aktifkan hanya sesudah koneksi dan migrasi Neon teruji.
+# File runtime hanya memuat DATABASE_URL pooled, bukan DIRECT_URL.
+services:
+  web:
+    env_file:
+      - path: /etc/menujuakad/runtime.env
+        required: true

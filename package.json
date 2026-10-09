@@ -22,6 +22,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:export:neon": "tsx scripts/database/export-neon.ts",
+    "db:preflight:neon": "tsx scripts/database/neon-preflight.ts",
     "check": "npm run db:validate && npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "@prisma/client": "7.10.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
+    "google-auth-library": "^11.2.0",
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",

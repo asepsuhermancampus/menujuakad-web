@@ -1,0 +1,60 @@
+.billing-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.billing-metric-value {
+  font: 28px var(--font-editorial);
+  margin-block: 16px;
+}
+.billing-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: end;
+}
+.billing-filters small {
+  grid-column: 1/-1;
+}
+.billing-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: 13px;
+}
+.billing-pagination > span {
+  margin-right: auto;
+}
+.billing-table-panel {
+  align-self: start;
+}
+.billing-webhook-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.billing-selected-row {
+  background: var(--color-accent-soft);
+}
+.billing-webhook-detail pre {
+  background: var(--color-ink);
+  color: var(--color-accent-soft);
+  padding: 24px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.billing-timeline {
+  padding-left: 24px;
+}
+.billing-timeline li {
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  margin-block: 12px;
+  font-size: 13px;
+}

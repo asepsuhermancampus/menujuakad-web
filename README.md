@@ -78,9 +78,9 @@ npm run start
 
 Build menyalin aset publik dan static ke output standalone. `npm run start` menjalankan server standalone di localhost secara default; atur port lewat environment `PORT`, bukan flag `next start`.
 
-## Figma dan desain
+## Stitch dan desain
 
-Acuan slicing aktif adalah [Menuju Akad V4](https://www.figma.com/design/5CJfAriMxIDxFgGFeQhv2q/Menuju-Akad-V4?t=a1VJtb4AWH2cJRgd-1), menggantikan URL sebelumnya sesuai instruksi user pada 7 Oktober 2026. URL tidak memuat node ID; frame target ditentukan setelah file dapat dibaca. Figma MCP tersedia, tetapi percobaan pembacaan V4 ditolak karena kuota Starter habis sehingga belum ada slicing atau perbandingan visual terhadap desain resmi. Integrasi tersebut hanya untuk konteks pengembangan, bukan dependency runtime. Panduan pemetaan dan status desain: [design system](docs/design-system.md).
+Acuan visual aktif adalah proyek Stitch **MENUJU-AKAD-UIUX** (`12559574101879777472`), design system **Editorial Ivory & Gold**, dengan **Noto Serif + Manrope**, sesuai keputusan user pada 7 Oktober 2026. MCP berhasil membaca metadata proyek/design system dan daftar layar; inspeksi visual lengkap serta slicing belum dilakukan dan menunggu izin user. Figma V4 dan tipografi Cormorant disimpan sebagai riwayat. Integrasi desain hanya untuk konteks pengembangan, bukan dependency runtime. Snapshot token berada di folder rancangan; panduan pemetaan dan status desain: [design system](docs/design-system.md).
 
 ## Mayar
 

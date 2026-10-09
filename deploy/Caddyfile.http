@@ -1,0 +1,10 @@
+# Tahap sementara selama DNS belum mengarah ke VPS yang dikonfirmasi.
+# Ganti dengan Caddyfile HTTPS setelah A apex/www menuju 43.173.15.136.
+http://menujuakad.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3100
+}
+
+http://www.menujuakad.com {
+	redir http://menujuakad.com{uri} 308
+}

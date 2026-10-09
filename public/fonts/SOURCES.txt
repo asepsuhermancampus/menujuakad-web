@@ -1,0 +1,8 @@
+Font lokal dari Google Fonts; SIL Open Font License di berkas pendamping.
+manrope-400.ttf | source Google Fonts CSS | SHA256 a13d9b41b0a471ce58f0e46d377fa3cc76615e4632c3b15eb397caadf7a13f0a | source_identical=True
+manrope-500.ttf | source Google Fonts CSS | SHA256 f433e5d333be1128d8ec8a28b8aadd0314d10e14e4105406076666bc830fc15d | source_identical=True
+manrope-600.ttf | source Google Fonts CSS | SHA256 6bad1a774228464cc88b8b0271555b266f7a3c64a7bedf15e165fdab4f6ac0ce | source_identical=True
+manrope-700.ttf | source Google Fonts CSS | SHA256 b9584e099e0e7f1e1e914c3037aabb9010c50346a3ce8df5eeeeecc0563044d8 | source_identical=True
+noto-serif-400.ttf | source Google Fonts CSS | SHA256 5473d2e43bdd018ee124a4addba8091fd0a29894b121cbb741023af6549662b6 | source_identical=True
+noto-serif-500.ttf | source Google Fonts CSS | SHA256 4ac293744360aaf983c105398e3fb4b5bfe03c784689c3c4f5c0071dce73e8df | source_identical=True
+noto-serif-600.ttf | source Google Fonts CSS | SHA256 6f232358fe1ca18c9ef85a5e6ef09b82188794256c9e8873f8f323f424eb6373 | source_identical=True

@@ -1,0 +1,175 @@
+/*
+ * Kontrol editor memakai token Editorial Ivory & Gold.
+ * Nilai turunan gelap (mis. teks di atas beige) dipilih agar tetap lolos kontras
+ * teks kecil; token resmi tetap dipakai untuk bidang dan aksen.
+ */
+.cover-modes {
+  gap: 12px;
+}
+.cover-mode-card {
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  text-align: center;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.cover-mode-card:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-rest);
+}
+.cover-mode-card > span {
+  font: 26px var(--font-editorial);
+  padding: 16px 0;
+}
+.cover-mode-card .button {
+  padding: 10px;
+  font-size: 11px;
+}
+.cover-mode-card .button[aria-pressed="true"] {
+  border-color: var(--color-primary-deep);
+  background: var(--color-primary-soft);
+}
+.cover-phone-preview {
+  padding: 28px 16px;
+  min-height: 360px;
+  margin: 0 -6px;
+  border-radius: var(--radius-card);
+  position: relative;
+}
+.cover-phone-preview h2,
+.cover-phone-preview p,
+.cover-phone-preview small {
+  color: var(--color-ink-fixed);
+}
+.cover-phone-preview h2 {
+  font-size: 30px;
+  margin-top: 28px;
+}
+.cover-phone-preview p {
+  font-size: 12px;
+}
+.cover-type-rule {
+  width: 70px;
+  height: 1px;
+  background: var(--color-gold);
+  margin: 32px auto;
+}
+.cover-phone-preview .cover-media-layer {
+  margin: -15px -5px 20px;
+}
+.cover-phone-preview .invitation-media {
+  margin: 0;
+}
+.cover-solid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.music-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 80px;
+  background: var(--color-primary-soft);
+}
+.music-wave span {
+  width: 6px;
+  background: var(--color-primary-deep);
+  border-radius: 3px;
+}
+.playlist-choice {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out);
+}
+.playlist-choice:hover {
+  border-color: var(--color-gold);
+}
+.playlist-choice[aria-pressed="true"] {
+  border-color: var(--color-primary-deep);
+  background: var(--color-primary-soft);
+}
+.playlist-choice small {
+  font-size: 10px;
+}
+.video-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 52px;
+  background: var(--color-accent-soft);
+  color: var(--color-muted);
+  min-height: 180px;
+  max-height: 420px;
+}
+.video-placeholder small {
+  font: 12px var(--font-body);
+  padding: 12px;
+}
+.duration-parts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+.duration-parts strong {
+  display: block;
+  font: 30px var(--font-editorial);
+}
+.duration-preview > small {
+  font-size: 10px;
+}
+.duration-cards .duration-parts > span {
+  padding: 12px;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-button);
+}
+.duration-minimal .duration-parts > span {
+  border-bottom: 1px solid var(--color-primary-deep);
+  padding: 12px 0;
+}
+.filter-thumbnail {
+  background: var(--color-accent-soft);
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font: 40px var(--font-editorial);
+  border-radius: var(--radius-card);
+}
+.filter-thumbnail small {
+  font: 11px var(--font-body);
+  margin-top: 18px;
+}
+.hashtag-preview {
+  font: 28px var(--font-editorial);
+  text-align: center;
+  background: var(--color-paper);
+  padding: 28px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .cover-modes {
+    grid-template-columns: 1fr;
+  }
+  .playlist-choice {
+    flex-direction: column;
+  }
+}

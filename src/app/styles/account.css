@@ -1,0 +1,257 @@
+.auth-header,
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 28px;
+}
+.auth-header a,
+.auth-footer a {
+  font-size: 12px;
+}
+.auth-footer {
+  border-top: 1px solid var(--color-border);
+  font-size: 11px;
+}
+.auth-footer nav {
+  display: flex;
+  gap: 20px;
+}
+.wizard-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+}
+.wizard-paper {
+  text-align: center;
+  align-self: start;
+}
+.wizard-paper h2 {
+  font-size: 28px;
+}
+.account-settings-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 32px;
+}
+.account-settings-nav {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 24px 0;
+}
+.account-settings-nav button {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: var(--radius-button);
+  font-size: 13px;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+.account-settings-nav button:hover {
+  background: var(--color-accent-soft);
+}
+.account-settings-nav button[aria-pressed="true"] {
+  background: var(--color-primary-soft);
+}
+.notifications-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  align-items: start;
+  margin-top: 32px;
+}
+.notifications-layout > .section {
+  padding: 0;
+}
+.support-stats {
+  margin-block: 28px;
+}
+@media (max-width: 767px) {
+  .auth-header,
+  .auth-footer {
+    flex-wrap: wrap;
+  }
+  .wizard-layout,
+  .account-settings-layout,
+  .notifications-layout {
+    grid-template-columns: 1fr;
+  }
+  .account-settings-nav {
+    display: flex;
+    overflow: auto;
+    padding: 12px 0;
+  }
+  .account-settings-nav button {
+    white-space: nowrap;
+  }
+  .notifications-layout {
+    gap: 20px;
+  }
+}
+.auth-state-card {
+  border: 1px solid var(--color-border);
+  padding: 20px;
+  background: var(--color-background);
+  text-align: center;
+  border-radius: var(--radius-button);
+  overflow-wrap: anywhere;
+}
+.auth-state-card p {
+  margin: 8px 0;
+  font-weight: 600;
+}
+.auth-card .card {
+  padding: 20px;
+}
+.auth-card h2 {
+  font-size: 22px;
+}
+.verification-symbol {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  font-size: 38px;
+  color: var(--color-primary-deep);
+}
+.auth-instructions {
+  padding-left: 20px;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* Auth nyata dan akun: komposisi sederhana memakai token Editorial Ivory & Gold. */
+.auth-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.auth-password-field {
+  gap: 8px;
+}
+.auth-google {
+  gap: 6px;
+  text-align: center;
+}
+.button.google-button {
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid #747775;
+  font-weight: 500;
+  box-shadow: none;
+  transform: none;
+}
+.button.google-button:hover {
+  background: #f8fafd;
+  border-color: #747775;
+  transform: none;
+  box-shadow: none;
+}
+.button.google-button svg {
+  flex: 0 0 20px;
+}
+.auth-card-compact .divider {
+  margin-block: 16px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.auth-recovery-link {
+  font-size: 12px;
+  text-align: right;
+}
+.account-live {
+  max-width: 1000px;
+}
+.account-live-nav {
+  margin-bottom: 32px;
+  gap: 24px;
+}
+.account-live-nav a {
+  padding-block: 12px;
+  font-size: 13px;
+}
+.account-live .card {
+  transform: none;
+}
+.account-live h1 {
+  font-size: clamp(28px, 5vw, 40px);
+}
+.account-live h2 {
+  font-size: 22px;
+}
+.account-live p,
+.account-live strong {
+  overflow-wrap: anywhere;
+}
+.account-live .button {
+  width: fit-content;
+  max-width: 100%;
+}
+.account-security-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.account-session {
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border);
+}
+@media (max-width: 767px) {
+  .account-security-grid {
+    grid-template-columns: 1fr;
+  }
+  .account-live .button {
+    width: 100%;
+  }
+}
+
+.auth-card-compact .auth-footnote a {
+  color: var(--color-ink);
+}
+.auth-card-compact label.check {
+  min-height: 44px;
+}
+.auth-card-compact .google-button {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.account-security-grid > * {
+  min-width: 0;
+}
+.account-live small {
+  overflow-wrap: anywhere;
+}
+.account-live label.check {
+  min-height: 44px;
+}
+@media (max-width: 390px) {
+  .auth-card-compact {
+    padding-inline: 24px;
+  }
+}
+
+/* Teks persetujuan membungkus dalam satu flex item, termasuk pada pembesaran teks. */
+.auth-card-compact .auth-fields > *,
+.auth-card-compact .auth-password-field > * {
+  min-width: 0;
+}
+.auth-consent > input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.auth-consent > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

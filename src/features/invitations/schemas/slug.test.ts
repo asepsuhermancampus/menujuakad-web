@@ -9,6 +9,13 @@ describe("alamat undangan", () => {
     }
   });
 
+  it.each(["about", "terms", "privacy", "preview-ui", "how-it-works", "fonts"])(
+    "melindungi rute publik slicing %s",
+    (slug) => {
+      expect(invitationSlugSchema.safeParse(slug).success).toBe(false);
+    },
+  );
+
   it.each(RESERVED_SLUGS)("melindungi rute sistem %s", (slug) => {
     expect(invitationSlugSchema.safeParse(slug).success).toBe(false);
   });

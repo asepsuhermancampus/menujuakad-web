@@ -1,0 +1,196 @@
+.business {
+  min-width: 0;
+}
+.business label {
+  display: grid;
+  gap: 0.5rem;
+}
+.business input:not([type="checkbox"]),
+.business select,
+.business textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--color-taupe);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+}
+.business-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+.business-table {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+.business table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  text-align: left;
+}
+.business caption {
+  text-align: left;
+  padding: 1rem;
+  font-weight: 600;
+}
+.business th,
+.business td {
+  padding: 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.business progress {
+  width: 100%;
+  accent-color: var(--color-gold);
+}
+.business-chart {
+  display: grid;
+  gap: 0.8rem;
+}
+.business-chart > div {
+  display: grid;
+  grid-template-columns: 4rem 1fr 2rem;
+  gap: 1rem;
+  align-items: center;
+}
+.business meter {
+  width: 100%;
+}
+.business .card,
+.business p {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .business-filters {
+    grid-template-columns: 1fr;
+  }
+}
+.guest-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.guest-summary-card {
+  min-width: 0;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.guest-summary-card:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-hover);
+}
+.guest-summary-card h2 {
+  font: 600 0.85rem var(--font-body);
+  margin: 0 0 1rem;
+}
+.guest-summary-card p {
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
+.guest-summary-card .guest-summary-value {
+  font: 500 2rem var(--font-editorial);
+  margin: 0 0 0.75rem;
+}
+.guest-summary-value span {
+  font: 500 0.8rem var(--font-body);
+}
+.guest-summary-rsvp {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+.guest-summary-rsvp > div {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+.guest-summary-rsvp dd {
+  margin: 0;
+  font-weight: 600;
+}
+.guest-cell-label {
+  display: none;
+}
+.guest-rsvp-badge {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.guest-rsvp-badge[data-status="ATTENDING"] {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+.guest-rsvp-badge[data-status="NOT_ATTENDING"] {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+.guest-rsvp-badge[data-status="MAYBE"] {
+  background: var(--color-primary-soft);
+  color: var(--color-ink);
+}
+.guest-pagination .button {
+  min-height: 48px;
+}
+@media (max-width: 1023px) {
+  .guest-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .guest-summary {
+    grid-template-columns: 1fr;
+  }
+  .guest-table {
+    overflow: visible;
+    border: 0;
+  }
+  .guest-table table {
+    min-width: 0;
+  }
+  /* Header tetap aksesibel saat baris menjadi kartu; satu DOM untuk desktop dan mobile. */
+  .guest-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .guest-table tbody {
+    display: grid;
+    gap: 1rem;
+  }
+  .guest-table tbody tr {
+    display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    padding: 0.5rem 1rem;
+  }
+  .guest-table td {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 1rem;
+    padding: 0.75rem 0;
+    overflow-wrap: anywhere;
+    align-items: start;
+  }
+  .guest-table .guest-cell-label {
+    display: block;
+    font-weight: 600;
+  }
+  .guest-table td:last-child {
+    border-bottom: 0;
+  }
+  .guest-table .guest-rsvp-badge {
+    justify-self: start;
+    max-width: 100%;
+    white-space: normal;
+  }
+}

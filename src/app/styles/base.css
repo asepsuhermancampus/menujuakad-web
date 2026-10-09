@@ -1,0 +1,124 @@
+/*
+ * Dasar global diselaraskan dengan skala tipografi dan panduan fokus Stitch:
+ * - Display/heading memakai Noto Serif 500; body/label Manrope.
+ * - Fokus: ring Black 2px dengan offset 3px (panduan komponen Stitch).
+ * - Eyebrow memakai label-eyebrow Stitch: 12px/600, tracking +0.08em.
+ */
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+p {
+  margin: 0 0 20px;
+  line-height: var(--leading-relaxed);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  margin: 0 0 20px;
+  letter-spacing: var(--tracking-display);
+}
+/* Skala headline Stitch: headline-lg 56, headline-md 40, headline-sm 28/headline-xs 22. */
+h1 {
+  font-size: clamp(36px, 4vw, 56px);
+}
+h2 {
+  font-size: clamp(28px, 3vw, 40px);
+}
+h3 {
+  font-size: 22px;
+  line-height: 1.36;
+  letter-spacing: var(--tracking-heading);
+}
+.container {
+  width: min(var(--container-max), calc(100% - 80px));
+  margin-inline: auto;
+}
+.section {
+  padding-block: clamp(56px, 8vw, 96px);
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-primary-deep);
+  text-transform: uppercase;
+}
+.muted,
+small {
+  color: var(--color-muted);
+}
+/*
+ * Animasi masuk yang halus untuk section utama — memberi kesan hidup tanpa
+ * mengganggu. Hanya opacity/transform (murah untuk compositor) dan otomatis
+ * dimatikan oleh guard prefers-reduced-motion di primitives.css.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero > *,
+.section > .section-heading,
+.cta > * {
+  animation: rise-in var(--duration-slow) var(--ease-out) both;
+}
+.hero > *:nth-child(2) {
+  animation-delay: 80ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero > *,
+  .section > .section-heading,
+  .cta > * {
+    animation: none;
+  }
+}

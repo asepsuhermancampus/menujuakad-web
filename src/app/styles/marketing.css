@@ -1,0 +1,523 @@
+.site-header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--layer-header);
+  /* Header melebar penuh agar kaca buram menutup seluruh lebar saat menggulir. */
+  width: 100%;
+  max-width: none;
+  padding-inline: max(40px, calc((100% - var(--container-max)) / 2));
+  /*
+   * Kaca buram halus agar konten yang menggulir terasa lembut di balik header.
+   * Fallback solid lebih dulu; browser yang mendukung backdrop-filter memakai
+   * lapisan transparan + blur.
+   */
+  background: var(--color-background);
+  background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+}
+.wordmark {
+  font: 22px var(--font-editorial);
+  letter-spacing: var(--tracking-heading);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wordmark span {
+  color: var(--color-primary-deep);
+}
+.site-header nav {
+  display: flex;
+  gap: 28px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.site-header nav a,
+.site-footer a {
+  text-decoration: none;
+  position: relative;
+  transition: color var(--duration-base) var(--ease-out);
+}
+/* Garis emas tipis yang tumbuh saat hover — penanda navigasi yang halus. */
+.site-header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 1px;
+  background: var(--color-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.site-header nav a:hover {
+  color: var(--color-primary-deep);
+}
+.site-header nav a:hover::after {
+  transform: scaleX(1);
+}
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding-block: 64px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.site-footer p {
+  font-size: 12px;
+  margin-top: 16px;
+  color: var(--color-muted);
+}
+.site-footer nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.site-footer nav a:hover {
+  color: var(--color-primary-deep);
+}
+.site-footer small {
+  grid-column: 1/-1;
+  font-size: 11px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding-block: clamp(72px, 10vw, 128px);
+}
+.hero h1 {
+  font-size: clamp(44px, 5.4vw, 72px);
+  line-height: 1.12;
+  letter-spacing: var(--tracking-display);
+}
+.hero-description {
+  max-width: 470px;
+  color: var(--color-muted);
+  font-size: 16px;
+  line-height: var(--leading-relaxed);
+}
+.hero-notes {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+}
+.hero-notes span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Titik emas kecil sebagai pemisah — aksen halus, bukan dekorasi berlebih. */
+.hero-notes span::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+}
+.hero-preview {
+  max-width: 360px;
+  justify-self: center;
+  transform: rotate(3deg);
+  text-align: center;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+.hero-preview:hover {
+  transform: rotate(1deg) translateY(-4px);
+}
+.preview-paper {
+  background: var(--color-surface);
+  padding: 24px;
+  box-shadow: var(--shadow-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+.preview-paper h2 {
+  font-size: 26px;
+  margin-top: 20px;
+}
+.preview-paper p,
+.preview-paper a {
+  font-size: 10px;
+}
+.preview-paper a:hover {
+  color: var(--color-primary-deep);
+}
+.hero-caption {
+  display: block;
+  margin-top: 24px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-muted);
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.section-heading a {
+  font-size: 12px;
+  color: var(--color-primary-deep);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-base) var(--ease-out);
+}
+.section-heading a:hover {
+  border-bottom-color: var(--color-gold);
+}
+.template-art {
+  display: block;
+  padding: 28px;
+  background: var(--color-beige);
+  text-align: center;
+  text-decoration: none;
+}
+.tone-botanical {
+  background: var(--color-success-soft);
+}
+.tone-minimal {
+  background: var(--color-surface-container);
+}
+.invitation-mini {
+  padding: 20px 12px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-rest);
+}
+.invitation-mini small {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+.invitation-mini h3 {
+  font-size: 22px;
+  margin: 14px 0;
+}
+.invitation-mini .floral-art {
+  height: 160px;
+}
+.template-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-rest);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+.template-card:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+.template-card .template-art {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+.template-card:hover .template-art {
+  transform: scale(1.02);
+}
+.template-copy {
+  padding: 24px;
+}
+.template-copy p {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.template-copy small {
+  font-size: 10px;
+}
+.template-copy h3 {
+  margin: 12px 0;
+}
+.template-copy .button {
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.template-copy a {
+  font-size: 12px;
+}
+.feature-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.feature-section .card p {
+  font-size: 13px;
+}
+.faq {
+  max-width: 780px;
+}
+.faq h2 {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.faq details {
+  padding: 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  margin-block: 10px;
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+.faq details:hover {
+  background: var(--color-paper);
+}
+.faq details[open] {
+  background: var(--color-paper);
+}
+.faq summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.faq summary:hover {
+  color: var(--color-primary-deep);
+}
+.faq details p {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-top: 16px;
+}
+.cta {
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+}
+.cta .actions {
+  justify-content: center;
+}
+.step-number {
+  font: 32px var(--font-editorial);
+  color: var(--color-primary-deep);
+  display: block;
+  margin-bottom: 24px;
+  letter-spacing: var(--tracking-heading);
+}
+.auth-wrap {
+  min-height: 72vh;
+  padding: 72px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-modal);
+  padding: 36px;
+  box-shadow: var(--shadow-rest);
+  transition: box-shadow var(--duration-slow) var(--ease-out);
+}
+.auth-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+.auth-card h1 {
+  font-size: 28px;
+}
+.auth-card .button {
+  width: 100%;
+}
+.auth-card p {
+  font-size: 13px;
+}
+.auth-card .divider {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+/*
+ * Login ringkas (auth-card-compact): satu fokus form tanpa blok panjang.
+ * Kartu lebih ramping, judul diberi tanda kecil emas, dan catatan status
+ * "akun uji" diletakkan sebagai kaki kartu agar tidak bersaing dengan form.
+ */
+.auth-card-compact {
+  max-width: 400px;
+  padding: 40px 36px 28px;
+}
+.auth-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.auth-mark {
+  width: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+.auth-card-compact h1 {
+  font-size: 26px;
+  line-height: 1.15;
+}
+.auth-card-compact .muted {
+  font-size: 14px;
+}
+.auth-card-compact form {
+  gap: 18px;
+}
+.auth-card-compact input[type="email"],
+.auth-card-compact input[type="password"],
+.auth-card-compact input[type="text"] {
+  padding: 12px 14px;
+  font-size: 15px;
+}
+.auth-show-password {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.auth-footnote {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: center;
+}
+.auth-footnote a {
+  color: var(--color-primary-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.auth-card-compact .local-message {
+  margin-top: 18px;
+}
+.legal-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+}
+.legal-layout aside a {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.legal-copy section {
+  margin-bottom: 36px;
+}
+.legal-copy p {
+  font-size: 14px;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.detail-preview {
+  background: var(--color-accent-soft);
+  padding: 36px;
+  text-align: center;
+}
+.detail-preview .preview-paper {
+  max-width: 380px;
+  margin: auto;
+}
+.search-field {
+  flex: 1;
+}
+.step-number + h3 {
+  font-size: 24px;
+}
+@media (max-width: 1023px) {
+  .site-header {
+    padding-inline: 32px;
+  }
+  .site-header nav {
+    gap: 16px;
+  }
+  .hero {
+    gap: 40px;
+  }
+  .hero h1 {
+    font-size: 56px;
+  }
+}
+@media (max-width: 767px) {
+  .site-header {
+    flex-wrap: wrap;
+    padding-block: 20px;
+    padding-inline: 20px;
+    gap: 16px;
+  }
+  .site-header nav {
+    order: 3;
+    width: 100%;
+    overflow: auto;
+    gap: 20px;
+    padding-top: 6px;
+  }
+  .site-header .actions {
+    gap: 10px;
+    font-size: 12px;
+  }
+  .site-header .button {
+    padding: 10px 14px;
+    min-height: 44px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    padding-block: 56px;
+    gap: 48px;
+  }
+  .hero h1 {
+    font-size: 44px;
+  }
+  .hero-preview {
+    max-width: 310px;
+    transform: none;
+  }
+  .feature-section,
+  .legal-layout,
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+  .section-heading {
+    align-items: start;
+  }
+  .section-heading a {
+    max-width: 100px;
+  }
+  .auth-card {
+    padding: 28px;
+  }
+  .legal-layout aside {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+.home-packages {
+  display: none;
+}
+.preview-gallery .card p {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1023px) {
+  .home-packages {
+    display: block;
+  }
+}
+@media (max-width: 767px) {
+  .home-packages .card:last-child {
+    display: none;
+  }
+}
