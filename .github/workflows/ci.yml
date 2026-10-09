@@ -36,11 +36,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - name: Perbarui npm
-        # npm 10.x yang dibundel Node 22 gagal dengan bug internal npm
-        # "Exit handler never called!" saat npm ci; npm 11 memperbaikinya.
-        run: npm install -g npm@11
-
       - name: Install dependensi
         run: npm ci --no-audit --no-fund
 
@@ -84,10 +79,6 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-
-      - name: Perbarui npm
-        # Alasan sama dengan job quality; npm 10.x gagal saat npm ci.
-        run: npm install -g npm@11
 
       - name: Install dependensi
         run: npm ci --no-audit --no-fund
