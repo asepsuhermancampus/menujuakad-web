@@ -14,6 +14,7 @@ const multimethodMigrations = [
   "20261009000000_auth_roles",
   "20261009001000_auth_multimethod",
   "20261009002000_auth_sms_policy",
+  "20261010000000_role_client_superadmin",
 ];
 
 async function main() {
@@ -105,7 +106,7 @@ async function main() {
       seedCounts = await db.$queryRaw<{ admins: number; customers: number; drafts: number }[]>`
         SELECT
           (SELECT count(*)::int FROM "User" WHERE email='admin@menujuakad.test' AND role='SUPERADMIN' AND status='ACTIVE') AS admins,
-          (SELECT count(*)::int FROM "User" WHERE email ~ '^customer(0[1-9]|10)@menujuakad[.]test$' AND role='CUSTOMER' AND status='ACTIVE') AS customers,
+          (SELECT count(*)::int FROM "User" WHERE email ~ '^customer(0[1-9]|10)@menujuakad[.]test$' AND role='CLIENT' AND status='ACTIVE') AS customers,
           (SELECT count(*)::int FROM "Invitation" WHERE slug ~ '^seed-customer-(0[1-9]|10)$' AND status='DRAFT' AND NOT "isPublished") AS drafts
       `;
     }

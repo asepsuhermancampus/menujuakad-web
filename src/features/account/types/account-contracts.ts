@@ -5,7 +5,7 @@ export type ProfileDto = {
   email: string | null;
   phone: string | null;
   avatarUrl: string | null;
-  role: "CLIENT" | "CUSTOMER" | "VENDOR" | "SUPERADMIN";
+  role: "CLIENT" | "SUPERADMIN";
   emailVerified: boolean;
   phoneVerified: boolean;
 };

@@ -13,9 +13,9 @@ describe("hasil login dua tahap", () => {
     });
   });
   it("hasil sesi lengkap mengikuti path lokal tervalidasi", () => {
-    expect(readLoginResult({ ok: true, redirectTo: "/vendor" })).toEqual({
+    expect(readLoginResult({ ok: true, redirectTo: "/dashboard" })).toEqual({
       kind: "authenticated",
-      redirectTo: "/vendor",
+      redirectTo: "/dashboard",
     });
   });
   it.each([

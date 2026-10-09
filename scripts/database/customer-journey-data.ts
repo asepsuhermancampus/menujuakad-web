@@ -110,7 +110,7 @@ export async function seedCustomerJourneys(db: SeedDatabase, input: CustomerJour
       Date.parse(manifest.createdAt) - (index + 1) * 86400000,
     ).toISOString();
     await db.query(
-      `INSERT INTO "User" ("id","email","name","phone","role","status","emailVerifiedAt","lastLoginAt","createdAt","updatedAt") VALUES ($1,$2,$3,$4,'CUSTOMER','ACTIVE',$5,$6,$7,$7)`,
+      `INSERT INTO "User" ("id","email","name","phone","role","status","emailVerifiedAt","lastLoginAt","createdAt","updatedAt") VALUES ($1,$2,$3,$4,'CLIENT','ACTIVE',$5,$6,$7,$7)`,
       [
         fixture.userId,
         fixture.email,

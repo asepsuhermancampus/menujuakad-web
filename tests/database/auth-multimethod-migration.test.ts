@@ -20,7 +20,7 @@ describe("identitas autentikasi multimethod PostgreSQL", () => {
     await db.close();
   });
 
-  it("normalisasi identitas mempertahankan CUSTOMER, hash dan semua relasi bisnis", async () => {
+  it("normalisasi identitas memetakan role lama ke CLIENT dan menjaga relasi bisnis", async () => {
     expect(
       (
         await db.query(
@@ -31,7 +31,7 @@ describe("identitas autentikasi multimethod PostgreSQL", () => {
       {
         email: "legacy@example.test",
         phone: "+6281234567890",
-        role: "CUSTOMER",
+        role: "CLIENT",
         phoneVerifiedAt: null,
       },
     ]);
@@ -53,10 +53,10 @@ describe("identitas autentikasi multimethod PostgreSQL", () => {
       ]);
     await expect(db.exec(`DELETE FROM "User" WHERE "id"='legacy'`)).rejects.toThrow();
   });
-  it("default CLIENT, phone-only/email-only signup dan role VENDOR/SUPERADMIN valid", async () => {
+  it("default CLIENT, phone-only/email-only signup dan role SUPERADMIN valid", async () => {
     await db.exec(`INSERT INTO "User" ("id","phone","updatedAt") VALUES ('phone-only','+6281234567891',now()),('second-phone','+6281234567892',now());
       INSERT INTO "User" ("id","email","updatedAt") VALUES ('email-only','email@example.test',now());
-      INSERT INTO "User" ("id","role","updatedAt") VALUES ('vendor','VENDOR',now()),('admin','SUPERADMIN',now());`);
+      INSERT INTO "User" ("id","role","updatedAt") VALUES ('admin','SUPERADMIN',now());`);
     expect(
       (
         await db.query(

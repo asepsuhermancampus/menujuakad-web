@@ -1,5 +1,13 @@
 # Changelog Implementasi Menuju Akad
 
+## Dua role saja: CLIENT dan SUPERADMIN — 10 Oktober 2026
+
+- **`UserRole` disederhanakan menjadi `CLIENT` dan `SUPERADMIN`.** `CUSTOMER` digabung ke `CLIENT` dan `VENDOR` dihapus karena tidak dibutuhkan. Halaman `/vendor` dihapus total (bukan dialihkan) dan tidak lagi menjadi target redirect yang sah.
+- **Migrasi `20261010000000_role_client_superadmin`** diterapkan ke Neon setelah backup (`pg_dump`, 980 baris) dan pengujian di PostgreSQL terisolasi. PostgreSQL tidak mendukung `ALTER TYPE ... DROP VALUE`, sehingga tipe enum dibuat ulang dan kolom dipindahkan melalui kolom sementara; pemetaan aditif tanpa menghapus baris/relasi. `migrate status` up to date, `migrate diff` tanpa drift.
+- **Kode, guard, dan routing disesuaikan:** `AuthRole` menjadi `CLIENT | SUPERADMIN`, `requireVendorSession` dihapus, regex path aman tidak lagi memuat `vendor`, query domain memakai `role: "CLIENT"` (bukan `IN ('CUSTOMER','CLIENT')`), dan tipe DTO akun menjadi `CLIENT | SUPERADMIN`.
+- **Dua temuan penting yang dicatat sebagai pelajaran:** (1) `DROP COLUMN`/`DROP TYPE` menghapus grant kolom sehingga grant runtime harus diterapkan ulang — jika tidak, login gagal `permission denied for table User`; (2) image lama yang memakai `role IN ('CUSTOMER','CLIENT')` tidak kompatibel dengan enum baru, sehingga image baru wajib diterbitkan segera setelah migrasi.
+- **Gate:** unit **610/610 (72 file)**, typecheck, lint, build exit 0, E2E **140/140** satu run. **Produksi terverifikasi:** rilis `preview-20261010-roles` (BUILD_ID `epeqWqDd6FN43imUrFlKy`) aktif, tujuh probe HTTPS lulus, `/vendor` 404, dan login nyata end-to-end 9/9 PASS. Akun uji dibersihkan; database kembali 0 user.
+
 ## Aktivasi login produksi — 10 Oktober 2026
 
 - **Login produksi kini berfungsi nyata.** `AUTH_SECRET` 64 karakter acak dan `AUTH_TRUST_PROXY=1` ditulis atomik ke `/etc/menujuakad/runtime.env` (root `0600`); nilainya tidak pernah dicatat pada dokumen, log, atau chat.

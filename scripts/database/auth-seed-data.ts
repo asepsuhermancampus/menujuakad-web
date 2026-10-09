@@ -166,7 +166,7 @@ export async function seedAuthPreproduction(db: SeedDatabase, input: AuthSeedMan
   let createdDrafts = 0;
   for (const account of manifest.accounts) {
     if (await ensureAccount(db, account)) createdAccounts++;
-    if (account.role === "CUSTOMER" && (await ensureDraft(db, account))) createdDrafts++;
+    if (account.role === "CLIENT" && (await ensureDraft(db, account))) createdDrafts++;
   }
   return { accounts: 11, createdAccounts, createdDrafts };
 }

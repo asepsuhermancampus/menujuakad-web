@@ -5,7 +5,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 
 export type SeedAccount = {
   email: string;
-  role: "SUPERADMIN" | "CUSTOMER";
+  role: "SUPERADMIN" | "CLIENT";
   password: string;
   userId: string;
 };
@@ -19,7 +19,7 @@ const expectedAccounts = [
   { email: "admin@menujuakad.test", role: "SUPERADMIN" as const },
   ...Array.from({ length: 10 }, (_, index) => ({
     email: `customer${String(index + 1).padStart(2, "0")}@menujuakad.test`,
-    role: "CUSTOMER" as const,
+    role: "CLIENT" as const,
   })),
 ];
 

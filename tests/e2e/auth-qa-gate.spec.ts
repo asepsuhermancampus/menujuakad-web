@@ -139,7 +139,7 @@ test("API nyata tanpa konfigurasi fail closed dan capability provider false", as
   }
 });
 
-test("alias akun dan vendor tidak membuka area privat dengan cookie palsu", async ({
+test("alias akun tidak membuka area privat dengan cookie palsu", async ({
   context,
   page,
 }) => {
@@ -149,7 +149,6 @@ test("alias akun dan vendor tidak membuka area privat dengan cookie palsu", asyn
   for (const path of [
     "/account",
     "/account/security",
-    "/vendor",
     "/dashboard/account",
     "/dashboard/settings",
     "/dashboard/settings/profile",
@@ -158,7 +157,7 @@ test("alias akun dan vendor tidak membuka area privat dengan cookie palsu", asyn
     await page.goto(path);
     await expect(page, path).toHaveURL(/\/login\?next=/);
     expect(new URL(page.url()).searchParams.get("next")).toMatch(
-      /^\/(account|dashboard|vendor)(\/|$)/,
+      /^\/(account|dashboard)(\/|$)/,
     );
     await expect(page.getByRole("heading", { name: "Masuk", exact: true })).toBeVisible();
   }

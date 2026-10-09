@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await requireAccountSession("/account");
-  const home =
-    session.role === "SUPERADMIN" ? "/admin" : session.role === "VENDOR" ? "/vendor" : "/dashboard";
+  const home = session.role === "SUPERADMIN" ? "/admin" : "/dashboard";
   return <AccountShell home={home}>{children}</AccountShell>;
 }

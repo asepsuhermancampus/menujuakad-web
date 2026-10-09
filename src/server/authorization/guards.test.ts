@@ -11,7 +11,7 @@ import { requireCustomerSession, requireSuperadminSession } from "./guards";
 const now = 1_800_000_000_000;
 const customer: VerifiedSession = {
   userId: "customer-example",
-  role: "CUSTOMER",
+  role: "CLIENT",
   expiresAt: now + 60_000,
 };
 const admin: VerifiedSession = {
@@ -123,9 +123,9 @@ describe.each([
   });
 });
 
-it("allows legacy CUSTOMER and CLIENT but denies VENDOR customer domain", async () => {
+it("allows CLIENT into the customer domain and keeps SUPERADMIN out", async () => {
   vi.spyOn(sessions, "getVerifiedSession").mockResolvedValue({ ...customer, role: "CLIENT" });
   expect(await requireCustomerSession("/dashboard")).toMatchObject({ role: "CLIENT" });
-  vi.spyOn(sessions, "getVerifiedSession").mockResolvedValue({ ...customer, role: "VENDOR" });
+  vi.spyOn(sessions, "getVerifiedSession").mockResolvedValue({ ...customer, role: "SUPERADMIN" });
   await expectLoginRedirect(requireCustomerSession("/dashboard"), "/login?next=%2Fdashboard");
 });

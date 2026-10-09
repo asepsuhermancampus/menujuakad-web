@@ -1,4 +1,5 @@
 import "server-only";
+import type { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/server/db/client";
 import { WorkspaceError } from "@/server/invitations/errors";
 import type { AnalyticsGroups, AnalyticsWindow } from "./types";
@@ -7,10 +8,10 @@ export async function readOwnedAnalytics(
   window: AnalyticsWindow,
 ): Promise<AnalyticsGroups> {
   const createdAt = { ...(window.from ? { gte: window.from } : {}), lte: window.to };
-  const identity = {
+  const identity: Prisma.UserWhereInput = {
     id: userId,
-    role: { in: ["CUSTOMER", "CLIENT"] as ("CUSTOMER" | "CLIENT")[] },
-    status: "ACTIVE" as const,
+    role: "CLIENT",
+    status: "ACTIVE",
   };
   return getPrisma().$transaction(async (tx) => {
     const user = await tx.user.findFirst({ where: identity, select: { id: true } });

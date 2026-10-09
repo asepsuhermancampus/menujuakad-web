@@ -30,13 +30,13 @@ beforeEach(() => {
   context.frameworkError = null;
   context.record = {
     expiresAt: new Date(Date.now() + 60000),
-    user: { id: "verified-user", status: "ACTIVE", role: "CUSTOMER" },
+    user: { id: "verified-user", status: "ACTIVE", role: "CLIENT" },
   };
 });
 afterEach(() => vi.unstubAllEnvs());
 describe("request scoped verified session", () => {
   it("returns identity only from current database record", async () => {
-    expect(await getVerifiedSession()).toMatchObject({ userId: "verified-user", role: "CUSTOMER" });
+    expect(await getVerifiedSession()).toMatchObject({ userId: "verified-user", role: "CLIENT" });
     context.record = null;
     expect(await getVerifiedSession()).toBeNull();
   });

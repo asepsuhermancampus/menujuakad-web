@@ -93,7 +93,7 @@ it("registration rejects privilege fields before inserting", async () => {
 });
 
 import { createOwnedDraft } from "../invitations/repository";
-it("CLIENT domain ownership is allowed while VENDOR and SUPERADMIN stay isolated", async () => {
+it("CLIENT domain ownership is allowed while SUPERADMIN stays isolated", async () => {
   const customer = await client.user.findUniqueOrThrow({ where: { phone: "+6281234567890" } });
   await client.template.create({
     data: {
@@ -111,11 +111,10 @@ it("CLIENT domain ownership is allowed while VENDOR and SUPERADMIN stay isolated
   };
   const draft = await createOwnedDraft(customer.id, input);
   expect((await listOwnedInvitations(customer.id)).map((r) => r.id)).toContain(draft.id);
-  await client.user.update({ where: { id: customer.id }, data: { role: "VENDOR" } });
+  await client.user.update({ where: { id: customer.id }, data: { role: "SUPERADMIN" } });
   expect(await listOwnedInvitations(customer.id)).toEqual([]);
   await expect(
-    createOwnedDraft(customer.id, { ...input, slug: "vendor-draft" }),
+    createOwnedDraft(customer.id, { ...input, slug: "superadmin-draft" }),
   ).rejects.toMatchObject({ status: 403 });
-  await client.user.update({ where: { id: customer.id }, data: { role: "SUPERADMIN" } });
   expect(await listOwnedInvitations(customer.id)).toEqual([]);
 });

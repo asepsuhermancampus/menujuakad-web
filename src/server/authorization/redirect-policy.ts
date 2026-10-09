@@ -1,7 +1,7 @@
 import "server-only";
 import type { AuthRole } from "./roles";
 
-const safeReturnPath = /^\/(?:dashboard|admin|vendor|account)(?:\/[A-Za-z0-9_-]+)*\/?$/;
+const safeReturnPath = /^\/(?:dashboard|admin|account)(?:\/[A-Za-z0-9_-]+)*\/?$/;
 
 export function buildSafeLoginRedirect(returnTo: string): string {
   // Allowlist path saja: tidak perlu decoding berulang atau memercayai origin browser.
@@ -13,7 +13,7 @@ export function buildSafeLoginRedirect(returnTo: string): string {
 }
 
 export function resolvePostLoginRedirect(next: string | undefined, role: AuthRole): string {
-  const root = role === "SUPERADMIN" ? "/admin" : role === "VENDOR" ? "/vendor" : "/dashboard";
+  const root = role === "SUPERADMIN" ? "/admin" : "/dashboard";
   if (typeof next !== "string") return root;
   const match = next.length <= 2048 ? safeReturnPath.exec(next) : null;
   return match &&

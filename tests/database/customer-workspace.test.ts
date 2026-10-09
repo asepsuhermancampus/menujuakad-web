@@ -19,7 +19,7 @@ let client: PrismaClient;
 const template = "menujuakad-seed-preproduction-template";
 beforeAll(async () => {
   await applyAuthMigrations(db);
-  await db.exec(`INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('customer1','customer01@menujuakad.test','CUSTOMER',now()),('customer2','customer02@menujuakad.test','CUSTOMER',now()),('admin','admin@menujuakad.test','SUPERADMIN',now()),('outside','real@example.test','CUSTOMER',now());
+  await db.exec(`INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('customer1','customer01@menujuakad.test','CLIENT',now()),('customer2','customer02@menujuakad.test','CLIENT',now()),('admin','admin@menujuakad.test','SUPERADMIN',now()),('outside','real@example.test','CLIENT',now());
     INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('${template}','TEST Internal','seed-preproduction-internal',now());`);
   client = new PrismaClient({ adapter: workspaceTestAdapter(db) });
   state.client = client;

@@ -20,7 +20,7 @@ beforeEach(() => {
 it("customer cannot list accounts", async () => {
   mock.session.mockResolvedValue({
     userId: "customer",
-    role: "CUSTOMER",
+    role: "CLIENT",
     expiresAt: Date.now() + 100000,
   });
   await expect(getAdminUsers(1)).rejects.toMatchObject({ status: 403 });

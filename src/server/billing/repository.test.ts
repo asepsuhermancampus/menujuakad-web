@@ -24,7 +24,7 @@ const input = (
 ) => ({ invitationId, packageSlug, amountIdr, reference: "deklarasi customer" });
 beforeAll(async () => {
   await applyAuthMigrations(db);
-  await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('owner','owner@menujuakad.test','CUSTOMER','ACTIVE',now()),('other','other@menujuakad.test','CUSTOMER','ACTIVE',now()),('admin','admin@menujuakad.test','SUPERADMIN','ACTIVE',now()),('suspended','suspended@menujuakad.test','CUSTOMER','SUSPENDED',now());
+  await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('owner','owner@menujuakad.test','CLIENT','ACTIVE',now()),('other','other@menujuakad.test','CLIENT','ACTIVE',now()),('admin','admin@menujuakad.test','SUPERADMIN','ACTIVE',now()),('suspended','suspended@menujuakad.test','CLIENT','SUSPENDED',now());
     INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('template','Template TEST','billing-test-template',now());
     INSERT INTO "Invitation" ("id","ownerUserId","templateId","title","slug","status","isPublished","updatedAt") VALUES ('draft','owner','template','Draft Uji','billing-draft','DRAFT',false,now()),('foreign','other','template','Asing','billing-foreign','DRAFT',false,now()),('published','owner','template','Terbit','billing-published','ACTIVE',true,now()),('blocked','suspended','template','Suspend','billing-suspend','DRAFT',false,now());`);
   client = new PrismaClient({ adapter: workspaceTestAdapter(db) });
@@ -136,7 +136,7 @@ it("persistent hourly request budget cannot be bypassed by new invitation", asyn
   });
 });
 it("10 pending requests limit remains persistent across different drafts", async () => {
-  await db.exec(`INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('budget','budget@menujuakad.test','CUSTOMER',now());
+  await db.exec(`INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('budget','budget@menujuakad.test','CLIENT',now());
     INSERT INTO "Invitation" ("id","ownerUserId","templateId","title","slug","updatedAt") SELECT 'budget-draft-'||g,'budget','template','Budget','budget-slug-'||g,now() FROM generate_series(1,11) g;
     INSERT INTO "PaymentTestRequest" ("id","invitationId","userId","amountIdr","packageSlug","status","createdAt","updatedAt") SELECT 'budget-test-'||g,'budget-draft-'||g,'budget',1000,'TEST_BASIC','REQUESTED',now(),now() FROM generate_series(1,10) g;`);
   await expect(createOwnedRequest("budget", input("budget-draft-11"))).rejects.toMatchObject({

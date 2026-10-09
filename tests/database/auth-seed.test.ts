@@ -1,6 +1,7 @@
 import {
   mkdtemp,
   readFile,
+  readdir,
   stat,
   chmod,
   symlink,
@@ -30,11 +31,10 @@ const env = {
 
 async function database() {
   const db = new PGlite();
-  for (const name of [
-    "20261007000000_foundation",
-    "20261008000000_auth_preproduction",
-    "20261008010000_payment_test",
-  ]) {
+  // Seluruh migrasi diterapkan agar enum UserRole sama dengan produksi (CLIENT/SUPERADMIN).
+  for (const name of (await readdir(new URL("../../prisma/migrations/", import.meta.url)))
+    .filter((name) => name !== "migration_lock.toml")
+    .sort()) {
     await db.exec(
       await readFile(
         new URL(`../../prisma/migrations/${name}/migration.sql`, import.meta.url),
@@ -180,7 +180,7 @@ describe("seed database tanpa takeover atau reset credential", () => {
           await db.query<{ role: string; status: string }>(`SELECT "role","status" FROM "User"`)
         ).rows;
         expect(users.filter((user) => user.role === "SUPERADMIN")).toHaveLength(1);
-        expect(users.filter((user) => user.role === "CUSTOMER")).toHaveLength(10);
+        expect(users.filter((user) => user.role === "CLIENT")).toHaveLength(10);
         expect(users.every((user) => user.status === "ACTIVE")).toBe(true);
         const credentials = (
           await db.query<{ userId: string; passwordHash: string }>(
@@ -243,7 +243,7 @@ describe("seed database tanpa takeover atau reset credential", () => {
       await cleanup(directory);
     }
   }, 30000);
-  it.each(["admin@menujuakad.test", "CUSTOMER01@menujuakad.test"])(
+  it.each(["admin@menujuakad.test", "customer01@menujuakad.test"])(
     "menolak collision email existing %s dan rollback seluruh seed",
     async (email) => {
       const db = await database();
@@ -259,7 +259,7 @@ describe("seed database tanpa takeover atau reset credential", () => {
           );
         });
         expect((await db.query(`SELECT "id","email","role","name" FROM "User"`)).rows).toEqual([
-          { id: "unrelated", email, role: "CUSTOMER", name: "Unrelated existing" },
+          { id: "unrelated", email, role: "CLIENT", name: "Unrelated existing" },
         ]);
         expect((await db.query(`SELECT * FROM "AuthCredential"`)).rows).toHaveLength(0);
         expect((await db.query(`SELECT * FROM "Template"`)).rows).toHaveLength(0);

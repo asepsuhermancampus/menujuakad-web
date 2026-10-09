@@ -13,7 +13,7 @@ let client: PrismaClient;
 const now = new Date("2026-10-08T12:00:00.000Z");
 beforeAll(async () => {
   await applyAuthMigrations(db);
-  await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('a','a@test.invalid','CUSTOMER','ACTIVE',now()),('b','b@test.invalid','CUSTOMER','ACTIVE',now()),('admin','admin@test.invalid','SUPERADMIN','ACTIVE',now()),('suspended','s@test.invalid','CUSTOMER','SUSPENDED',now());
+  await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('a','a@test.invalid','CLIENT','ACTIVE',now()),('b','b@test.invalid','CLIENT','ACTIVE',now()),('admin','admin@test.invalid','SUPERADMIN','ACTIVE',now()),('suspended','s@test.invalid','CLIENT','SUSPENDED',now());
   INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('t','TEST','test',now());`);
   for (const [id, owner, status, createdAt] of [
     ["lower", "a", "DRAFT", "2026-10-01T12:00:00.000Z"],

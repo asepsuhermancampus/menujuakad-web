@@ -13,6 +13,10 @@ const patterns = [
   { email: { startsWith: "daftar-" } },
   { email: { startsWith: "probe-" } },
   { email: { startsWith: "runtime-probe-" } },
+  { email: { startsWith: "cek-role" } },
+  { email: { startsWith: "uji-roles" } },
+  { email: { startsWith: "verif-roles" } },
+  { email: { startsWith: "admin-roles" } },
 ];
 
 const before = await prisma.user.findMany({ select: { email: true, role: true, status: true } });

@@ -2,13 +2,13 @@ import "server-only";
 import { getPrisma } from "@/server/db/client";
 import { verifyWorkspaceRole } from "./access";
 import { WorkspaceError, unavailable } from "@/server/invitations/errors";
-export async function getWorkspaceIdentity(role: "CUSTOMER" | "SUPERADMIN") {
+export async function getWorkspaceIdentity(role: "CLIENT" | "SUPERADMIN") {
   const session = await verifyWorkspaceRole(role);
   try {
     const user = await getPrisma().user.findFirst({
       where: {
         id: session.userId,
-        role: role === "CUSTOMER" ? { in: ["CUSTOMER", "CLIENT"] } : role,
+        role,
         status: "ACTIVE",
       },
       select: { name: true, email: true, phone: true },

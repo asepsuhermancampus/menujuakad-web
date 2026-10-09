@@ -74,7 +74,7 @@ export async function authRequest<T = unknown>(
 export function isLocalAuthRedirect(value: unknown): value is string {
   return (
     typeof value === "string" &&
-    /^\/(dashboard|admin|vendor|account)(\/[A-Za-z0-9_-]+)*\/?$/.test(value)
+    /^\/(dashboard|admin|account)(\/[A-Za-z0-9_-]+)*\/?$/.test(value)
   );
 }
 export function isGoogleAuthRedirect(value: unknown): value is string {

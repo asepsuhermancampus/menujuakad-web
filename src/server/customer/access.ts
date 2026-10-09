@@ -12,7 +12,7 @@ export async function verifyWorkspaceRole(role: VerifiedSession["role"]) {
     !session.userId
   )
     throw new WorkspaceError(401, "Silakan masuk kembali.");
-  if (role === "CUSTOMER" ? !isClientRole(session.role) : session.role !== role)
+  if (role === "CLIENT" ? !isClientRole(session.role) : session.role !== role)
     throw new WorkspaceError(403, "Akses ditolak.");
   return session;
 }

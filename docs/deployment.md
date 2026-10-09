@@ -1,5 +1,44 @@
 # Deployment VPS Menuju Akad
 
+## Penyederhanaan role: dua role saja — 10 Oktober 2026
+
+**Status fase 7: `preview-20261010-roles` aktif di produksi.** `UserRole` kini hanya **`CLIENT` dan `SUPERADMIN`**; `CUSTOMER` digabung ke `CLIENT` dan `VENDOR` dihapus beserta halaman `/vendor`. Produksi https://menujuakad.com memakai BUILD_ID **`epeqWqDd6FN43imUrFlKy`**, image `menujuakad-web:preview-20261010-roles` (`sha256:c1c6ce90e108e3a07636073543b4feacd3d762abe3055bd0edc0f60350bceff7`), artifact SHA256 `a05698d6a2d81eb9f0c86147cfa40a7e9524e3a618098e6807ccdcf623d383dd`, container `menujuakad-web-1` healthy.
+
+### Gate dan migrasi
+
+- Gate lokal: `db:validate`, typecheck, lint exit 0; unit **610/610 (72 file)**; build `NEXT_PUBLIC_APP_URL=https://menujuakad.com` exit 0; E2E **140/140 lulus satu run**.
+- Backup pra-migrasi `/tmp/menujuakad-role-20261010/before-role-simplification.sql` (980 baris, schema + data) via `pg_dump` image `postgres:18-bookworm`. Data saat migrasi kosong (0 user), sehingga pemetaan role tidak menyentuh data pengguna.
+- `prisma migrate deploy` menerapkan `20261010000000_role_client_superadmin`; `migrate status` up to date dan `migrate diff` **No difference detected**.
+- Migrasi diuji lebih dulu pada PostgreSQL terisolasi (PGlite) di `tests/database/role-simplification-migration.test.ts`: pemetaan `CUSTOMER`/`VENDOR` → `CLIENT`, `SUPERADMIN` tetap, nilai enum lama ditolak, dan trigger runtime tetap menolak `SUPERADMIN`.
+
+### Dua temuan penting saat penerapan
+
+1. **Grant runtime terhapus oleh migrasi.** `ALTER TABLE ... DROP COLUMN` dan `DROP TYPE` menghapus grant kolom di PostgreSQL, sehingga setelah migrasi login gagal dengan `permission denied for table User`. Grant diterapkan ulang (`scripts/database/apply-auth-grants.ts`) lalu diverifikasi: INSERT `CLIENT`/`ACTIVE` berhasil, trigger menolak `SUPERADMIN`, serta escalation role, DDL, dan `DELETE` pada `User` ditolak.
+2. **Image lama tidak kompatibel dengan enum baru.** Query bergaya lama `role IN ('CUSTOMER','CLIENT')` gagal dengan `invalid input value for enum "UserRole": "CUSTOMER"`. Karena itu image baru diterbitkan dan di-switch **segera setelah** migrasi; produksi tidak dibiarkan berjalan dengan image lama di atas enum baru.
+
+### Bukti produksi sesudah switch
+
+- Tujuh probe HTTPS lulus: `/`, `/login`, `/register`, `/account`, `/dashboard`, `/api/health/live`, `/api/health` (readiness `database ok`), serta `/api/auth/capabilities`.
+- `/vendor` mengembalikan **404** (rute dihapus total, bukan dialihkan).
+- Login nyata end-to-end **9/9 PASS** dengan image 2-role: login kredensial nyata (cookie HttpOnly+Secure), `/account`, `/account/security`, `/dashboard`, kredensial salah → 401, tanpa CSRF → 403, logout → 200.
+- Akun uji dan throttle dibersihkan; database kembali `users 0` dengan enum `["CLIENT","SUPERADMIN"]`.
+- Rollback manual bila diperlukan (image sebelumnya masih tersedia):
+```bash
+sudo -n env MENUJUAKAD_IMAGE=menujuakad-web:preview-20261010-auth docker compose \
+  --env-file /srv/menujuakad/backups/before-preview-20261010-roles/release.env \
+  --project-name menujuakad \
+  -f /srv/menujuakad/deploy/compose.yaml \
+  -f /srv/menujuakad/deploy/compose.neon.yaml \
+  up -d --wait --wait-timeout 90 web
+```
+  Catatan: rollback image ke `preview-20261010-auth` **tidak kompatibel** dengan enum baru (lihat temuan 2); pemulihan schema hanya lewat restore snapshot, bukan rollback image.
+
+### Batas yang masih terbuka
+
+- Provider Google/Resend/Twilio belum dikonfigurasi; verifikasi email, OTP SMS, dan OAuth belum dapat diuji end-to-end. `capabilities` melaporkan `false` secara jujur.
+- Mayar/persistence bisnis, restore database teruji, dan fidelity seluruh Stitch tetap terbuka.
+- Menambah role baru di masa depan memerlukan migrasi enum baru; jangan mengandalkan `ALTER TYPE ... ADD VALUE` di dalam transaksi yang sama dengan pemakaian nilai barunya.
+
 ## Aktivasi login produksi: AUTH_SECRET, migrasi Neon, dan grant runtime — 10 Oktober 2026
 
 **Status fase 6: login produksi berfungsi nyata.** `AUTH_SECRET` (64 karakter acak, dibangkitkan server) dan `AUTH_TRUST_PROXY=1` aktif pada `/etc/menujuakad/runtime.env` (root `0600`, nilai tidak pernah dicatat pada dokumen/log/chat). Lima migrasi auth diterapkan ke Neon `menujuakad-preproduction`, dan grant runtime terbatas diterapkan. Container `menujuakad-web-1` tetap `preview-20261010-auth` BUILD_ID `O09eZzNI28H-sbZQG2szk` healthy; tidak ada image/schema bisnis baru.

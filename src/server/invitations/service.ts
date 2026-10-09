@@ -4,7 +4,7 @@ import { createInvitationSchema, updateInvitationSchema } from "./input";
 import { WorkspaceError, unavailable } from "./errors";
 import * as repository from "./repository";
 async function customerOperation<T>(operation: (userId: string) => Promise<T>): Promise<T> {
-  const session = await verifyWorkspaceRole("CUSTOMER");
+  const session = await verifyWorkspaceRole("CLIENT");
   try {
     return await operation(session.userId);
   } catch (error) {

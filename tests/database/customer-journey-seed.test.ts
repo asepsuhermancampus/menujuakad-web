@@ -1,4 +1,4 @@
-import { readFile, mkdtemp, unlink, rmdir } from "node:fs/promises";
+import { readFile, readdir, mkdtemp, unlink, rmdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PGlite } from "@electric-sql/pglite";
@@ -13,11 +13,10 @@ import { withCustomerJourneyManifest } from "../../scripts/database/customer-jou
 import { seedCustomerJourneys } from "../../scripts/database/customer-journey-data";
 async function database() {
   const db = new PGlite();
-  for (const name of [
-    "20261007000000_foundation",
-    "20261008000000_auth_preproduction",
-    "20261008010000_payment_test",
-  ])
+  // Seluruh migrasi diterapkan agar enum UserRole sama dengan produksi (CLIENT/SUPERADMIN).
+  for (const name of (await readdir(new URL("../../prisma/migrations/", import.meta.url)))
+    .filter((name) => name !== "migration_lock.toml")
+    .sort())
     await db.exec(
       await readFile(
         new URL(`../../prisma/migrations/${name}/migration.sql`, import.meta.url),
@@ -36,7 +35,7 @@ describe("30 customer journey fixtures PostgreSQL nyata", () => {
     try {
       expect(await journeyReviewer(db)).toBeNull();
       await db.exec(
-        `INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('reviewer','admin@menujuakad.test','CUSTOMER',now())`,
+        `INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('reviewer','admin@menujuakad.test','CLIENT',now())`,
       );
       expect(await journeyReviewer(db)).toBeNull();
       await db.exec(`UPDATE "User" SET "role"='SUPERADMIN',"status"='SUSPENDED'`);
@@ -62,7 +61,7 @@ describe("30 customer journey fixtures PostgreSQL nyata", () => {
         });
         const users = (
           await db.query<{ role: string; name: string | null; lastLoginAt: Date }>(
-            `SELECT * FROM "User" WHERE "role"='CUSTOMER'`,
+            `SELECT * FROM "User" WHERE "role"='CLIENT'`,
           )
         ).rows;
         expect(users).toHaveLength(30);
@@ -127,12 +126,12 @@ describe("30 customer journey fixtures PostgreSQL nyata", () => {
         expect(
           (
             await db.query(
-              `SELECT * FROM "User" WHERE "role"='CUSTOMER' AND "emailVerifiedAt" IS NULL`,
+              `SELECT * FROM "User" WHERE "role"='CLIENT' AND "emailVerifiedAt" IS NULL`,
             )
           ).rows,
         ).toHaveLength(10);
         expect(
-          (await db.query(`SELECT * FROM "User" WHERE "role"='CUSTOMER' AND "name" IS NULL`)).rows,
+          (await db.query(`SELECT * FROM "User" WHERE "role"='CLIENT' AND "name" IS NULL`)).rows,
         ).toHaveLength(6);
         for (const table of ["UserSession", "Package"])
           expect((await db.query(`SELECT * FROM "${table}"`)).rows).toHaveLength(0);

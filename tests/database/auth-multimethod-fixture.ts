@@ -3,12 +3,19 @@ import type { PGlite } from "@electric-sql/pglite";
 const migrations = new URL("../../prisma/migrations/", import.meta.url);
 export async function applyAuthMigrations(db: PGlite, legacy = false) {
   for (const name of (await readdir(migrations)).sort()) {
-    if (name === "migration_lock.toml" || (legacy && name.startsWith("20261009"))) continue;
+    // Mode legacy berhenti sebelum migrasi multimethod dan penyederhanaan role.
+    if (name === "migration_lock.toml") continue;
+    if (legacy && (name.startsWith("20261009") || name.startsWith("20261010"))) continue;
     await db.exec(await readFile(new URL(`${name}/migration.sql`, migrations), "utf8"));
   }
 }
 export async function applyMultimethodMigration(db: PGlite) {
-  for (const name of ["20261009000000_auth_roles", "20261009001000_auth_multimethod"]) {
+  // Termasuk penyederhanaan role agar hasil akhir sama dengan database produksi.
+  for (const name of [
+    "20261009000000_auth_roles",
+    "20261009001000_auth_multimethod",
+    "20261010000000_role_client_superadmin",
+  ]) {
     await db.exec(await readFile(new URL(`${name}/migration.sql`, migrations), "utf8"));
   }
 }

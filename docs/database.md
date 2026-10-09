@@ -172,7 +172,7 @@ Referensi resmi yang diperiksa saat fondasi:
 
 | Model             | Tanggung jawab dan constraint utama                                                                                   |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
-| User              | Akun, email unique, role CUSTOMER/SUPERADMIN, status ACTIVE/SUSPENDED. Auth belum diimplementasikan.                  |
+| User              | Akun, email/phone opsional unique, role CLIENT/SUPERADMIN, status ACTIVE/SUSPENDED. Auth multimethod aktif.           |
 | Template          | Slug unique, status DRAFT/PUBLISHED/HIDDEN/ARCHIVED, metadata visual opsional.                                        |
 | TemplateFeature   | Primary key gabungan template + featureKey.                                                                           |
 | Package           | Slug unique, harga integer IDR, durasi, status; belum ada harga komersial yang di-seed.                               |
@@ -211,6 +211,17 @@ Seed menambah satu template pengembangan berstatus DRAFT, tidak membuat user/pas
 SQL migrasi awal sudah dijalankan pada PostgreSQL terisolasi PGlite melalui integration test. Unique slug, foreign key yang melindungi owner/template, membership unik, constraint harga/currency/durasi, dan penyimpanan nominal integer telah diuji. Ini tidak menggantikan pengujian adapter/koneksi Neon.
 
 Belum ada migrasi yang diterapkan ke Neon. Saat URL branch pengembangan tersedia: verifikasi target → deploy migrasi → seed dua kali untuk memeriksa idempotensi → probe health → catat hasil. Jangan menandai koneksi selesai sebelum query nyata berhasil.
+
+## Penyederhanaan role menjadi CLIENT dan SUPERADMIN — 10 Oktober 2026
+
+Tujuh migrasi sudah diterapkan ke Neon `menujuakad-preproduction` (`migrate status` up to date, `migrate diff` tanpa drift). Migrasi terakhir `20261010000000_role_client_superadmin` menyederhanakan `UserRole` menjadi **hanya `CLIENT` dan `SUPERADMIN`**:
+
+- `CUSTOMER` dan `CLIENT` digabung menjadi `CLIENT`; `VENDOR` dihapus karena tidak dipakai. Default kolom tetap `CLIENT`.
+- PostgreSQL tidak mendukung `ALTER TYPE ... DROP VALUE`, sehingga migrasi membuat ulang tipe enum dan memindahkan kolom melalui kolom sementara bertipe teks (bukan `ALTER TYPE` in-place). Pemetaan bersifat aditif: tidak ada baris atau relasi bisnis yang dihapus.
+- Migrasi juga membuat ulang fungsi/trigger `auth_guard_runtime_registration`, karena keduanya merujuk nama tipe lama. Trigger tetap menolak `SUPERADMIN` dari role runtime.
+- **Pelajaran penting:** `ALTER TABLE ... DROP COLUMN` dan `DROP TYPE` **menghapus grant kolom** di PostgreSQL. Setelah migrasi ini grant runtime harus **diterapkan ulang** (`scripts/database/apply-auth-grants.ts`), jika tidak login akan gagal dengan `permission denied for table User`. Jalankan verifikasi `scripts/database/verify-auth-runtime-grants.ts` sesudah setiap migrasi yang menyentuh kolom `User`.
+- Image lama yang masih memakai `role IN ('CUSTOMER','CLIENT')` **tidak kompatibel** dengan enum baru (`invalid input value for enum "UserRole": "CUSTOMER"`). Migrasi enum wajib diikuti penerbitan image baru; rilis `preview-20261010-roles` melakukannya.
+- Rute `/vendor` dihapus total (bukan dialihkan) dan tidak lagi menjadi target redirect yang sah. Halaman `/account` serta `/account/security` tetap berlaku untuk kedua role.
 
 ## Ekspansi per domain
 

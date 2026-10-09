@@ -27,7 +27,7 @@ export async function readTestInvitations(userId: string, page: number) {
   await assertAdmin(userId);
   const rows = await getPrisma().invitation.findMany({
     where: {
-      owner: { is: { email: { in: testCustomerEmails }, role: { in: ["CUSTOMER", "CLIENT"] } } },
+      owner: { is: { email: { in: testCustomerEmails }, role: "CLIENT" } },
     },
     select: {
       id: true,

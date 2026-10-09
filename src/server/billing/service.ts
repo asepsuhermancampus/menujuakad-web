@@ -20,12 +20,12 @@ async function operation<T>(
     );
   }
 }
-export const requireBillingCustomer = () => verifyWorkspaceRole("CUSTOMER");
-export const listCustomerTestRequests = () => operation("CUSTOMER", repository.listOwnedRequests);
-export const listCustomerBillingDrafts = () => operation("CUSTOMER", repository.listOwnedDrafts);
+export const requireBillingCustomer = () => verifyWorkspaceRole("CLIENT");
+export const listCustomerTestRequests = () => operation("CLIENT", repository.listOwnedRequests);
+export const listCustomerBillingDrafts = () => operation("CLIENT", repository.listOwnedDrafts);
 export const listAdminPaymentTests = () => operation("SUPERADMIN", repository.listAdminRequests);
 export function getCustomerTestRequest(id: string) {
-  return operation("CUSTOMER", async (userId) => {
+  return operation("CLIENT", async (userId) => {
     if (!billingIdSchema.safeParse(id).success)
       throw new WorkspaceError(404, "Permintaan uji tidak ditemukan.");
     const row = await repository.findOwnedRequest(userId, id);
@@ -34,7 +34,7 @@ export function getCustomerTestRequest(id: string) {
   });
 }
 export function createCustomerTestRequest(raw: unknown) {
-  return operation("CUSTOMER", (userId) => {
+  return operation("CLIENT", (userId) => {
     const parsed = createTestSchema.safeParse(raw);
     if (!parsed.success) throw new WorkspaceError(400, "Data permintaan uji tidak valid.");
     const item = testingPackages.find((item) => item.slug === parsed.data.packageSlug)!;

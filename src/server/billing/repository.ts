@@ -4,13 +4,14 @@ import type { Prisma } from "@/generated/prisma/client";
 import { WorkspaceError } from "@/server/invitations/errors";
 import { adminTestDto, adminTestSelect, testRequestDto, testRequestSelect } from "./dto";
 import type { CreateTestInput, ReviewStatus } from "./validation";
-const customerScope = (userId: string) => ({
+// Anotasi tipe Prisma menjaga literal role tetap sempit tanpa `as const` berulang.
+const customerScope = (userId: string): Prisma.PaymentTestRequestWhereInput => ({
   userId,
   user: {
     is: {
       id: userId,
-      role: { in: ["CUSTOMER", "CLIENT"] as ("CUSTOMER" | "CLIENT")[] },
-      status: "ACTIVE" as const,
+      role: "CLIENT",
+      status: "ACTIVE",
     },
   },
   invitation: { is: { ownerUserId: userId } },
@@ -21,7 +22,7 @@ export function listOwnedDrafts(userId: string) {
       ownerUserId: userId,
       status: "DRAFT",
       isPublished: false,
-      owner: { is: { role: { in: ["CUSTOMER", "CLIENT"] }, status: "ACTIVE" } },
+      owner: { is: { role: "CLIENT", status: "ACTIVE" } },
     },
     select: { id: true, title: true },
     orderBy: { createdAt: "desc" },
@@ -77,7 +78,7 @@ export async function createOwnedRequest(userId: string, input: CreateTestInput)
       SELECT i."id", i."status", i."isPublished" FROM "Invitation" i
       JOIN "User" u ON u."id"=i."ownerUserId"
       WHERE i."id"=${input.invitationId} AND i."ownerUserId"=${userId}
-        AND u."status"='ACTIVE' AND u."role" IN ('CUSTOMER','CLIENT') FOR UPDATE OF i`;
+        AND u."status"='ACTIVE' AND u."role"='CLIENT' FOR UPDATE OF i`;
     const draft = drafts[0];
     if (!draft) throw new WorkspaceError(404, "Undangan tidak ditemukan.");
     if (draft.status !== "DRAFT" || draft.isPublished)

@@ -38,7 +38,7 @@ beforeEach(() => {
   state.review.mockResolvedValue({ status: "APPROVED_TEST" });
   state.customer.mockResolvedValue({
     userId: "customer1",
-    role: "CUSTOMER",
+    role: "CLIENT",
     expiresAt: Date.now() + 60000,
   });
 });

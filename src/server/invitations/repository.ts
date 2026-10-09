@@ -9,13 +9,14 @@ const internalTemplate = {
   slug: "seed-preproduction-internal",
   status: "DRAFT" as const,
 };
-const ownerScope = (userId: string) => ({
+// Anotasi tipe Prisma menjaga literal role tetap sempit tanpa `as const` berulang.
+const ownerScope = (userId: string): Prisma.InvitationWhereInput => ({
   ownerUserId: userId,
   owner: {
     is: {
       id: userId,
-      role: { in: ["CUSTOMER", "CLIENT"] as ("CUSTOMER" | "CLIENT")[] },
-      status: "ACTIVE" as const,
+      role: "CLIENT",
+      status: "ACTIVE",
     },
   },
 });
@@ -68,7 +69,7 @@ async function assertDraft(tx: Prisma.TransactionClient, userId: string, id: str
 export async function createOwnedDraft(userId: string, input: CreateInvitationInput) {
   return getPrisma().$transaction(async (tx) => {
     const user = await tx.user.findFirst({
-      where: { id: userId, role: { in: ["CUSTOMER", "CLIENT"] }, status: "ACTIVE" },
+      where: { id: userId, role: "CLIENT", status: "ACTIVE" },
       select: { id: true },
     });
     if (!user) throw new WorkspaceError(403, "Akses ditolak.");

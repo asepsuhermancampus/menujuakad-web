@@ -30,7 +30,7 @@ describe("resolver menolak identitas palsu dari browser", () => {
         authorization: "Bearer fake-token",
       },
     },
-    { url: "/dashboard?role=CUSTOMER", headers: { cookie: "role=CUSTOMER; userId=fake" } },
+    { url: "/dashboard?role=CLIENT", headers: { cookie: "role=CLIENT; userId=fake" } },
   ])("request $url tidak memberi sesi", async ({ url, headers }) => {
     browser.request = new NextRequest(new URL(url, "https://menujuakad.example"), { headers });
     expect(await getVerifiedSession()).toBeNull();

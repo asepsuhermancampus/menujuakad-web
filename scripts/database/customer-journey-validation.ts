@@ -33,7 +33,7 @@ export async function validateJourneyIdentity(
     "User",
     '"id"=$1 OR lower("email")=lower($2)',
     [fixture.userId, fixture.email],
-    { id: fixture.userId, email: fixture.email, role: "CUSTOMER" },
+    { id: fixture.userId, email: fixture.email, role: "CLIENT" },
   );
   if (user) {
     const credential = (

@@ -1,5 +1,7 @@
 # Rencana implementasi autentikasi Menuju Akad
 
+> **Catatan superseded (10 Oktober 2026):** dokumen ini adalah **bukti historis bertanggal 9 Oktober 2026** dan tidak ditulis ulang. Keputusan user 10 Oktober 2026 menyederhanakan `UserRole` menjadi **hanya `CLIENT` dan `SUPERADMIN`**: `CUSTOMER` digabung ke `CLIENT`, `VENDOR` dihapus, dan halaman `/vendor` dihapus total. Rujukan VENDOR/CUSTOMER di bawah menggambarkan keadaan saat dokumen dibuat, bukan kontrak aktif. Kontrak aktif ada di `docs/database.md` dan `docs/deployment.md`.
+
 ## Mandat dan status dokumen
 
 Tanggal audit: 9 Oktober 2026. Dokumen ini menjadi kontrak kerja PM, fullstack, UI dan QA untuk implementasi autentikasi lengkap yang sudah diperintahkan user: Google otomatis daftar/masuk, email atau telepon dengan kata sandi, pemulihan, OTP SMS kondisional, profil dan keamanan, pengaitan metode terverifikasi, sesi dan logout, CSRF, pembatasan percobaan, serta CLIENT/VENDOR/SUPERADMIN. Tidak ada permintaan persetujuan implementasi ulang. Deploy, push, perubahan VPS dan migrasi database aktif berada di luar tugas ini.

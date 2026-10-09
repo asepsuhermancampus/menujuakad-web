@@ -41,7 +41,7 @@ describe("HTTP autentikasi browser", () => {
     });
   });
   it("membatasi redirect lokal pada domain aplikasi yang disahkan", () => {
-    for (const path of ["/dashboard", "/admin/users", "/vendor", "/account/security"])
+    for (const path of ["/dashboard", "/admin/users", "/account/security"])
       expect(isLocalAuthRedirect(path)).toBe(true);
     for (const path of [
       "//evil.test",

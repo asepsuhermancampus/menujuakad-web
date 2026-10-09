@@ -29,7 +29,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   mocks.session.mockResolvedValue({
     userId: "owner1",
-    role: "CUSTOMER",
+    role: "CLIENT",
     expiresAt: Date.now() + 100000,
   });
 });
@@ -45,7 +45,7 @@ it("rejects superadmin as customer and expired sessions", async () => {
     expiresAt: Date.now() + 100000,
   });
   await expect(listCustomerInvitations()).rejects.toMatchObject({ status: 403 });
-  mocks.session.mockResolvedValue({ userId: "owner1", role: "CUSTOMER", expiresAt: 0 });
+  mocks.session.mockResolvedValue({ userId: "owner1", role: "CLIENT", expiresAt: 0 });
   await expect(listCustomerInvitations()).rejects.toMatchObject({ status: 401 });
 });
 it("scopes guessed ID lookup to actual user without revealing owner", async () => {

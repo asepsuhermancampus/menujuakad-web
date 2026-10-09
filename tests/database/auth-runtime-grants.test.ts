@@ -87,7 +87,6 @@ describe("grant runtime auth/CRUD minimal", () => {
         expect(user.status).toBe("ACTIVE");
         expect(user.smsOtpEnabled).toBe(false);
         await expect(prisma.user.create({ data: { role: "SUPERADMIN" } })).rejects.toThrow();
-        await expect(prisma.user.create({ data: { role: "VENDOR" } })).rejects.toThrow();
         await expect(prisma.user.create({ data: { status: "SUSPENDED" } })).rejects.toThrow();
         await expect(
           prisma.user.update({ where: { id: user.id }, data: { role: "SUPERADMIN" } }),

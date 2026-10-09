@@ -11,11 +11,7 @@ async function requireSession(
   const session = await getVerifiedSession();
   if (
     !session ||
-    (role
-      ? role === "CUSTOMER"
-        ? !isClientRole(session.role)
-        : session.role !== role
-      : !isAuthRole(session.role)) ||
+    (role ? !roleMatches(session.role, role) : !isAuthRole(session.role)) ||
     typeof session.userId !== "string" ||
     session.userId.trim().length === 0 ||
     !Number.isSafeInteger(session.expiresAt) ||
@@ -26,8 +22,13 @@ async function requireSession(
   return session;
 }
 
+/** CLIENT adalah satu-satunya role customer; SUPERADMIN harus cocok persis. */
+function roleMatches(actual: VerifiedSession["role"], required: VerifiedSession["role"]): boolean {
+  return required === "CLIENT" ? isClientRole(actual) : actual === required;
+}
+
 export function requireCustomerSession(returnTo: string): Promise<VerifiedSession> {
-  return requireSession(returnTo, "CUSTOMER");
+  return requireSession(returnTo, "CLIENT");
 }
 
 export function requireSuperadminSession(returnTo: string): Promise<VerifiedSession> {
@@ -36,7 +37,4 @@ export function requireSuperadminSession(returnTo: string): Promise<VerifiedSess
 
 export function requireAccountSession(returnTo: string): Promise<VerifiedSession> {
   return requireSession(returnTo);
-}
-export function requireVendorSession(returnTo: string): Promise<VerifiedSession> {
-  return requireSession(returnTo, "VENDOR");
 }

@@ -31,7 +31,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   state.session.mockResolvedValue({
     userId: "customer1",
-    role: "CUSTOMER",
+    role: "CLIENT",
     expiresAt: Date.now() + 60000,
   });
 });
@@ -42,7 +42,7 @@ it("requires verified customer for every billing read and QR access", async () =
   expect(state.list).not.toHaveBeenCalled();
 });
 it("rejects expired session and superadmin at customer operation", async () => {
-  state.session.mockResolvedValue({ userId: "customer1", role: "CUSTOMER", expiresAt: 0 });
+  state.session.mockResolvedValue({ userId: "customer1", role: "CLIENT", expiresAt: 0 });
   await expect(listCustomerTestRequests()).rejects.toMatchObject({ status: 401 });
   state.session.mockResolvedValue({
     userId: "admin",

@@ -19,15 +19,15 @@ const input = { email: "user@example.invalid", password: "dummy-uji!", next: "/a
 beforeEach(() => {
   vi.resetAllMocks();
   store.reserveLoginAttempt.mockResolvedValue(true);
-  store.rotatePasswordSession.mockResolvedValue({ id: "u", role: "CUSTOMER", status: "ACTIVE" });
+  store.rotatePasswordSession.mockResolvedValue({ id: "u", role: "CLIENT", status: "ACTIVE" });
 });
 describe("server authentication", () => {
   it("gives identical denial for unknown, wrong password and suspended users", async () => {
     const hash = await hashPassword(input.password);
     for (const record of [
       null,
-      { passwordHash: hash, user: { id: "u", role: "CUSTOMER", status: "SUSPENDED" } },
-      { passwordHash: hash, user: { id: "u", role: "CUSTOMER", status: "ACTIVE" } },
+      { passwordHash: hash, user: { id: "u", role: "CLIENT", status: "SUSPENDED" } },
+      { passwordHash: hash, user: { id: "u", role: "CLIENT", status: "ACTIVE" } },
     ]) {
       store.findCredential.mockResolvedValue(record);
       expect(await loginWithPassword({ ...input, password: "wrong" }, [], undefined)).toEqual({
@@ -38,7 +38,7 @@ describe("server authentication", () => {
   it("rotates opaque session and returns role-safe redirect without identity", async () => {
     store.findCredential.mockResolvedValue({
       passwordHash: await hashPassword(input.password),
-      user: { id: "u", role: "CUSTOMER", status: "ACTIVE" },
+      user: { id: "u", role: "CLIENT", status: "ACTIVE" },
     });
     const oldToken = "a".repeat(43);
     const result = await loginWithPassword(
@@ -101,7 +101,7 @@ describe("server authentication", () => {
 it("suspended account cannot log in even with matching password", async () => {
   store.findCredential.mockResolvedValue({
     passwordHash: await hashPassword(input.password),
-    user: { id: "u", role: "CUSTOMER", status: "SUSPENDED" },
+    user: { id: "u", role: "CLIENT", status: "SUSPENDED" },
   });
   expect(await loginWithPassword(input, [], undefined)).toEqual({ ok: false });
   expect(store.createSession).not.toHaveBeenCalled();
@@ -111,7 +111,7 @@ it("rejects malformed cookie before database lookup", async () => {
   expect(store.findSession).not.toHaveBeenCalled();
 });
 
-it("accepts CLIENT and VENDOR from database and rejects revoked sessions", async () => {
+it("accepts CLIENT and SUPERADMIN from database and rejects revoked sessions", async () => {
   const row = {
     id: "s",
     tokenHash: "hash",
@@ -126,8 +126,8 @@ it("accepts CLIENT and VENDOR from database and rejects revoked sessions", async
     role: "CLIENT",
     sessionId: "s",
   });
-  store.findSession.mockResolvedValue({ ...row, user: { ...row.user, role: "VENDOR" } });
-  expect(await verifySessionToken("a".repeat(43))).toMatchObject({ role: "VENDOR" });
+  store.findSession.mockResolvedValue({ ...row, user: { ...row.user, role: "SUPERADMIN" } });
+  expect(await verifySessionToken("a".repeat(43))).toMatchObject({ role: "SUPERADMIN" });
   store.findSession.mockResolvedValue({ ...row, revokedAt: new Date() });
   expect(await verifySessionToken("a".repeat(43))).toBeNull();
 });

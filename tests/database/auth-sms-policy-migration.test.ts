@@ -28,9 +28,9 @@ describe("kebijakan SMS OTP permanen PostgreSQL", () => {
     await applyAuthMigrations(db, true);
     await applyMultimethodMigration(db);
     await db.exec(`INSERT INTO "User" ("id","email","phone","phoneVerifiedAt","role","updatedAt")
-      VALUES ('verified','verified@example.test','+628123450001',now(),'CUSTOMER',now()),
+      VALUES ('verified','verified@example.test','+628123450001',now(),'CLIENT',now()),
       ('unverified',NULL,'+628123450002',NULL,'CLIENT',now()),
-      ('google-only',NULL,NULL,NULL,'VENDOR',now());
+      ('google-only',NULL,NULL,NULL,'CLIENT',now());
       INSERT INTO "AuthCredential" VALUES ('verified','existing-password-hash');
       INSERT INTO "UserSession" ("id","userId","tokenHash","expiresAt")
         VALUES ('session','verified','existing-session-hash',now()+interval '1 day');
@@ -105,7 +105,7 @@ describe("kebijakan SMS OTP permanen PostgreSQL", () => {
     ).toEqual([{ smsOtpEnabled: false, phone: null, phoneVerifiedAt: null }]);
   });
 
-  it("kontrak inspect multimethod mencakup enam migrasi dan dua belas CHECK terkini", async () => {
+  it("kontrak inspect multimethod mencakup tujuh migrasi dan dua belas CHECK terkini", async () => {
     const source = await readFile(
       new URL("../../scripts/database/auth-preproduction-inspect.ts", import.meta.url),
       "utf8",
@@ -114,7 +114,7 @@ describe("kebijakan SMS OTP permanen PostgreSQL", () => {
     expect(listedMigrations).toEqual(
       (await readdir(migrations)).filter((name) => name !== "migration_lock.toml").sort(),
     );
-    expect(listedMigrations).toHaveLength(6);
+    expect(listedMigrations).toHaveLength(7);
     const checksBlock = source.slice(
       source.indexOf("const expectedChecks = ["),
       source.indexOf("    if (\n      checks.length"),

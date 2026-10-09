@@ -53,13 +53,13 @@ it("callback session success sets HttpOnly cookie and local role redirect", asyn
   service.completeGoogleOAuth.mockResolvedValue({
     token: "a".repeat(43),
     expiresAt: new Date(Date.now() + 60000),
-    redirectTo: "/vendor",
+    redirectTo: "/dashboard",
   });
   const r = await handleGoogleCallback(
     new Request(origin + "/api/auth/google/callback?state=s&code=c"),
   );
   expect(r.status).toBe(303);
-  expect(r.headers.get("location")).toBe(origin + "/vendor");
+  expect(r.headers.get("location")).toBe(origin + "/dashboard");
   expect(r.headers.get("set-cookie")).toContain("HttpOnly");
   expect(r.headers.get("cache-control")).toBe("no-store");
 });

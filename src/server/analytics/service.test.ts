@@ -8,14 +8,14 @@ vi.mock("./repository", () => ({ readOwnedAnalytics: state.rows }));
 import { getCustomerAnalytics } from "./query";
 import { analyticsInputSchema } from "./input";
 beforeEach(() => {
-  state.session = { userId: "owner", role: "CUSTOMER", expiresAt: Date.now() + 60000 };
+  state.session = { userId: "owner", role: "CLIENT", expiresAt: Date.now() + 60000 };
   state.rows.mockReset();
   state.rows.mockResolvedValue({ invitations: [], payments: [] });
 });
 it.each([
   null,
   { userId: "admin", role: "SUPERADMIN", expiresAt: Date.now() + 60000 },
-  { userId: "owner", role: "CUSTOMER", expiresAt: 1 },
+  { userId: "owner", role: "CLIENT", expiresAt: 1 },
 ])("denies absent, wrong-role and expired sessions before reading data", async (session) => {
   state.session = session;
   await expect(getCustomerAnalytics({})).rejects.toMatchObject({
