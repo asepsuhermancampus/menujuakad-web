@@ -94,3 +94,10 @@ describe("redirect after verified login", () => {
     expect(resolvePostLoginRedirect("//evil.example", "SUPERADMIN")).toBe("/admin");
   });
 });
+
+it("isolates vendor and accepts own account routes for each role", () => {
+  expect(resolvePostLoginRedirect("/dashboard", "VENDOR")).toBe("/vendor");
+  expect(resolvePostLoginRedirect("/admin", "CLIENT")).toBe("/dashboard");
+  expect(resolvePostLoginRedirect("/account/security", "VENDOR")).toBe("/account/security");
+  expect(resolvePostLoginRedirect("/vendor", "SUPERADMIN")).toBe("/admin");
+});

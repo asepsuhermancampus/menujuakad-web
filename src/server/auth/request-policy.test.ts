@@ -77,3 +77,21 @@ it("reusable mutation origin gate fails closed and accepts configured origin onl
   ).toBe(true);
   expect(assertTrustedOrigin(new Request("https://menujuakad.com"))).toBe(false);
 });
+
+it("accepts phone identifier and rejects both legacy and new fields", async () => {
+  const req = (body: object) =>
+    new Request("http://localhost", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  expect(await readLoginInput(req({ identifier: "081234567890", password: "legacy" }))).toEqual({
+    identifier: "+6281234567890",
+    password: "legacy",
+  });
+  await expect(
+    readLoginInput(
+      req({ identifier: "a@example.invalid", email: "a@example.invalid", password: "pw" }),
+    ),
+  ).rejects.toThrow();
+});

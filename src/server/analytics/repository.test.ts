@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { applyAuthMigrations } from "../../../tests/database/auth-multimethod-fixture";
 import { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
@@ -12,13 +12,7 @@ const db = new PGlite();
 let client: PrismaClient;
 const now = new Date("2026-10-08T12:00:00.000Z");
 beforeAll(async () => {
-  for (const name of ["20261007000000_foundation", "20261008010000_payment_test"])
-    await db.exec(
-      await readFile(
-        new URL(`../../../prisma/migrations/${name}/migration.sql`, import.meta.url),
-        "utf8",
-      ),
-    );
+  await applyAuthMigrations(db);
   await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('a','a@test.invalid','CUSTOMER','ACTIVE',now()),('b','b@test.invalid','CUSTOMER','ACTIVE',now()),('admin','admin@test.invalid','SUPERADMIN','ACTIVE',now()),('suspended','s@test.invalid','CUSTOMER','SUSPENDED',now());
   INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('t','TEST','test',now());`);
   for (const [id, owner, status, createdAt] of [

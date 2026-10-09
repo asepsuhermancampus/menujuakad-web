@@ -7,7 +7,11 @@ export async function readOwnedAnalytics(
   window: AnalyticsWindow,
 ): Promise<AnalyticsGroups> {
   const createdAt = { ...(window.from ? { gte: window.from } : {}), lte: window.to };
-  const identity = { id: userId, role: "CUSTOMER" as const, status: "ACTIVE" as const };
+  const identity = {
+    id: userId,
+    role: { in: ["CUSTOMER", "CLIENT"] as ("CUSTOMER" | "CLIENT")[] },
+    status: "ACTIVE" as const,
+  };
   return getPrisma().$transaction(async (tx) => {
     const user = await tx.user.findFirst({ where: identity, select: { id: true } });
     if (!user) throw new WorkspaceError(403, "Akses ditolak.");

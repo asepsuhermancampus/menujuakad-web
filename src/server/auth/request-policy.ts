@@ -2,6 +2,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { z } from "zod";
+import { normalizeIdentifier, normalizeEmail, loginPasswordSchema } from "./identifiers";
 export type AuthConfig = Readonly<{ origin: string; secret: string; trustProxy: boolean }>;
 export function getAuthConfig(): AuthConfig {
   const secret = process.env.AUTH_SECRET;
@@ -19,19 +20,29 @@ export function getAuthConfig(): AuthConfig {
 }
 export function requireSameOrigin(request: Request, config: AuthConfig): void {
   if (request.headers.get("origin") !== config.origin) throw new Error("Origin tidak valid.");
+  const site = request.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin" && site !== "none") throw new Error("Origin tidak valid.");
 }
 const loginSchema = z
   .object({
-    email: z.string().trim().toLowerCase().max(254).email(),
-    password: z
-      .string()
-      .min(1)
-      .max(256)
-      .refine((value) => Buffer.byteLength(value, "utf8") <= 1024),
+    email: z.string().optional(),
+    identifier: z.string().optional(),
+    password: loginPasswordSchema,
     next: z.string().max(2048).optional(),
   })
-  .strict();
+  .strict()
+  .refine((value) => (value.email === undefined) !== (value.identifier === undefined));
 export async function readLoginInput(request: Request) {
+  const input = loginSchema.parse(await readBoundedJson(request));
+  if (input.email !== undefined)
+    return { email: normalizeEmail(input.email), password: input.password, next: input.next };
+  return {
+    identifier: normalizeIdentifier(input.identifier!).value,
+    password: input.password,
+    next: input.next,
+  };
+}
+export async function readBoundedJson(request: Request): Promise<unknown> {
   if (
     request.headers.get("content-type")?.split(";")[0].trim() !== "application/json" ||
     !request.body
@@ -54,9 +65,9 @@ export async function readLoginInput(request: Request) {
   } finally {
     reader.releaseLock();
   }
-  return loginSchema.parse(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
-export type ThrottleKey = { keyHash: string; limit: number };
+export type ThrottleKey = { keyHash: string; limit: number; windowSeconds?: number };
 export function getThrottleKeys(
   email: string,
   request: Request,
@@ -82,4 +93,28 @@ export function assertTrustedOrigin(request: Request): boolean {
   } catch {
     return false;
   }
+}
+
+export function getScopedThrottleKeys(
+  scope: string,
+  identifier: string,
+  request: Request,
+  config: AuthConfig,
+  limits: { identifier?: number; ip?: number; windowSeconds?: number } = {},
+): ThrottleKey[] {
+  const legacy = getThrottleKeys(identifier, request, config);
+  const hash = (value: string) =>
+    createHmac("sha256", config.secret).update(`${scope}:${value}`).digest("hex");
+  return [
+    {
+      keyHash: hash(legacy[0].keyHash),
+      limit: limits.identifier ?? 5,
+      windowSeconds: limits.windowSeconds ?? 900,
+    },
+    {
+      keyHash: hash(legacy[1].keyHash),
+      limit: limits.ip ?? 100,
+      windowSeconds: limits.windowSeconds ?? 900,
+    },
+  ];
 }

@@ -9,6 +9,8 @@ datasource db {
 
 enum UserRole {
   CUSTOMER
+  CLIENT
+  VENDOR
   SUPERADMIN
 }
 
@@ -72,12 +74,14 @@ enum InvitationSectionType {
 
 model User {
   id              String     @id @default(cuid())
-  email           String     @unique
+  email           String?    @unique
   emailVerifiedAt DateTime?  @db.Timestamptz(3)
   name            String?
-  phone           String?
+  phone           String?    @unique
+  phoneVerifiedAt DateTime?  @db.Timestamptz(3)
+  smsOtpEnabled   Boolean    @default(false)
   avatarUrl       String?
-  role            UserRole   @default(CUSTOMER)
+  role            UserRole   @default(CLIENT)
   status          UserStatus @default(ACTIVE)
   lastLoginAt     DateTime?  @db.Timestamptz(3)
   createdAt       DateTime   @default(now()) @db.Timestamptz(3)
@@ -87,8 +91,10 @@ model User {
   memberships          InvitationMember[]
   credential           AuthCredential?
   sessions             UserSession[]
-  paymentTestRequests  PaymentTestRequest[] @relation("PaymentTestRequester")
-  paymentsTestReviewed PaymentTestRequest[] @relation("PaymentTestReviewer")
+  authAccounts         AuthAccount[]
+  verificationTokens   AuthVerificationToken[]
+  paymentTestRequests  PaymentTestRequest[]    @relation("PaymentTestRequester")
+  paymentsTestReviewed PaymentTestRequest[]    @relation("PaymentTestReviewer")
 }
 
 model Template {
@@ -230,11 +236,16 @@ model AuthCredential {
 }
 
 model UserSession {
-  id        String   @id @default(cuid())
-  userId    String
-  tokenHash String   @unique
-  expiresAt DateTime @db.Timestamptz(3)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  id                String    @id @default(cuid())
+  userId            String
+  tokenHash         String    @unique
+  expiresAt         DateTime  @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  reauthenticatedAt DateTime? @db.Timestamptz(3)
+  lastSeenAt        DateTime? @db.Timestamptz(3)
+  revokedAt         DateTime? @db.Timestamptz(3)
+  userAgent         String?   @db.VarChar(512)
+  ipHash            String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -275,4 +286,41 @@ model PaymentTestRequest {
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+}
+
+// Identitas provider ditautkan hanya setelah verifikasi server.
+model AuthAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  email             String?
+  emailVerified     Boolean  @default(false)
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+}
+
+// Token/OTP di-hash; payload rahasia harus dienkripsi oleh layanan.
+model AuthVerificationToken {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  purpose    String
+  userId     String?
+  identifier String?
+  payload    Json?
+  expiresAt  DateTime  @db.Timestamptz(3)
+  consumedAt DateTime? @db.Timestamptz(3)
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([identifier, purpose])
+  @@index([expiresAt])
 }

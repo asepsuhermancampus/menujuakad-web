@@ -1,13 +1,8 @@
-import { AuthForm } from "@/features/auth/components/auth-form";
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ state?: string }>;
-}) {
-  const q = await searchParams;
+import { PasswordRecoveryForm } from "@/features/auth/components/password-recovery-form";
+export default function Page() {
   return (
     <main id="main">
-      <AuthForm mode={q.state === "conflict" ? "conflict" : "forgot-password"} />
+      <PasswordRecoveryForm />
     </main>
   );
 }

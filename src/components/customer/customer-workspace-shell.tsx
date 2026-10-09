@@ -14,7 +14,8 @@ const links = [
   ["/dashboard/analytics", "Analitik"],
   ["/dashboard/billing", "Paket & Billing"],
   ["/dashboard/billing/packages", "Paket Pengujian"],
-  ["/dashboard/account", "Akun & Keamanan"],
+  ["/account", "Profil Akun"],
+  ["/account/security", "Keamanan"],
   ["/dashboard/notifications", "Notifikasi"],
   ["/dashboard/support", "Bantuan"],
 ];
@@ -33,9 +34,9 @@ export function CustomerWorkspaceShell({
       <header className="workspace-header">
         <Brand />
         <div>
-          <strong>{identity.name ?? identity.email}</strong>
+          <strong>{identity.name ?? identity.email ?? identity.phone ?? "Akun Anda"}</strong>
           <br />
-          <small>{identity.email}</small>
+          <small>{identity.email ?? identity.phone}</small>
         </div>
         <LogoutButton />
       </header>

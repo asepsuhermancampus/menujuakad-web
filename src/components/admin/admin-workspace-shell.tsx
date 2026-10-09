@@ -9,6 +9,8 @@ const links = [
   ["/admin/invitations", "Undangan Pengujian"],
   ["/admin/payments", "Pembayaran Uji"],
   ["/admin/webhooks", "Log Webhook"],
+  ["/account", "Profil Akun"],
+  ["/account/security", "Keamanan"],
 ];
 export function AdminWorkspaceShell({
   children,
@@ -26,9 +28,9 @@ export function AdminWorkspaceShell({
         <Brand />
         <span className="badge">SUPERADMIN · Preproduction</span>
         <div>
-          {identity.name ?? identity.email}
+          {identity.name ?? identity.email ?? identity.phone ?? "Akun Anda"}
           <br />
-          <small>{identity.email}</small>
+          <small>{identity.email ?? identity.phone}</small>
         </div>
         <LogoutButton />
       </header>

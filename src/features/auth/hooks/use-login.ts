@@ -1,45 +1,47 @@
 "use client";
-import { useSyncExternalStore, useState, type FormEvent } from "react";
-const subscribeHydration = () => () => {};
-const clientReady = () => true;
-const serverReady = () => false;
+import { useState, type FormEvent } from "react";
+import { identifierError, cleanIdentifierInput } from "../lib/identifier-input";
+import { authRequest, AuthClientError, redirectAfterAuth } from "../lib/auth-client";
+import { readLoginResult } from "../lib/login-result";
+import type { LoginData, OtpChallenge } from "../types/auth-contracts";
+import { useAuthRequest } from "./use-auth-request";
 export function useLogin(next?: string) {
-  const ready = useSyncExternalStore(subscribeHydration, clientReady, serverReady);
-  const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState("");
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  const state = useAuthRequest();
+  const [challenge, setChallenge] = useState<OtpChallenge | null>(null);
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending) return;
     const data = new FormData(event.currentTarget);
-    setPending(true);
-    setMessage("");
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.get("email"), password: data.get("password"), next }),
-      });
-      const result = await response.json();
-      if (
-        response.ok &&
-        result.ok &&
-        typeof result.redirectTo === "string" &&
-        /^\/(dashboard|admin)(\/[A-Za-z0-9_-]+)*\/?$/.test(result.redirectTo)
-      ) {
-        window.location.assign(result.redirectTo);
-        return;
-      }
-      setMessage(
-        response.status === 401
-          ? "Email atau kata sandi tidak sesuai. Coba lagi nanti bila batas percobaan tercapai."
-          : "Layanan masuk sementara tidak tersedia. Silakan coba lagi.",
-      );
-    } catch {
-      setMessage("Koneksi gagal. Silakan coba lagi.");
-    } finally {
-      setPending(false);
+    const error = identifierError(data.get("identifier"));
+    if (error) {
+      state.setMessage(error);
+      return;
     }
+    void state.run(async () => {
+      const response = await authRequest<LoginData>("/api/auth/login", "POST", {
+        identifier: cleanIdentifierInput(String(data.get("identifier") ?? "")),
+        password: data.get("password"),
+        ...(next ? { next } : {}),
+      });
+      const result = readLoginResult(response);
+      if (result.kind === "otp") setChallenge(result.challenge);
+      else redirectAfterAuth(result.redirectTo);
+    });
   }
-  return { ready, pending, message, submit };
+  async function verify(code: string) {
+    if (!challenge) throw new AuthClientError(400);
+    const result = await authRequest("/api/auth/otp/verify", "POST", {
+      token: challenge.token,
+      code,
+    });
+    redirectAfterAuth(result.redirectTo);
+  }
+  async function resend() {
+    if (!challenge) throw new AuthClientError(400);
+    const result = await authRequest<OtpChallenge>("/api/auth/otp/resend", "POST", {
+      token: challenge.token,
+    });
+    if (!result.data?.token) throw new AuthClientError(503);
+    setChallenge(result.data);
+  }
+  return { ...state, submit, challenge, verify, resend, cancelChallenge: () => setChallenge(null) };
 }

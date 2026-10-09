@@ -128,3 +128,130 @@
   font-size: 12px;
   line-height: 1.9;
 }
+
+/* Auth nyata dan akun: komposisi sederhana memakai token Editorial Ivory & Gold. */
+.auth-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.auth-password-field {
+  gap: 8px;
+}
+.auth-google {
+  gap: 6px;
+  text-align: center;
+}
+.button.google-button {
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid #747775;
+  font-weight: 500;
+  box-shadow: none;
+  transform: none;
+}
+.button.google-button:hover {
+  background: #f8fafd;
+  border-color: #747775;
+  transform: none;
+  box-shadow: none;
+}
+.button.google-button svg {
+  flex: 0 0 20px;
+}
+.auth-card-compact .divider {
+  margin-block: 16px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.auth-recovery-link {
+  font-size: 12px;
+  text-align: right;
+}
+.account-live {
+  max-width: 1000px;
+}
+.account-live-nav {
+  margin-bottom: 32px;
+  gap: 24px;
+}
+.account-live-nav a {
+  padding-block: 12px;
+  font-size: 13px;
+}
+.account-live .card {
+  transform: none;
+}
+.account-live h1 {
+  font-size: clamp(28px, 5vw, 40px);
+}
+.account-live h2 {
+  font-size: 22px;
+}
+.account-live p,
+.account-live strong {
+  overflow-wrap: anywhere;
+}
+.account-live .button {
+  width: fit-content;
+  max-width: 100%;
+}
+.account-security-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.account-session {
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border);
+}
+@media (max-width: 767px) {
+  .account-security-grid {
+    grid-template-columns: 1fr;
+  }
+  .account-live .button {
+    width: 100%;
+  }
+}
+
+.auth-card-compact .auth-footnote a {
+  color: var(--color-ink);
+}
+.auth-card-compact label.check {
+  min-height: 44px;
+}
+.auth-card-compact .google-button {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.account-security-grid > * {
+  min-width: 0;
+}
+.account-live small {
+  overflow-wrap: anywhere;
+}
+.account-live label.check {
+  min-height: 44px;
+}
+@media (max-width: 390px) {
+  .auth-card-compact {
+    padding-inline: 24px;
+  }
+}
+
+/* Teks persetujuan membungkus dalam satu flex item, termasuk pada pembesaran teks. */
+.auth-card-compact .auth-fields > *,
+.auth-card-compact .auth-password-field > * {
+  min-width: 0;
+}
+.auth-consent > input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.auth-consent > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

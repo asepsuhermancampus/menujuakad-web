@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { applyAuthMigrations } from "../../../tests/database/auth-multimethod-fixture";
 import { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
@@ -23,17 +23,7 @@ const input = (
   amountIdr = 1000,
 ) => ({ invitationId, packageSlug, amountIdr, reference: "deklarasi customer" });
 beforeAll(async () => {
-  for (const name of [
-    "20261007000000_foundation",
-    "20261008000000_auth_preproduction",
-    "20261008010000_payment_test",
-  ])
-    await db.exec(
-      await readFile(
-        new URL(`../../../prisma/migrations/${name}/migration.sql`, import.meta.url),
-        "utf8",
-      ),
-    );
+  await applyAuthMigrations(db);
   await db.exec(`INSERT INTO "User" ("id","email","role","status","updatedAt") VALUES ('owner','owner@menujuakad.test','CUSTOMER','ACTIVE',now()),('other','other@menujuakad.test','CUSTOMER','ACTIVE',now()),('admin','admin@menujuakad.test','SUPERADMIN','ACTIVE',now()),('suspended','suspended@menujuakad.test','CUSTOMER','SUSPENDED',now());
     INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('template','Template TEST','billing-test-template',now());
     INSERT INTO "Invitation" ("id","ownerUserId","templateId","title","slug","status","isPublished","updatedAt") VALUES ('draft','owner','template','Draft Uji','billing-draft','DRAFT',false,now()),('foreign','other','template','Asing','billing-foreign','DRAFT',false,now()),('published','owner','template','Terbit','billing-published','ACTIVE',true,now()),('blocked','suspended','template','Suspend','billing-suspend','DRAFT',false,now());`);

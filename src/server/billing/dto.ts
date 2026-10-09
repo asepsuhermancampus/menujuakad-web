@@ -36,7 +36,7 @@ export function adminTestDto(
 ): AdminTestRequestDto {
   return {
     ...testRequestDto(row),
-    customerEmail: row.user.email,
+    customerEmail: row.user.email ?? "Email belum ditambahkan",
     reviewedByUserId: row.reviewedByUserId,
   };
 }

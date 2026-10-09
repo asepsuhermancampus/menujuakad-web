@@ -10,10 +10,17 @@ const migrationNames = [
   "20261008000000_auth_preproduction",
   "20261008010000_payment_test",
 ];
+const multimethodMigrations = [
+  "20261009000000_auth_roles",
+  "20261009001000_auth_multimethod",
+  "20261009002000_auth_sms_policy",
+];
 
 async function main() {
   const config = getAuthSeedConfig(process.env);
   const before = process.argv.includes("--before-auth");
+  const multimethod = process.argv.includes("--multimethod");
+  if (before && multimethod) throw new Error("Mode inspeksi tidak kompatibel");
   const db = new PrismaClient({
     adapter: new PrismaNeon({
       connectionString: config.migrationUrl,
@@ -29,7 +36,8 @@ async function main() {
     const tables = await db.$queryRaw<{ name: string }[]>`
       SELECT tablename::text AS name FROM pg_tables WHERE schemaname='public' AND tablename<>'_prisma_migrations' ORDER BY tablename
     `;
-    if (tables.length !== (before ? 9 : 13)) throw new Error("Table count salah");
+    if (tables.length !== (before ? 9 : multimethod ? 15 : 13))
+      throw new Error("Table count salah");
     const records = await db.$queryRaw<
       {
         migration_name: string;
@@ -40,7 +48,9 @@ async function main() {
     >`
       SELECT migration_name,checksum,finished_at,rolled_back_at FROM public._prisma_migrations ORDER BY migration_name
     `;
-    for (const name of before ? migrationNames.slice(0, 1) : migrationNames) {
+    for (const name of before
+      ? migrationNames.slice(0, 1)
+      : [...migrationNames, ...(multimethod ? multimethodMigrations : [])]) {
       const sql = await readFile(
         new URL(`../../prisma/migrations/${name}/migration.sql`, import.meta.url),
       );
@@ -63,6 +73,17 @@ async function main() {
       "Package_currency_idr",
       "Template_usageCount_nonnegative",
       ...(before ? [] : ["PaymentTestRequest_amountIdr_positive"]),
+      ...(multimethod
+        ? [
+            "User_email_canonical_check",
+            "User_phone_e164_check",
+            "User_phone_verified_check",
+            "User_sms_otp_verified_check",
+            "AuthAccount_identity_check",
+            "AuthVerificationToken_attempts_check",
+            "AuthVerificationToken_identity_check",
+          ]
+        : []),
     ];
     if (
       checks.length !== expectedChecks.length ||
@@ -91,7 +112,7 @@ async function main() {
     console.info(
       JSON.stringify(
         {
-          mode: before ? "before-auth" : "after-migrations",
+          mode: before ? "before-auth" : multimethod ? "after-multimethod" : "after-migrations",
           metadata,
           tables: tables.map((table) => table.name),
           migrations: records.map((record) => ({

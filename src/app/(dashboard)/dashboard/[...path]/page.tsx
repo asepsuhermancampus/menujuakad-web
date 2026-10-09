@@ -1,6 +1,5 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireCustomerSession } from "@/server/authorization/guards";
-import { getWorkspaceIdentity } from "@/server/customer/identity";
 import {
   workspaceView,
   PendingFeature,
@@ -83,16 +82,10 @@ export default async function Page({ params }: { params: Promise<{ path: string[
         return InvitationDetailView({ id: path[1], tab: path[2] ?? "" });
       notFound();
     }
-    if (path.length === 1 && ["account", "settings"].includes(path[0])) {
-      const identity = await getWorkspaceIdentity("CUSTOMER");
-      return (
-        <section className="card stack">
-          <h1>Akun & Keamanan</h1>
-          <p>Nama: {identity.name ?? "Belum diisi"}</p>
-          <p>Email: {identity.email}</p>
-          <p>Identitas dibaca dari database. Perubahan profil dan sandi belum aktif.</p>
-        </section>
-      );
+    if (["account", "settings"].includes(path[0]) && path.length <= 2) {
+      if (path.length === 1 || path[1] === "profile") redirect("/account");
+      if (path[1] === "security") redirect("/account/security");
+      notFound();
     }
     if (path.length === 2 && path[0] === "billing" && path[1] === "packages")
       return <PendingFeature title="Paket Pengujian" preview="/preview-ui/cus-07" />;

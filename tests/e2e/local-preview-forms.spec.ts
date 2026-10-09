@@ -1,10 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 /*
- * Form halaman nyata `/login` sudah aktif sejak increment auth preproduction
- * (API `POST /api/auth/login`), sehingga tidak lagi termasuk daftar inert.
- * Cakupan test ini tetap: seluruh form contoh/simulasi harus inert tanpa
- * JavaScript dan tidak boleh mengirim nilai apa pun lewat URL/body.
+ * Form auth resmi dan form simulasi sama-sama tidak boleh mengirim nilai
+ * tanpa JavaScript. Reset simulasi berada di AUT-04; route reset resmi tanpa
+ * fragment tidak merender field dan diuji terpisah di kontrak auth.
  */
 test("form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat URL/body", async ({
   browser,
@@ -24,7 +23,7 @@ test("form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat URL/body
     for (const path of [
       "/register",
       "/forgot-password",
-      "/reset-password",
+      "/preview-ui/aut-04",
       "/contact",
       "/preview-ui/acc-01",
       "/preview-ui/sup-01",
@@ -66,12 +65,17 @@ test("form login nyata tidak membocorkan nilai contoh lewat URL tanpa JavaScript
   const marker = "qa-local-sensitive-example";
   try {
     await page.goto("/login");
-    const input = page.locator("form input[type=email], form input[name=email]").first();
+    const input = page.locator("form input[name=identifier]").first();
     expect(await input.count(), "/login").toBeGreaterThan(0);
+    await expect(input).toBeDisabled();
+    await expect(input).toHaveAttribute("autocomplete", "username");
+    await expect(input.fill(marker, { timeout: 150 })).rejects.toThrow();
+    await expect(page.getByRole("button", { name: "Masuk", exact: true })).toBeDisabled();
     expect(new URL(page.url()).search, "/login").toBe("");
     // Nilai tidak boleh muncul pada URL setelah interaksi keyboard apa pun.
     await page.keyboard.press("Enter");
     expect(new URL(page.url()).search.includes(marker)).toBe(false);
+    await expect(page).toHaveURL("http://127.0.0.1:3107/login");
   } finally {
     await context.close();
   }

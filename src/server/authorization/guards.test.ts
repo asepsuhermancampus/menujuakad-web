@@ -122,3 +122,10 @@ describe.each([
     await expect(guard(path)).rejects.toThrow("Provider unavailable");
   });
 });
+
+it("allows legacy CUSTOMER and CLIENT but denies VENDOR customer domain", async () => {
+  vi.spyOn(sessions, "getVerifiedSession").mockResolvedValue({ ...customer, role: "CLIENT" });
+  expect(await requireCustomerSession("/dashboard")).toMatchObject({ role: "CLIENT" });
+  vi.spyOn(sessions, "getVerifiedSession").mockResolvedValue({ ...customer, role: "VENDOR" });
+  await expectLoginRedirect(requireCustomerSession("/dashboard"), "/login?next=%2Fdashboard");
+});

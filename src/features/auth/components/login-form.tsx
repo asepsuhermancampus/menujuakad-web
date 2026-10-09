@@ -1,74 +1,64 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { OtpForm } from "./otp-form";
+import { OAuthFeedback } from "./oauth-feedback";
 import { Button } from "@/components/ui/button";
 import { useLogin } from "../hooks/use-login";
-
-/*
- * Halaman login resmi — desain bersih, satu fokus (form), teks minimum.
- * Blok panjang (notice, tombol Google nonaktif, divider ganda) dihapus; status
- * "akun uji" diringkas menjadi satu baris kecil di kaki kartu.
- *
- * Kontrak keamanan yang dipertahankan:
- * - form POST ke /api/auth/login dengan autoComplete username/current-password;
- * - tombol submit disabled sampai JavaScript siap (fallback aman tanpa JS);
- * - pesan galat generik dari useLogin, tanpa membocorkan status akun.
- */
-export function LoginForm({ next }: { next?: string }) {
+import { useCapabilities } from "../hooks/use-capabilities";
+import { GoogleAuthButton } from "./google-auth-button";
+import { PasswordField } from "./password-field";
+import { RealAuthCard } from "./real-auth-card";
+export function LoginForm({ next, error }: { next?: string; error?: string }) {
   const state = useLogin(next);
-  const [show, setShow] = useState(false);
+  const { capabilities, loaded } = useCapabilities();
+  if (state.challenge)
+    return (
+      <RealAuthCard title="Konfirmasi masuk" description="Masukkan kode SMS untuk melanjutkan.">
+        <OtpForm challenge={state.challenge} verify={state.verify} resend={state.resend} />
+        <Button type="button" className="outline" onClick={state.cancelChallenge}>
+          Gunakan metode lain
+        </Button>
+      </RealAuthCard>
+    );
   return (
-    <div className="auth-wrap">
-      <section className="auth-card auth-card-compact">
-        <header className="auth-head">
-          <span className="auth-mark" aria-hidden="true" />
-          <h1>Masuk</h1>
-          <p className="muted">Gunakan akun Anda untuk melanjutkan.</p>
-        </header>
-        <form className="stack" action="/api/auth/login" method="post" onSubmit={state.submit}>
+    <RealAuthCard title="Masuk" description="Selamat datang kembali.">
+      <OAuthFeedback code={error} />
+      <GoogleAuthButton enabled={capabilities.google} loading={!loaded} next={next} />
+      <p className="divider">atau</p>
+      <form className="stack" action="/api/auth/login" method="post" onSubmit={state.submit}>
+        <fieldset
+          className="auth-fields stack"
+          disabled={!state.ready || state.pending || state.rateLimited}
+        >
           <label>
-            Email
+            Email atau nomor telepon
             <input
-              name="email"
-              type="email"
+              name="identifier"
+              type="text"
               required
               maxLength={254}
               autoComplete="username"
-              placeholder="nama@contoh.com"
+              placeholder="Email atau 08…"
             />
           </label>
-          <label>
-            Kata sandi
-            <input
-              name="password"
-              type={show ? "text" : "password"}
-              required
-              maxLength={256}
-              autoComplete="current-password"
-            />
-          </label>
-          <label className="check auth-show-password">
-            <input
-              type="checkbox"
-              checked={show}
-              onChange={(event) => setShow(event.target.checked)}
-            />
-            Tampilkan kata sandi
-          </label>
-          <Button type="submit" disabled={!state.ready || state.pending}>
+          <PasswordField />
+          <Link className="auth-recovery-link" href="/forgot-password">
+            Lupa kata sandi?
+          </Link>
+          <Button type="submit" disabled={!state.ready || state.pending || state.rateLimited}>
             {state.pending ? "Memproses…" : "Masuk"}
           </Button>
-          <noscript>Aktifkan JavaScript untuk masuk dengan aman.</noscript>
-        </form>
-        {state.message && (
-          <p role="alert" className="local-message">
-            {state.message}
-          </p>
-        )}
-        <p className="auth-footnote">
-          Akun uji preproduction · <Link href="/">beranda</Link>
+        </fieldset>
+        <noscript>Aktifkan JavaScript untuk masuk dengan aman.</noscript>
+      </form>
+      {state.message && (
+        <p role="alert" className="local-message">
+          {state.message}
         </p>
-      </section>
-    </div>
+      )}
+      <p className="auth-footnote">
+        Belum punya akun? <Link href="/register">Daftar</Link>
+      </p>
+    </RealAuthCard>
   );
 }

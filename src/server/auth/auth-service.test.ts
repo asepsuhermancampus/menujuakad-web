@@ -6,9 +6,12 @@ const store = vi.hoisted(() => ({
   findCredential: vi.fn(),
   findSession: vi.fn(),
   createSession: vi.fn(),
+  rotatePasswordSession: vi.fn(),
   deleteSession: vi.fn(),
+  beginPasswordOtpLogin: vi.fn(),
 }));
 vi.mock("./auth-repository", () => store);
+vi.mock("./otp-service", () => ({ beginPasswordOtpLogin: store.beginPasswordOtpLogin }));
 import { loginWithPassword, verifySessionToken, revokeSessionToken } from "./auth-service";
 import { hashPassword } from "./password-crypto";
 import { createHash } from "node:crypto";
@@ -16,6 +19,7 @@ const input = { email: "user@example.invalid", password: "dummy-uji!", next: "/a
 beforeEach(() => {
   vi.resetAllMocks();
   store.reserveLoginAttempt.mockResolvedValue(true);
+  store.rotatePasswordSession.mockResolvedValue({ id: "u", role: "CUSTOMER", status: "ACTIVE" });
 });
 describe("server authentication", () => {
   it("gives identical denial for unknown, wrong password and suspended users", async () => {
@@ -46,21 +50,24 @@ describe("server authentication", () => {
       oldToken,
     );
     expect(result).toMatchObject({ ok: true, redirectTo: "/dashboard" });
-    if (!result.ok) throw new Error("login failed");
+    if (!result.ok || result.otpRequired) throw new Error("login failed");
     expect(result.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(result.token).not.toBe(oldToken);
     expect(store.releaseSuccessfulEmailAttempt).toHaveBeenCalledWith("email-hash");
-    expect(store.createSession.mock.calls[0][0]).toMatchObject({
+    expect(store.rotatePasswordSession.mock.calls[0][0]).toMatchObject({
       userId: "u",
       tokenHash: createHash("sha256").update(result.token).digest("hex"),
     });
-    expect(store.deleteSession).toHaveBeenCalledWith(
+    expect(store.rotatePasswordSession.mock.calls[0][2]).toBe(
       createHash("sha256").update(oldToken).digest("hex"),
     );
   });
   it("denies throttled request before expensive hashing or account lookup", async () => {
     store.reserveLoginAttempt.mockResolvedValue(false);
-    expect(await loginWithPassword(input, [], undefined)).toEqual({ ok: false });
+    expect(await loginWithPassword(input, [], undefined)).toEqual({
+      ok: false,
+      code: "RATE_LIMITED",
+    });
     expect(store.findCredential).not.toHaveBeenCalled();
   });
   it("rechecks ACTIVE, expiry and database revocation each time", async () => {
@@ -102,4 +109,65 @@ it("suspended account cannot log in even with matching password", async () => {
 it("rejects malformed cookie before database lookup", async () => {
   expect(await verifySessionToken("a".repeat(43) + "\n")).toBeNull();
   expect(store.findSession).not.toHaveBeenCalled();
+});
+
+it("accepts CLIENT and VENDOR from database and rejects revoked sessions", async () => {
+  const row = {
+    id: "s",
+    tokenHash: "hash",
+    reauthenticatedAt: new Date(),
+    revokedAt: null,
+    expiresAt: new Date(Date.now() + 60000),
+    user: { id: "u", status: "ACTIVE", role: "CLIENT" },
+  };
+  store.findSession.mockResolvedValue(row);
+  expect(await verifySessionToken("a".repeat(43))).toMatchObject({
+    userId: "u",
+    role: "CLIENT",
+    sessionId: "s",
+  });
+  store.findSession.mockResolvedValue({ ...row, user: { ...row.user, role: "VENDOR" } });
+  expect(await verifySessionToken("a".repeat(43))).toMatchObject({ role: "VENDOR" });
+  store.findSession.mockResolvedValue({ ...row, revokedAt: new Date() });
+  expect(await verifySessionToken("a".repeat(43))).toBeNull();
+});
+
+it("SMS-enabled password proof returns only pending challenge and never issues full session", async () => {
+  const passwordHash = await hashPassword(input.password);
+  store.findCredential.mockResolvedValue({
+    passwordHash,
+    user: {
+      id: "u",
+      role: "CLIENT",
+      status: "ACTIVE",
+      smsOtpEnabled: true,
+      phone: "+6281234567890",
+      phoneVerifiedAt: new Date(),
+    },
+  });
+  store.beginPasswordOtpLogin.mockResolvedValue({
+    token: "opaque-challenge",
+    expiresIn: 300,
+    resendAfter: 60,
+  });
+  const result = await loginWithPassword(input, [], undefined, { browserHash: "browser-bound" });
+  expect(result).toEqual({
+    ok: true,
+    otpRequired: true,
+    challenge: { token: "opaque-challenge", expiresIn: 300, resendAfter: 60 },
+  });
+  expect(store.rotatePasswordSession).not.toHaveBeenCalled();
+});
+it("SMS-enabled login cannot bypass provider failure or missing browser context", async () => {
+  const passwordHash = await hashPassword(input.password);
+  store.findCredential.mockResolvedValue({
+    passwordHash,
+    user: { id: "u", role: "CLIENT", status: "ACTIVE", smsOtpEnabled: true },
+  });
+  store.beginPasswordOtpLogin.mockRejectedValue(new Error("Provider unavailable"));
+  await expect(
+    loginWithPassword(input, [], undefined, { browserHash: "browser-bound" }),
+  ).rejects.toThrow();
+  await expect(loginWithPassword(input, [], undefined)).rejects.toThrow();
+  expect(store.rotatePasswordSession).not.toHaveBeenCalled();
 });

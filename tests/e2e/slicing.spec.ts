@@ -102,7 +102,7 @@ test("wizard, bantuan, validasi auth dan slug asing", async ({ page }) => {
     .fill("Mohon bantu tinjau tata letak contoh.");
   await page.getByRole("button", { name: "Tambahkan tiket lokal" }).click();
   await expect(page.getByRole("status")).toContainText("Tidak dikirim");
-  await page.goto("/reset-password");
+  await page.goto("/preview-ui/aut-04");
   await page.getByLabel("Kata sandi baru", { exact: true }).fill("contoh-1234");
   await page.getByLabel("Konfirmasi kata sandi").fill("berbeda-1234");
   await page.getByRole("button", { name: /Tinjau kata sandi baru/ }).click();

@@ -1,10 +1,12 @@
 import "server-only";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { browserBinding, failureResponse } from "../account/http";
+import { setPendingCookie } from "./otp-http";
+import { emptyInput, parseInput } from "../account/account-input";
 import {
-  getAuthConfig,
-  getThrottleKeys,
+  getScopedThrottleKeys,
   readLoginInput,
-  requireSameOrigin,
+  readBoundedJson,
   type AuthConfig,
 } from "./request-policy";
 import {
@@ -13,68 +15,82 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions,
 } from "./auth-service";
-const json = (body: object, status = 200) =>
-  NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
-const unavailable = () =>
-  json({ ok: false, error: "Layanan masuk sementara tidak tersedia." }, 503);
-function checkOrigin(request: Request, config?: AuthConfig): AuthConfig | NextResponse {
-  let resolved: AuthConfig;
-  try {
-    resolved = config ?? getAuthConfig();
-  } catch {
-    return unavailable();
-  }
-  try {
-    requireSameOrigin(request, resolved);
-  } catch {
-    return json({ ok: false, error: "Permintaan tidak diizinkan." }, 403);
-  }
-  return resolved;
-}
+import {
+  authJson,
+  authError,
+  authUnavailable,
+  mutationAuthConfig,
+  requestSessionToken,
+  setSessionCookie,
+  clearCsrf,
+} from "./auth-http";
 export async function handleLogin(request: Request, config?: AuthConfig): Promise<NextResponse> {
-  const trusted = checkOrigin(request, config);
+  const trusted = mutationAuthConfig(request, config);
   if (trusted instanceof NextResponse) return trusted;
   let input;
   try {
     input = await readLoginInput(request);
   } catch {
-    return json({ ok: false, error: "Permintaan masuk tidak valid." }, 400);
+    return authError(400, "INVALID_INPUT", "Permintaan masuk tidak valid.");
   }
   try {
-    const oldToken = new NextRequest(request.url, { headers: request.headers }).cookies.get(
-      SESSION_COOKIE,
-    )?.value;
     const result = await loginWithPassword(
       input,
-      getThrottleKeys(input.email, request, trusted),
-      oldToken,
+      getScopedThrottleKeys("login", input.identifier ?? input.email!, request, trusted),
+      requestSessionToken(request),
+      {
+        browserHash: browserBinding(request, trusted),
+        otpSendKeys: (phone) =>
+          getScopedThrottleKeys("otp-send", phone, request, trusted, {
+            identifier: 3,
+            ip: 10,
+            windowSeconds: 3600,
+          }),
+      },
     );
-    if (!result.ok) return json({ ok: false, error: "Email atau kata sandi tidak sesuai." }, 401);
-    const response = json({ ok: true, redirectTo: result.redirectTo });
-    response.cookies.set(SESSION_COOKIE, result.token, {
-      ...sessionCookieOptions(),
-      expires: result.expiresAt,
-    });
+    if (!result.ok)
+      return result.code === "RATE_LIMITED"
+        ? authError(429, "RATE_LIMITED", "Terlalu banyak percobaan. Coba lagi nanti.")
+        : authError(401, "INVALID_CREDENTIALS", "Identitas atau kata sandi tidak sesuai.");
+    if (result.otpRequired) {
+      const response = authJson(
+        { ok: true, data: { otpRequired: true, ...result.challenge } },
+        202,
+      );
+      response.cookies.set(SESSION_COOKIE, "", {
+        ...sessionCookieOptions(),
+        maxAge: 0,
+        expires: new Date(0),
+      });
+      setPendingCookie(response, result.challenge.token);
+      return response;
+    }
+    const response = authJson({ ok: true, redirectTo: result.redirectTo });
+    setSessionCookie(response, result);
     return response;
-  } catch {
-    return unavailable();
+  } catch (error) {
+    return failureResponse(error);
   }
 }
 export async function handleLogout(request: Request, config?: AuthConfig): Promise<NextResponse> {
-  const trusted = checkOrigin(request, config);
+  const trusted = mutationAuthConfig(request, config);
   if (trusted instanceof NextResponse) return trusted;
   try {
-    await revokeSessionToken(
-      new NextRequest(request.url, { headers: request.headers }).cookies.get(SESSION_COOKIE)?.value,
-    );
-    const response = json({ ok: true, redirectTo: "/login" });
+    parseInput(emptyInput, await readBoundedJson(request));
+  } catch {
+    return authError(400, "INVALID_INPUT", "Data permintaan tidak valid.");
+  }
+  try {
+    await revokeSessionToken(requestSessionToken(request));
+    const response = authJson({ ok: true, redirectTo: "/login" });
     response.cookies.set(SESSION_COOKIE, "", {
       ...sessionCookieOptions(),
       maxAge: 0,
       expires: new Date(0),
     });
+    clearCsrf(response);
     return response;
   } catch {
-    return unavailable();
+    return authUnavailable();
   }
 }

@@ -1,5 +1,11 @@
 # Changelog Implementasi Menuju Akad
 
+## Checkpoint resume autentikasi — 9 Oktober 2026
+
+- Menyelaraskan [PM01](docs/authentication/01-pm-rencana.md) dengan backend lokal aktual dan bukti dokumen02–08: canonical akun lintas role `/account`/`/account/security`, `/vendor`, empat alias exact307 sebelum layout customer, verifikasi email signup exact sesi+browser tanpa fresh reauth awal, contact private fresh, OTP flag permanen/enforced202 pending HttpOnly tanpa sesi penuh, strict logout/DELETE dan minimum recovery/resend11 detik dengan residual.
+- Bukti scoped pemilik: data5 file/37 test PASS (6 migrasi/12 CHECK), backend9 file/70 test PASS, security6 file/49 test PASS, alias5 test PASS. QA baseline600/600 dalam70 file dan build PASS; **QA final LULUS pada source final**: unit606/606 (71 file,138,89detik), build `Qt-A2nlN0Q3skYY1vYgN3` exit0, **E2E 140/140 PASS satu run** (4,3menit, workers2); QA-02 overflow register320→326px dan720px teks200%→732px tertutup dan terverifikasi browser; timeout keyboard specialist terdiagnosis contention beban (scoped PASS9,9detik), bukan bug produk. Gate ini membuktikan kode lokal teruji, bukan kesiapan produksi.
+- Progres bersama, changelog rancangan, AGENTS dan bagian auth historis architecture diselaraskan. Tidak mengubah master spec atau membuat dokumen bernomor duplikat. Provider live/schema-grants Neon aktif belum diterapkan/terverifikasi; produksi tetap rilis login historis503, tanpa rilis baru. Tidak ada kode/env/migrasi aktif/commit/push/deploy dari tugas dokumentasi ini.
+
 ## Login bersih tanpa banyak teks — 2026-10-09
 
 - **Instruksi user:** halaman login dibuat lebih clean, lebih nyaman, dan mudah dipahami tanpa banyak teks.

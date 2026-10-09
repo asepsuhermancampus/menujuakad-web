@@ -1,8 +1,8 @@
-import { readFile } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { beforeAll, afterAll, expect, it, vi } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
 import { workspaceTestAdapter } from "./workspace-test-adapter";
+import { applyAuthMigrations } from "./auth-multimethod-fixture";
 vi.mock("server-only", () => ({}));
 const state = vi.hoisted(() => ({ client: null as unknown }));
 vi.mock("@/server/db/client", () => ({ getPrisma: () => state.client }));
@@ -18,18 +18,7 @@ const db = new PGlite();
 let client: PrismaClient;
 const template = "menujuakad-seed-preproduction-template";
 beforeAll(async () => {
-  await db.exec(
-    await readFile(
-      new URL("../../prisma/migrations/20261007000000_foundation/migration.sql", import.meta.url),
-      "utf8",
-    ),
-  );
-  await db.exec(
-    await readFile(
-      new URL("../../prisma/migrations/20261008010000_payment_test/migration.sql", import.meta.url),
-      "utf8",
-    ),
-  );
+  await applyAuthMigrations(db);
   await db.exec(`INSERT INTO "User" ("id","email","role","updatedAt") VALUES ('customer1','customer01@menujuakad.test','CUSTOMER',now()),('customer2','customer02@menujuakad.test','CUSTOMER',now()),('admin','admin@menujuakad.test','SUPERADMIN',now()),('outside','real@example.test','CUSTOMER',now());
     INSERT INTO "Template" ("id","name","slug","updatedAt") VALUES ('${template}','TEST Internal','seed-preproduction-internal',now());`);
   client = new PrismaClient({ adapter: workspaceTestAdapter(db) });

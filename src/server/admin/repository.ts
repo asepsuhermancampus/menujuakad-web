@@ -25,8 +25,10 @@ export async function readTestUsers(userId: string, page: number) {
 }
 export async function readTestInvitations(userId: string, page: number) {
   await assertAdmin(userId);
-  return getPrisma().invitation.findMany({
-    where: { owner: { is: { email: { in: testCustomerEmails }, role: "CUSTOMER" } } },
+  const rows = await getPrisma().invitation.findMany({
+    where: {
+      owner: { is: { email: { in: testCustomerEmails }, role: { in: ["CUSTOMER", "CLIENT"] } } },
+    },
     select: {
       id: true,
       title: true,
@@ -40,4 +42,8 @@ export async function readTestInvitations(userId: string, page: number) {
     skip: (page - 1) * 25,
     take: 25,
   });
+  // Query hanya fixture email allowlist, sehingga DTO ini selalu mempunyai email nyata.
+  return rows.flatMap((row) =>
+    row.owner.email ? [{ ...row, owner: { ...row.owner, email: row.owner.email } }] : [],
+  );
 }

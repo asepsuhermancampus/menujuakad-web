@@ -11,7 +11,13 @@ const internalTemplate = {
 };
 const ownerScope = (userId: string) => ({
   ownerUserId: userId,
-  owner: { is: { id: userId, role: "CUSTOMER" as const, status: "ACTIVE" as const } },
+  owner: {
+    is: {
+      id: userId,
+      role: { in: ["CUSTOMER", "CLIENT"] as ("CUSTOMER" | "CLIENT")[] },
+      status: "ACTIVE" as const,
+    },
+  },
 });
 const draftScope = (userId: string, id: string) => ({
   ...ownerScope(userId),
@@ -62,7 +68,7 @@ async function assertDraft(tx: Prisma.TransactionClient, userId: string, id: str
 export async function createOwnedDraft(userId: string, input: CreateInvitationInput) {
   return getPrisma().$transaction(async (tx) => {
     const user = await tx.user.findFirst({
-      where: { id: userId, role: "CUSTOMER", status: "ACTIVE" },
+      where: { id: userId, role: { in: ["CUSTOMER", "CLIENT"] }, status: "ACTIVE" },
       select: { id: true },
     });
     if (!user) throw new WorkspaceError(403, "Akses ditolak.");
