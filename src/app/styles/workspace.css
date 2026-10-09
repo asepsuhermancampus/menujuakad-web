@@ -1,6 +1,6 @@
 .preview-banner {
-  background: #171717;
-  color: #fff;
+  background: var(--color-ink);
+  color: var(--color-ink-fixed);
   padding: 12px 24px;
   display: flex;
   align-items: center;
@@ -10,18 +10,24 @@
   font-size: 12px;
 }
 .preview-banner a {
-  color: #fff;
+  color: var(--color-ink-fixed);
+}
+/* Label ikut membungkus agar varian panjang tidak memperlebar viewport. */
+.preview-banner label {
+  min-width: 0;
+  max-width: 100%;
 }
 .preview-banner select {
-  min-height: 40px;
+  min-width: 48px;
+  min-height: 48px;
   padding: 8px;
   width: auto;
-  max-width: 300px;
+  max-width: min(300px, 100%);
   font-size: 11px;
 }
 .workspace-header {
   padding: 20px 32px;
-  background: #fff;
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -36,18 +42,24 @@
 .workspace-nav {
   padding: 28px 20px;
   border-right: 1px solid var(--color-border);
-  background: #fff;
+  background: var(--color-surface);
 }
 .workspace-nav a {
   display: block;
   padding: 12px 16px;
   text-decoration: none;
   font-size: 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-button);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
 }
-.workspace-nav a:hover,
+.workspace-nav a:hover {
+  background: var(--color-primary-soft);
+}
 .workspace-nav a[aria-current="page"] {
-  background: #f1e7d3;
+  background: var(--color-primary-soft);
+  font-weight: 600;
 }
 .workspace-main {
   padding: 40px;
@@ -83,7 +95,7 @@
   gap: 0;
 }
 .editor-nav {
-  background: #fff;
+  background: var(--color-surface);
   padding: 24px 12px;
   border-right: 1px solid var(--color-border);
 }
@@ -93,8 +105,17 @@
   font-size: 12px;
   text-decoration: none;
 }
+.editor-nav a {
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+.editor-nav a:hover {
+  background: var(--color-primary-soft);
+}
 .editor-nav a[aria-current="page"] {
-  background: #f1e7d3;
+  background: var(--color-primary-soft);
+  font-weight: 600;
 }
 .editor-panel {
   padding: 32px;
@@ -109,12 +130,12 @@
   text-align: center;
 }
 .phone-frame {
-  border: 7px solid #171717;
+  border: 7px solid var(--color-ink);
   border-radius: 36px;
   max-width: 270px;
   padding: 22px 14px;
-  background: #fff;
-  box-shadow: 0 12px 24px #17171715;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hover);
   margin: 20px auto;
   min-height: 480px;
 }
@@ -122,7 +143,7 @@
   width: 80px;
   height: 12px;
   border-radius: 99px;
-  background: #171717;
+  background: var(--color-ink);
   margin: 0 auto 22px;
 }
 .phone-frame h2 {
@@ -148,12 +169,19 @@
   height: 48px;
   width: 48px;
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-button);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+.swatch:hover {
+  transform: scale(1.08);
+  border-color: var(--color-gold);
 }
 .notification-card {
   padding: 24px;
   border-bottom: 1px solid var(--color-border);
-  background: #fff;
+  background: var(--color-surface);
 }
 .notification-card p {
   font-size: 13px;
@@ -161,18 +189,24 @@
 .preview-index-card {
   display: block;
   text-decoration: none;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
 }
 .preview-index-card:hover {
-  border-color: #a8854a;
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
 }
 .local-message {
   font-size: 13px;
-  color: #3f6b4f;
+  color: var(--color-success);
   padding-top: 12px;
 }
 .gallery-placeholder {
   min-height: 180px;
-  background: #efeae1;
+  background: var(--color-accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +223,7 @@
   min-height: 180px;
 }
 .stat-bars div {
-  background: #c5a46d;
+  background: var(--color-gold);
   min-width: 35px;
   width: 15%;
   text-align: center;
@@ -197,9 +231,9 @@
 }
 .support-message {
   padding: 16px;
-  background: #efeae1;
+  background: var(--color-accent-soft);
   margin-bottom: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-button);
 }
 .component-sheet .button {
   margin-right: 12px;
@@ -215,6 +249,28 @@
   }
   .workspace-main {
     padding: 28px;
+  }
+}
+/*
+ * Tablet 768-1023px: sidebar vertikal 210px menyisakan ruang terlalu sempit
+ * dan membuat konten bergeser (terukur overflow 32px pada GST-03 768px).
+ * Nav diubah menjadi baris horizontal yang dapat digulir, sama seperti pola
+ * dashboard-layout, sehingga konten memakai lebar penuh.
+ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .workspace-layout {
+    grid-template-columns: 1fr;
+  }
+  .workspace-nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .workspace-nav a {
+    white-space: nowrap;
   }
 }
 @media (max-width: 767px) {
@@ -286,10 +342,36 @@
   margin: 4px 0;
 }
 .preview-banner small {
-  color: #f5ead5;
+  color: var(--color-primary-soft);
 }
 .preview-banner .preview-limit {
   max-width: 340px;
+}
+/*
+ * Navigasi layar sekelompok di banner pratinjau: maju/mundur tanpa kembali ke
+ * galeri. Tautan tetap native agar dapat dijangkau keyboard dan dibuka di tab baru.
+ */
+.preview-neighbors {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.preview-neighbors a {
+  color: var(--color-ink-fixed);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-base) var(--ease-out);
+}
+.preview-neighbors a:hover {
+  border-bottom-color: var(--color-gold);
+}
+.preview-neighbors small {
+  color: var(--color-primary-soft);
+}
+.preview-neighbor-disabled {
+  color: rgb(255 255 255 / 45%);
 }
 .preview-card-title {
   font-size: 24px;
@@ -297,6 +379,91 @@
 .preview-index-card,
 .preview-card-title a {
   overflow-wrap: anywhere;
+}
+/*
+ * Preview Studio: daftar ringkas per domain menggantikan grid 63 kartu.
+ * Baris fleksibel agar tetap terbaca di 320px tanpa overflow.
+ */
+.preview-domain {
+  padding-block: 40px;
+}
+.preview-domain .section-heading {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+}
+.preview-domain h2 {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+.preview-domain h2 small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.preview-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.preview-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+.preview-row:hover {
+  background: var(--color-paper);
+}
+.preview-row-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.preview-row-main a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.preview-row-main a:hover {
+  color: var(--color-primary-deep);
+}
+.preview-row-main small {
+  font-size: 11px;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+.preview-row-variants {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.preview-row-variants .badge {
+  min-width: 32px;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+.preview-row-variants .badge:hover {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+@media (max-width: 767px) {
+  .preview-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .preview-row-variants {
+    width: 100%;
+  }
 }
 .invitation-summary-card {
   display: grid;
@@ -310,7 +477,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #efeae1;
+  background: var(--color-accent-soft);
   display: grid;
   place-items: center;
   font-size: 24px;
@@ -325,31 +492,40 @@
 }
 .wizard-steps li {
   padding: 12px;
-  border-bottom: 2px solid #e5ded3;
+  border-bottom: 2px solid var(--color-border);
+  transition: border-color var(--duration-base) var(--ease-out);
 }
 .wizard-steps .active {
-  border-color: #a8854a;
+  border-color: var(--color-primary-deep);
 }
 .ticket-selector {
   padding: 20px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-button);
   display: grid;
   gap: 12px;
   text-align: left;
   cursor: pointer;
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.ticket-selector:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-rest);
 }
 .ticket-selector[aria-pressed="true"] {
-  border-color: #a8854a;
-  background: #fbf9f4;
+  border-color: var(--color-primary-deep);
+  background: var(--color-background);
 }
 .status-actions {
   justify-content: center;
 }
 .preview-banner select {
-  background: #fff;
-  color: #171717;
+  background: var(--color-surface);
+  color: var(--color-ink);
 }
 .component-sheet h3 {
   font-size: 28px;

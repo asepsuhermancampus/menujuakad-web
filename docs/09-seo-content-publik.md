@@ -1,5 +1,35 @@
 # Audit SEO dan Konten Publik Menuju Akad
 
+## Status konten auth preproduction — 8 Oktober 2026
+
+**Status terbaru: copy tersedia dan terverifikasi lokal dalam cakupan ini.** Otorisasi aktif mencakup login customer/superadmin nyata pada Neon preproduction, seed satu admin dan sepuluh customer dummy, CRUD draft serta QRIS statis untuk pengujian. Berdasarkan handoff Security/Data/Fullstack/Payment, kode autentikasi dan persistence telah tersedia serta teruji lokal. Worker SEO tidak menjalankan migrasi, seed, operasi database live, build penuh, E2E, deploy atau Git. **Penerapan dan verifikasi produksi increment auth belum dibuktikan oleh worker ini.** Pernyataan frontend saja atau akun/database belum aktif pada audit historis di bawah tidak menggantikan status ini.
+
+### Copy yang diubah dan kontraknya
+
+- `src/components/shared/public-shell.tsx`: navigasi membedakan “Masuk akun uji” menuju `/login` dan “Simulasi Pendaftaran”. Notice menjelaskan katalog/preview data contoh serta pendaftaran publik, penerbitan dan pembayaran komersial yang belum tersedia.
+- `src/features/auth/config/auth-copy.ts`: hanya copy simulasi, tanpa perubahan handler. Preview login mengarahkan pengguna ke `/login`; signup tidak membuat akun, pemulihan/reset tidak mengubah sandi akun, dan verifikasi tidak mengirim email. Login nyata tetap menggunakan komponen `LoginForm` terpisah.
+- `src/features/marketing/components/how-it-works-detail.tsx`: langkah akun ditandai simulasi, tautan preview tetap sama, dan penjelasan penyimpanan membedakan respons tamu contoh dari draft workspace akun uji.
+- `src/features/marketing/components/faq-section.tsx`: FAQ membedakan akun uji, signup/Google/pemulihan yang belum tersedia, data preview dan draft server. Harga marketing contoh; QRIS hanya pengujian setelah login, persetujuan TEST bukan PAID serta tidak memberi hak paket atau penerbitan.
+- `src/features/marketing/config/legal-copy.ts`: dokumen tetap draf; batas pemrosesan email/kata sandi login serta penyimpanan draft dipisahkan dari form lokal. Neon preproduction disebut sebagai integrasi kode, tanpa klaim verifikasi publik. Email, Google, media storage, data tamu/RSVP publik dan Mayar belum aktif. Tidak menambahkan jaminan keamanan, retensi atau identitas pengendali data yang belum diaudit.
+- Deskripsi metadata enam route publik (`/`, `/templates`, `/how-it-works`, `/faq`, `/about`, `/contact`) dibuat sesuai isi masing-masing dan menghapus klaim usang “Akun ... belum aktif”. Judul, canonical, origin, whitelist sitemap dan aturan indeksasi existing dipertahankan.
+
+### Batas indeksasi, privasi dan kesiapan layanan
+
+Auth, private, preview dan pengujian tetap noindex; tidak memasukkan fixture, PII, query login atau token ke sitemap/metadata. Tidak mengubah `robots.ts`, `sitemap.ts`, policy SEO, guard, session, auth server, schema, billing logic, workspace atau tooling. Legal/pricing draf tetap noindex dan harga tetap bukan penawaran komersial. Noindex tidak menggantikan verifikasi sesi atau ownership server. Teks publik menyampaikan penggunaan akun uji; ini bukan bukti bahwa deployment auth baru telah berhasil.
+
+### Bukti validasi worker konten
+
+- `npx eslint` atas lima source copy dan enam route metadata: exit 0, tanpa temuan.
+- `npx vitest run src/config/seo.test.ts`: **2/2 lulus**, memeriksa canonical origin/path serta whitelist sitemap sembilan URL unik tanpa auth/preview/pricing/legal/demo/undangan contoh.
+- `npm run typecheck`: exit 0; Prisma Client 7.10.0 dihasilkan dan TypeScript lolos. Tidak melakukan migrasi database.
+- Prettier atas file yang diedit selesai. Inspeksi source memastikan perubahan terbatas pada copy/deskripsi dan mempertahankan handler, metadata policy, link tujuan serta kontrak legal draf.
+
+Build/E2E, inspeksi visual login real/preview, migrasi/seed Neon, grant runtime, smoke QRIS TEST dan browser HTTPS belum dijalankan dalam tugas konten. QA perlu memastikan label simulasi tetap terbaca pada mobile serta login menuju sesi nyata setelah rilis, tanpa menyamakan approval TEST dengan transaksi komersial. Konsolidasi changelog/progres bersama menjadi tanggung jawab ROOT agar tidak berbenturan dengan worker aktif.
+
+## Riwayat audit awal — 7 Oktober 2026
+
+Bagian di bawah adalah snapshot audit dan tindak lanjut sebelumnya. Pernyataan belum aktif/menunggu implementasi berlaku pada tanggal audit, bukan status increment auth terbaru.
+
 Tanggal: 7 Oktober 2026. Status: **audit source selesai; implementasi metadata, robots, sitemap dan perbaikan copy menunggu followup ROOT**. Worker tidak mengubah source aplikasi, dependency, fixture, tracker, konfigurasi deployment atau Git. Fullstack masih aktif saat inspeksi; temuan merupakan snapshot sementara, bukan hasil browser atau persetujuan rilis.
 
 ## Cakupan dan sumber bukti
@@ -114,3 +144,11 @@ Pemeriksaan yang benar-benar dilakukan: daftar file route/config/component, penc
 - Produksi: belum diverifikasi; akses VPS/TLS/redirect tetap gate DevOps dan ROOT.
 
 Followup ROOT berikutnya: setelah fullstack stabil, izinkan pemilik SEO mengedit metadata/config/copy terbatas sesuai ownership di atas, lalu validasi scoped dan review QA final. Izin slicing/publikasi user sudah tersedia; kebutuhan handoff ini adalah koordinasi file aktif, bukan permintaan izin user ulang.
+
+## Implementasi SEO setelah resume — 7 Oktober 2026
+
+ROOT menambahkan config SEO origin tetap `https://menujuakad.com`, metadata route-specific untuk enam halaman publik serta template slug whitelist, robots.txt dan sitemap sembilan URL unik. Root tetap noindex/nofollow dan tidak lagi memasang canonical/OG URL root pada semua turunan. Template asing tetap notFound. Auth/private/preview/demo/invitation/pricing/legal mewarisi fail-closed noindex tanpa canonical. robots tidak melarang crawling auth/preview agar meta noindex dapat dibaca; API/private dibatasi. Tidak menambah schema Offer/Organization/analytics atau tanggal lastModified palsu.
+
+Copy bantuan, langkah akhir cara kerja, CTA registrasi dan verifikasi email diselaraskan dengan preview. PublicShell menampilkan batas akun/penerbitan/pembayaran; dokumen legal diekstrak ke config dan mencatat audit log/retensi hosting belum selesai. Tidak ada janji layanan baru.
+
+Dua unit test memeriksa origin/path canonical dan sitemap whitelist; gate gabungan 227 unit/schema/typecheck/lint/build lulus. E2E head/canonical/noindex/robots/sitemap dicatat pada dokumen QA 10 setelah selesai. Produksi belum terverifikasi; metadata tidak membuktikan TLS atau redirect apex/www.

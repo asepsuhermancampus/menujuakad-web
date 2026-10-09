@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingIncludes: {
+    "/api/billing/testing-qris": ["./assets/payment/testing-qris.jpg"],
+  },
   poweredByHeader: false,
   async headers() {
     return [

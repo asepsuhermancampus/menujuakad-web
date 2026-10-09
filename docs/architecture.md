@@ -1,5 +1,9 @@
 # Arsitektur Menuju Akad
 
+## Persiapan backend setelah frontend online — 8 Oktober 2026
+
+User meminta persiapan backend dan jalur impor Neon. Increment aktif mempertahankan modular monolith serta sembilan model Prisma7 existing, menambah tooling impor/preflight dan konfigurasi DB container opsional. Rencana increment serta pengaturan Neon berada di [database](database.md). Auth/sesi provider belum dipilih atau diimplementasikan; kontrak VerifiedSession/guards existing tetap fail-closed. Pengembangan domain mengikuti urutan DB → auth/authorization → katalog/undangan → editor → tamu → pembayaran → admin/operasional. Model, query/action, service dan repository ditambahkan saat domainnya dikerjakan; tooling CLI tidak menjadi dependensi browser/runtime. Rilis frontend Docker tetap aktif dengan konfigurasi sebelumnya sampai Neon nyata teruji.
+
 ## Keputusan fondasi
 
 Aplikasi menggunakan satu Next.js App Router dengan modular monolith berbasis fitur, TypeScript strict, dan PostgreSQL Neon melalui Prisma 7. Folder proyek baru tidak memiliki kode lama untuk dimigrasikan. Workspace `HariKita-Web` merupakan proyek terpisah dan tidak diubah.

@@ -3,8 +3,8 @@ export function ContactOverview() {
   return (
     <section className="container section">
       <p className="eyebrow">BANTUAN MENUJU AKAD</p>
-      <h1>Kami Siap Membantu Hari Bahagia Anda</h1>
-      <p>Konsultasikan ide dan kebutuhan undangan kalian.</p>
+      <h1>Informasi Bantuan Menuju Akad</h1>
+      <p>Tinjau alur bantuan melalui formulir contoh.</p>
       <div className="grid-two">
         <article className="card">
           <h2>Kanal Bantuan</h2>

@@ -11,7 +11,7 @@ export function ContactForm() {
         setMessage("Pesan telah divalidasi lokal. Pengiriman belum terhubung.");
       }}
     >
-      <h2>Kirim Pesan Langsung</h2>
+      <h2>Tinjau Formulir Pesan</h2>
       <p className="notice">Form contoh; pesan tidak dikirim. Hindari data pribadi.</p>
       <label>
         Nama lengkap

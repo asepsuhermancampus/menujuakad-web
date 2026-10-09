@@ -7,7 +7,7 @@ export function AdminShell({ children, code }: { children: ReactNode; code: stri
       <header className="workspace-header">
         <Brand />
         <span className="badge">SUPERADMIN · Tampilan Contoh</span>
-        <Link href="/preview-ui">Galeri UI</Link>
+        <Link href="/preview-ui">Preview Studio</Link>
       </header>
       <div className="workspace-layout">
         <nav className="workspace-nav" aria-label="Area superadmin">

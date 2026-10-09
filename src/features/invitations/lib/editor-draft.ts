@@ -52,6 +52,22 @@ export function createEditorDraft(fixture: EditorPreviewDto): EditorDraft {
     hashtag: fixture.hashtag,
     filterUrl: "",
     filterEnabled: "false",
+    // EDT-15..20: nilai contoh untuk panel lokasi, ayat, rundown, protokol, kontak, kolofon.
+    locationVenue: fixture.location.venueName,
+    locationAddress: fixture.location.addressLabel,
+    locationMapLabel: fixture.location.mapLinkLabel,
+    locationShowMap: String(fixture.location.showMap),
+    verseEnabled: String(fixture.verse.enabled),
+    verseSource: fixture.verse.sourceLabel,
+    verseText: fixture.verse.text,
+    verseTranslation: fixture.verse.translationLabel,
+    protocolEnabled: String(fixture.protocol.enabled),
+    protocolHealth: fixture.protocol.healthNote,
+    protocolDress: fixture.protocol.dressNote,
+    protocolParking: fixture.protocol.parkingNote,
+    colophonEnabled: String(fixture.colophon.enabled),
+    colophonCredit: fixture.colophon.creditLabel,
+    colophonNote: fixture.colophon.note,
   };
 }
 export function updateEditorDraft(draft: EditorDraft, field: string, value: string): EditorDraft {

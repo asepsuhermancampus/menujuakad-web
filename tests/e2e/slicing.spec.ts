@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 import { previewScreens, screenRecords } from "../../src/features/design-preview/data/screens";
 
-test("preview mencakup 53 kode, 64 varian, noindex dan tanpa overflow", async ({
+test("preview mencakup 63 kode, 74 varian, noindex dan tanpa overflow", async ({
   page,
 }, testInfo) => {
   test.setTimeout(180000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/preview-ui");
-  await expect(page.getByRole("heading", { name: "Galeri UI Menuju Akad" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Preview Studio" })).toBeVisible();
   for (const screen of previewScreens) {
     await page.goto(`/preview-ui/${screen.code.toLowerCase()}`);
     await expect(
@@ -55,7 +55,7 @@ test("rute customer/admin menolak cookie dan parameter identitas palsu", async (
   ]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=/);
-    await expect(page.getByRole("heading", { name: "Selamat Datang Kembali" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Masuk", exact: true })).toBeVisible();
   }
 });
 

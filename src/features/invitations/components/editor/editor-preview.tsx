@@ -9,7 +9,11 @@ const sections = [
   ["EDT-02", "Sampul"],
   ["EDT-03", "Pasangan"],
   ["EDT-04", "Kisah cinta"],
+  ["EDT-16", "Ayat & mukadimah"],
   ["EDT-05", "Acara"],
+  ["EDT-15", "Lokasi & peta"],
+  ["EDT-17", "Susunan acara"],
+  ["EDT-18", "Protokol acara"],
   ["EDT-06", "Galeri"],
   ["EDT-07", "RSVP"],
   ["EDT-09", "Musik latar"],
@@ -18,6 +22,8 @@ const sections = [
   ["EDT-12", "Hitung mundur"],
   ["EDT-13", "Siaran langsung"],
   ["EDT-14", "Tagar & Filter"],
+  ["EDT-19", "Kontak narahubung"],
+  ["EDT-20", "Kolofon & kredit"],
   ["EDT-08", "Periksa & Terbitkan"],
 ];
 export function EditorPreview({

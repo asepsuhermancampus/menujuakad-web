@@ -13,15 +13,20 @@ export function PublicShell({ children }: { children: ReactNode }) {
           <Link href="/templates">Katalog Desain</Link>
           <Link href="/pricing">Paket</Link>
           <Link href="/how-it-works">Cara Kerja</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="/faq">FAQ</Link>
         </nav>
         <div className="actions">
-          <Link href="/login">Masuk</Link>
+          <Link href="/login">Masuk akun uji</Link>
           <Link className="button" href="/register">
-            Buat Undangan
+            Simulasi Pendaftaran
           </Link>
         </div>
       </header>
+      <p className="container notice">
+        Katalog dan preview memakai data contoh. Login akun uji tersedia melalui halaman Masuk;
+        pendaftaran publik, penerbitan undangan dan pembayaran komersial belum tersedia.
+      </p>
       {children}
       <footer className="site-footer container">
         <div>

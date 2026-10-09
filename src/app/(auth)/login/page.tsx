@@ -1,13 +1,9 @@
-import { AuthForm } from "@/features/auth/components/auth-form";
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ state?: string }>;
-}) {
-  const q = await searchParams;
+import { LoginForm } from "@/features/auth/components/login-form";
+export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const query = await searchParams;
   return (
     <main id="main">
-      <AuthForm mode={q.state === "conflict" ? "conflict" : "login"} />
+      <LoginForm next={typeof query.next === "string" ? query.next : undefined} />
     </main>
   );
 }

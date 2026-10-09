@@ -1,11 +1,20 @@
+/*
+ * Halaman undangan memakai token Editorial Ivory & Gold.
+ * Radius nav pill dan cover mengikuti skala Stitch (undangan 0-16 px untuk dokumen).
+ */
 .invitation-cover {
   max-width: 480px;
   margin: 60px auto;
   padding: 36px;
-  background: #fff;
-  box-shadow: 0 10px 40px #1717170a;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-rest);
   text-align: center;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-modal);
+  transition: box-shadow var(--duration-slow) var(--ease-out);
+}
+.invitation-cover:hover {
+  box-shadow: var(--shadow-hover);
 }
 .invitation-cover h1 {
   font-size: 36px;
@@ -22,9 +31,10 @@
 .invitation-document {
   max-width: 740px;
   margin: 40px auto;
-  background: #fff;
+  background: var(--color-surface);
   text-align: center;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-modal);
   padding: 56px;
 }
 .invitation-document section {
@@ -43,7 +53,7 @@
   font-size: 14px;
 }
 .invitation-document .card {
-  background: #fbf9f4;
+  background: var(--color-background);
 }
 .invitation-document label {
   text-align: left;
@@ -55,9 +65,9 @@
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  background: #171717;
-  color: #fff;
-  border-radius: 99px;
+  background: var(--color-ink);
+  color: var(--color-ink-fixed);
+  border-radius: var(--radius-pill);
   padding: 14px;
   font-size: 12px;
   margin: 20px auto;
@@ -66,6 +76,11 @@
 .invitation-nav a {
   padding: 4px 8px;
   text-decoration: none;
+  border-radius: var(--radius-button);
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+.invitation-nav a:hover {
+  background: rgb(255 255 255 / 12%);
 }
 .invitation-document form {
   max-width: 380px;
@@ -82,19 +97,19 @@
 .invitation-demo-label {
   padding: 12px;
   text-align: center;
-  background: #efeae1;
+  background: var(--color-accent-soft);
   font-size: 12px;
 }
 .couple-portrait {
   width: 130px;
   height: 180px;
   margin: 20px auto;
-  background: #efeae1;
+  background: var(--color-accent-soft);
   border-radius: 60px 60px 0 0;
   display: grid;
   place-items: center;
   font: 40px var(--font-editorial);
-  color: #a8854a;
+  color: var(--color-primary-deep);
 }
 @media (max-width: 767px) {
   .invitation-cover {

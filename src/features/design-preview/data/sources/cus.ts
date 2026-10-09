@@ -1,6 +1,6 @@
 import type { SourceScreenTuple } from "../../types";
 
-// Snapshot metadata Stitch 2026-10-07; bukan URL/aset runtime.
+// Snapshot metadata Stitch 2026-10-08 (11 varian customer); bukan URL/aset runtime.
 export const cusSources = [
   [
     "3f8be25ae0eb4ba9b5190d593d7a967a",
@@ -73,6 +73,30 @@ export const cusSources = [
     2560,
     4122,
     false,
+  ],
+  [
+    "741ba152a6c54dc487f5e282c58ff753",
+    "CUS-05",
+    "CUS-05 — Pratinjau Undangan — Default",
+    "/dashboard/invitations/[invitationId]/preview",
+    "Default",
+    "DESKTOP",
+    "screenshot",
+    2560,
+    2048,
+    true,
+  ],
+  [
+    "d5aadc0f2aa546a2ae5d854d59e147c5",
+    "CUS-06",
+    "CUS-06 — Pengaturan Undangan — Default",
+    "/dashboard/invitations/[invitationId]/settings",
+    "Default",
+    "DESKTOP",
+    "screenshot",
+    2560,
+    4540,
+    true,
   ],
   [
     "3ecacc9efc524ae2934bcb75337abf35",

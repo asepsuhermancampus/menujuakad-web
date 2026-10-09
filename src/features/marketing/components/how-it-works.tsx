@@ -8,7 +8,11 @@ export function HowItWorks() {
         {[
           ["01", "Pilih desain", "Temukan komposisi yang terasa seperti kalian."],
           ["02", "Lengkapi cerita", "Susun detail pasangan, rangkaian acara, dan kenangan."],
-          ["03", "Bagikan kebahagiaan", "Tinjau undangan dan siapkan tautan untuk orang terkasih."],
+          [
+            "03",
+            "Tinjau contoh undangan",
+            "Jelajahi tampilan undangan contoh. Penerbitan dan tautan tamu belum aktif.",
+          ],
         ].map(([n, t, b]) => (
           <article className="card" key={n}>
             <span className="step-number">{n}</span>

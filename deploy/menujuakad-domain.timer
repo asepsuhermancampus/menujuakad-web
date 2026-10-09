@@ -1,0 +1,11 @@
+[Unit]
+Description=Periksa kesiapan DNS Menuju Akad setiap dua menit
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+Unit=menujuakad-domain.service
+
+[Install]
+WantedBy=timers.target

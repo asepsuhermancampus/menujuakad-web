@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
-test("semua form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat URL/body", async ({
+
+/*
+ * Form halaman nyata `/login` sudah aktif sejak increment auth preproduction
+ * (API `POST /api/auth/login`), sehingga tidak lagi termasuk daftar inert.
+ * Cakupan test ini tetap: seluruh form contoh/simulasi harus inert tanpa
+ * JavaScript dan tidak boleh mengirim nilai apa pun lewat URL/body.
+ */
+test("form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat URL/body", async ({
   browser,
 }) => {
   const context = await browser.newContext({
@@ -15,7 +22,6 @@ test("semua form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat UR
   });
   try {
     for (const path of [
-      "/login",
       "/register",
       "/forgot-password",
       "/reset-password",
@@ -39,6 +45,33 @@ test("semua form contoh inert tanpa JavaScript dan tidak mengirim nilai lewat UR
       expect(new URL(page.url()).search, path).toBe("");
     }
     expect(leaked).toEqual([]);
+  } finally {
+    await context.close();
+  }
+});
+
+/*
+ * Form login nyata tanpa JavaScript harus tetap aman: tidak mengirim nilai
+ * contoh lewat URL/body, tetap di halaman yang sama, dan tidak membocorkan
+ * isi form ke query string saat submit gagal.
+ */
+test("form login nyata tidak membocorkan nilai contoh lewat URL tanpa JavaScript", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    baseURL: "http://127.0.0.1:3107",
+  });
+  const page = await context.newPage();
+  const marker = "qa-local-sensitive-example";
+  try {
+    await page.goto("/login");
+    const input = page.locator("form input[type=email], form input[name=email]").first();
+    expect(await input.count(), "/login").toBeGreaterThan(0);
+    expect(new URL(page.url()).search, "/login").toBe("");
+    // Nilai tidak boleh muncul pada URL setelah interaksi keyboard apa pun.
+    await page.keyboard.press("Enter");
+    expect(new URL(page.url()).search.includes(marker)).toBe(false);
   } finally {
     await context.close();
   }

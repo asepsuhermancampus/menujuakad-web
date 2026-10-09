@@ -13,16 +13,31 @@
   display: flex;
   gap: 32px;
   border-bottom: 1px solid var(--color-border);
-  overflow: auto;
+  flex-wrap: wrap;
 }
 .domain-tabs a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
   padding: 14px 4px;
   text-decoration: none;
   white-space: nowrap;
   font-size: 13px;
 }
+.domain-tabs a {
+  transition:
+    color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+.domain-tabs a:hover {
+  color: var(--color-primary-deep);
+  border-bottom: 2px solid var(--color-gold);
+}
 .domain-tabs a[aria-current="page"] {
-  border-bottom: 2px solid #a8854a;
+  border-bottom: 2px solid var(--color-primary-deep);
+  font-weight: 600;
 }
 .customer-settings-main h1,
 .domain-main h1 {
@@ -40,7 +55,7 @@
   height: 90px;
   width: 75px;
   border-radius: 50px 50px 0 0;
-  background: #e9dfce;
+  background: var(--color-accent-soft);
   display: grid;
   place-items: center;
   margin: 12px auto;
@@ -48,7 +63,7 @@
 }
 .phone-media-symbol {
   font-size: 68px;
-  background: #f1e9da;
+  background: var(--color-primary-soft);
   padding: 28px;
   margin-block: 24px;
 }
@@ -118,7 +133,7 @@
     align-items: center;
     justify-content: space-around;
     border-top: 1px solid var(--color-border);
-    background: #fff;
+    background: var(--color-surface);
     padding: 14px 8px;
   }
   .customer-bottom-nav a {
@@ -126,9 +141,10 @@
     text-decoration: none;
     padding: 10px 8px;
     min-height: 44px;
+    transition: color var(--duration-base) var(--ease-out);
   }
   .customer-bottom-nav a[aria-current="page"] {
-    color: #725724;
+    color: var(--color-primary-deep);
     font-weight: 700;
   }
   .domain-breadcrumb {

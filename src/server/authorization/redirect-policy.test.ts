@@ -84,3 +84,13 @@ describe("target login lokal", () => {
     expect(buildSafeLoginRedirect(target as unknown as string)).toBe("/login?next=%2Fdashboard");
   });
 });
+
+import { resolvePostLoginRedirect } from "./redirect-policy";
+describe("redirect after verified login", () => {
+  it("only accepts matching role paths", () => {
+    expect(resolvePostLoginRedirect("/admin/users", "SUPERADMIN")).toBe("/admin/users");
+    expect(resolvePostLoginRedirect("/admin", "CUSTOMER")).toBe("/dashboard");
+    expect(resolvePostLoginRedirect("/dashboard", "SUPERADMIN")).toBe("/admin");
+    expect(resolvePostLoginRedirect("//evil.example", "SUPERADMIN")).toBe("/admin");
+  });
+});

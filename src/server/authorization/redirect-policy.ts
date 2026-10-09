@@ -10,3 +10,13 @@ export function buildSafeLoginRedirect(returnTo: string): string {
   const target = match !== null && match[0] === returnTo ? returnTo : "/dashboard";
   return `/login?next=${encodeURIComponent(target)}`;
 }
+
+export function resolvePostLoginRedirect(
+  next: string | undefined,
+  role: "CUSTOMER" | "SUPERADMIN",
+): string {
+  const root = role === "SUPERADMIN" ? "/admin" : "/dashboard";
+  if (typeof next !== "string") return root;
+  const match = next.length <= 2048 ? safeReturnPath.exec(next) : null;
+  return match && match[0] === next && (next === root || next.startsWith(`${root}/`)) ? next : root;
+}

@@ -1,5 +1,79 @@
 # Slicing Fullstack Menuju Akad
 
+## Workspace actual preproduction — 8 Oktober 2026
+
+**Status terbaru:** kode workspace customer/superadmin dan API CRUD draft tersedia serta teruji pada database PostgreSQL lokal terisolasi. Identitas dan undangan workspace dibaca melalui Prisma dari database runtime, tanpa fixture/fallback Sarah–Dimas. Integrasi Neon live, browser HTTPS, build akhir dan produksi increment ini belum diverifikasi oleh worker. Bagian setelah increment ini adalah riwayat slicing frontend; klaim auth selalu null dan persistence belum tersedia pada riwayat tidak menggambarkan source terbaru.
+
+Lingkup mengikuti kontrak [PM03](03-pm-rencana-slicing.md) dan [Security04](04-security-akses.md). Mempertahankan branch dirty serta perubahan worker lain. Tidak mengubah auth, schema, seed, generated client, registry/preview, billing, aset, konfigurasi bersama, dependency, deployment atau commit. Tidak membaca file credential privat, menjalankan migrasi/seed atau menulis database live. Progres bersama dan changelog dikonsolidasikan ROOT setelah gate integrasi.
+
+### Perilaku customer dan superadmin yang tersedia
+
+- `/dashboard` membaca ringkasan undangan milik akun dari DB; angka menampilkan dataset dibatasi 100, bukan total analitik seluruh platform. Header menampilkan nama/email DB. Keluar memakai POST auth nyata, memeriksa `response.ok`, kemudian menuju login dan refresh; kompatibel dengan respons logout 200 JSON aktual.
+- `/dashboard/invitations`, `/dashboard/invitations/new`, `/dashboard/invitations/[id]`, serta tab `editor`, `preview`, `settings` berjalan dengan DTO DB. Buat draft memerlukan template internal seed `menujuakad-seed-preproduction-template` / `seed-preproduction-internal`, berstatus DRAFT. Template tidak tersedia menampilkan kegagalan nyata; tidak diganti fixture atau template komersial.
+- Editor menyimpan manual teks cover, profil pasangan, satu acara, kisah dan konfigurasi RSVP. Pengaturan menyimpan judul, tanggal pernikahan, slug dan zona waktu Indonesia (Jakarta/Makassar/Jayapura). API PATCH yang sama menjadi endpoint penyimpanan sections terstruktur; tidak memerlukan endpoint JSON bebas. Reload membaca data persisten. Native input/date/time dan field maxlength membantu input, sementara Zod server tetap menjadi otoritas validasi.
+- Preview privat membaca hasil DB dengan React escaping teks; tidak menerbitkan slug atau mengaktifkan entitlement. RSVP yang disimpan hanya konfigurasi; penerimaan RSVP publik, upload/media/storage, autosave dan snapshot publikasi belum aktif. Hapus draft menggunakan konfirmasi lokal lalu mutasi server; draft dengan riwayat PaymentTestRequest ditolak409 agar riwayat QRIS tidak hilang. Draft tanpa riwayat menghapus couple/sections secara cascade.
+- `/admin`, `/admin/users`, `/admin/invitations` membaca DTO aman. Daftar akun dibatasi tepat whitelist `admin@menujuakad.test`, `customer01@menujuakad.test` sampai `customer10@menujuakad.test`; undangan hanya pemilik whitelist customer. Pagination 25 row/halaman, page 1–10000. Ringkasan menyebut halaman pertama, bukan jumlah global. Tidak mengambil hash, session, provider secret atau isi credential.
+- Navigation memakai route peran nyata. Akun customer read-only menampilkan identitas DB. Tamu, RSVP publik, ucapan, hadiah, notifikasi, support dan log webhook menampilkan status layanan belum aktif serta tautan eksplisit ke preview sintetis yang terpisah. Tab tamu/RSVP/ucapan/hadiah/analitik per undangan memeriksa kepemilikan sebelum boundary. Route yang tidak masuk whitelist menghasilkan 404 setelah guard.
+- Shell `CustomerWorkspaceShell` dan `AdminWorkspaceShell` diekspor di lokasi sesuai task, digunakan layout actual, dan memiliki satu `<main id="main">`; page/view tidak membuat nested main. Boundary kegagalan identitas layout tetap memiliki main sendiri, sedangkan error data page berupa section. Dua route `not-found.tsx` privat menggunakan section agar root fallback tidak menambah nested main pada 404. Semua enam layout/page/catchall private dan API customer menetapkan `force-dynamic`. Tidak ada cache shared identity/data.
+- Billing dan analitik actual mempunyai pemilik worker lain. Navigation menyediakan `/dashboard/billing`, `/dashboard/billing/packages`, `/dashboard/analytics`, `/admin/payments`; concrete route milik mereka mengungguli catchall. Worker ini tidak mengimpor modul pending atau mengubah berkas tersebut. QRIS test tidak diperlakukan sebagai publikasi/pembayaran komersial.
+
+### Batas izin, validasi dan transaksi
+
+Setiap service customer/admin memanggil `getVerifiedSession()` ulang melalui `verifyWorkspaceRole`; guard layout bukan pengganti pemeriksaan operasi. Repository customer membatasi **owner-only**, termasuk `ownerUserId` bersama `User ACTIVE/CUSTOMER` pada lookup, list dan mutation. Membership EDITOR/VIEWER belum diberi izin pada CRUD increment ini. ID undangan customer lain menghasilkan 404 yang sama dengan ID tidak ada. Repository admin memeriksa user ACTIVE/SUPERADMIN lagi sebelum setiap query daftar.
+
+POST/PATCH/DELETE memeriksa `assertTrustedOrigin`, JSON content-type, body streaming maksimal **32768 byte**, dan skema strict. Client tidak boleh menetapkan pemilik, peran, status, published flag, template arbitrary, atau JSON sections arbitrary. Slug memakai helper existing (reserved path, format, 3–80 karakter); constraint unik DB tetap otoritatif dan collision P2002 menjadi 409 aman. Tanggal kalender mustahil, waktu di luar 00:00–23:59, timezone yang tidak didukung dan field asing ditolak 400. DELETE hanya menerima JSON `{}`.
+
+Update/delete hanya DRAFT dengan `isPublished=false`. Guarded UPDATE di transaksi memfilter owner/status dan mengunci row undangan sampai transaksi selesai; couple upsert dan penggantian empat section berjalan di transaksi yang sama. DELETE menaikkan lock row menjadi FOR UPDATE, sehingga penambahan FK PaymentTestRequest menunggu transaksi; count riwayat dijalankan sebelum delete. Riwayat pengujian tetap dipertahankan meski schema memiliki ON DELETE CASCADE. Section yang tidak dikirim tidak berubah. Input config memiliki kontrak per tipe, tidak menjadi mass assignment JSON. Failure transaksi dibatalkan; response tidak mengklaim tersimpan. DB exception dikonversi menjadi 503 aman tanpa detail koneksi dan tanpa fixture; denial 401/403/404 serta state conflict409 tetap dibedakan. Respons API memuat `Cache-Control: private, no-store`.
+
+### Struktur increment, teknologi dan endpoint
+
+Stack existing dipertahankan: Next.js App Router/Server Component untuk routing privat dan query; TypeScript strict untuk DTO; Zod untuk batas input; Prisma7/PostgreSQL untuk persistence transactional; Vitest plus PGlite untuk pengujian tanpa write Neon live. Tidak menambah dependency.
+
+```text
+src/server/
+  customer/access.ts, identity.ts       verifikasi per operasi, identitas aman
+  invitations/input.ts, dto.ts          skema typed, select dan DTO privat
+  invitations/repository.ts             query owner-only, transaksi CRUD draft
+  invitations/service.ts                sesi, validasi, aturan error domain
+  invitations/errors.ts, http.ts        HTTP aman, Origin, batas body, no-store
+  admin/repository.ts, query.ts          whitelist, SUPERADMIN, select/pagination
+src/features/workspace/
+  editor-payload.ts                     payload form whitelist
+  use-workspace-mutation.ts             fetch mutasi, status sukses/gagal/refresh
+  components/                          form create/editor/settings/delete,
+                                       preview privat, view customer/admin,
+                                       boundary layanan dan logout
+src/components/customer/customer-workspace-shell.tsx
+src/components/admin/admin-workspace-shell.tsx
+src/app/(dashboard)/dashboard/           layout, page, [...path]/page, not-found
+src/app/(admin)/admin/                   layout, page, [...path]/page, not-found
+src/app/api/customer/invitations/        route.ts, [id]/route.ts
+```
+
+| Metode dan endpoint                     | Kontrak                                                                                               |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| GET `/api/customer/invitations`         | `{ invitations: InvitationDto[] }`, maksimal100 undangan milik sesi                                   |
+| POST `/api/customer/invitations`        | `{title,slug,templateId,weddingDate?,timezone?}`; 201 `{invitation}` draft privat                     |
+| GET `/api/customer/invitations/[id]`    | 200 `{invitation}` owner-only; asing/tidak ada404                                                     |
+| PATCH `/api/customer/invitations/[id]`  | subset nonkosong `{title?,slug?,weddingDate?,timezone?,couple?,sections?}` strict; 200 `{invitation}` |
+| DELETE `/api/customer/invitations/[id]` | JSON `{}`, hanya draft belum published; 204 setelah transaksi berhasil                                |
+
+Tidak ada endpoint admin baru pada task ini; Server Component memakai query terverifikasi. Ekspor integrasi: `listCustomerInvitations`, `getCustomerInvitation`, `listCustomerTemplates`, `createCustomerInvitation`, `updateCustomerInvitation`, `deleteCustomerInvitation`, `getWorkspaceIdentity`, `getAdminUsers`, `getAdminInvitations`.
+
+Schema tidak diubah: `User` → `Invitation.ownerUserId`, `Template` → `Invitation.templateId`; `Invitation` → satu `CoupleProfile` dan banyak `InvitationSection`; `InvitationMember` tetap ada tetapi tidak diberi akses baru. Auth/session berasal dari worker Security/Data. Handoff grant minimum workspace ke DevOps: SELECT User/Template; SELECT/INSERT/UPDATE/DELETE Invitation, CoupleProfile, InvitationSection. Tambahkan SELECT PaymentTestRequest untuk count riwayat sebelum delete. Tidak membutuhkan UPDATE User/role/credential atau akses provider. DevOps wajib menilai grant/payment/cascade bersama pemilik data sebelum penerapan live.
+
+### Bukti pengujian increment dan gate yang tersisa
+
+- RED awal input/service dan HTTP/admin berupa import modul yang belum tersedia, kemudian GREEN. Regresi tambahan riwayat QRIS melalui RED assertion nyata: delete semula resolved dan menghapus riwayat, kemudian GREEN menolak409 dan mempertahankan kedua row. Ini bukan klaim seluruh fitur melalui RED assertion murni.
+- **51 test /8 file lulus** pada run12:08UTC+8 sesudah perubahan final tests: input12, service6, HTTP10, admin3, payload2, shell4, boundary2, integration PostgreSQL12. Pengujian integrasi memakai **PrismaClient asli** melalui adapter khusus test pada PGlite terisolasi dengan migrasi fondasi dan pembayaran uji existing, bukan mock state atau database live.
+- Integrasi membuktikan create/read/update/delete, reread metadata/couple/4section, partial section mempertahankan section lain dan tidak menambah duplikat, cascade saat delete, cross-owner404/no mutation, status ACTIVE/PENDING_PAYMENT/ARCHIVED/SUSPENDED ditolak, DRAFT published ditolak, user suspended/admin tidak dapat create customer draft, slug collision rollback, serta failure penulisan section lewat trigger DB membatalkan metadata/section sebelumnya.
+- Admin integration menguji whitelist, select tanpa credential/sesi, penolakan customer dan SUPERADMIN yang disuspend. HTTP menguji Origin, bodylimit, invalidJSON/type, denial/status409 dan503 tanpa detail private/no-store. Shell render menguji satu main, identitas DB props dan link actual. Payload mengabaikan hidden owner/published field. Boundary error layout/page dan render not-found di shell juga diperiksa agar main tidak bersarang.
+- **`npm test` seluruh proyek:** snapshot11:59UTC+8 lulus365/365,38file. Run12:05UTC+8 sesudah guard riwayat QRIS mencatat364lulus/2gagal,38file,exit1 (69,48detik): `fixtures.test.ts > screen_codes_are_unique_and_views_whitelisted` mengharapkan55kode tetapi registry53; `fixtures.test.ts > mempertahankan perangkat/state sumber tanpa mengklaim screenshot yang hilang` mengharapkan64screenshot tetapi62. Registry/preview milik worker UIUX dan tidak diubah worker ini. **Rerun terbaru12:09UTC+8 lulus371/371test,40file,exit0 (69,60detik)** setelah integrasi preview berubah; dua kegagalan sebelumnya tidak muncul lagi. Penambahan link paket setelah snapshot diverifikasi TypeScript serta enam test shell/boundary. Tidak menyamakan hasil unit snapshot ini dengan build/browser/grantlive gate final semua worker.
+- `npx tsc --noEmit` dan ESLint berkas task ini lulus setelah memperbaiki tiga pelanggaran children-prop pada test shell. Prettier scoped dan `git diff --check` lulus. Komponen terbesar127baris, repository145baris, service43baris; page actual maksimal64baris.
+- **Belum dilakukan worker:** full build, E2E actualauth/HTTPS, inspeksi visual/fidelity, grantruntime, migration/seed/write Neon, deployment atau verifikasi produksi. Cookie Secure produksi/origin exact tidak dilonggarkan. ROOT/QA menguji login/logout dua peran, CRUD browser/reload, cross-owner API, role/status perubahan, backend503, noindex/cache, serta integrasi billing/analytics; DevOps menerapkan layanan setelah gate.
+
+## Riwayat baseline frontend sebelum workspace actual
+
 Tanggal: 7 Oktober 2026. Lingkup worker: melanjutkan source parsial, mengimplementasikan UI frontend, route dan shell, tanpa commit/push atau deployment. Dokumen ini melengkapi [rencana 03](03-pm-rencana-slicing.md), bukan menggandakan master rancangan.
 
 ## Status dan batas klaim
@@ -175,3 +249,73 @@ Semua source record tercantum sekali. Status React tersedia berarti frontend ada
 ## Handoff berikutnya
 
 ROOT melanjutkan specialist billing/business, wiring resolver, SEO/content metadata, review visual browser dengan model yang dapat membaca gambar, gate integrasi akhir, dan rilis VPS jika akses tujuan tersedia. Public preview ini belum membuktikan produk backend atau domain live.
+
+## Increment GST-01 dan reflow paket — 8 Oktober 2026
+
+Increment ini melanjutkan [audit UI/UX 01](01-uiux-inventaris.md), khusus GST-01 dan temuan tambahan QA-PROD-01 CUS-07 yang diberikan ROOT. Fondasi, impor CSV, fixture dan navigasi yang tersedia dipertahankan. Tidak ada scaffold, dependency, kontak tamu, token personal, WhatsApp, provider atau backend nyata baru. Dokumen ini satu-satunya dokumen yang diubah worker; progres, changelog, QA, inventaris dan deployment tetap menjadi tanggung jawab pemilik masing-masing.
+
+### Kontrak dan tanggung jawab modul increment
+
+- `src/features/guests/lib/guest-preview.ts`: `summarizeGuests` menerima daftar `GuestPreviewDto` readonly, menghitung total tamu, `seats=sum(partySize)`, `sent=count(SENT_EXAMPLE)`, persentase pengiriman dan empat status RSVP. Denominator persentase adalah seluruh tamu; pembulatan integer konsisten, daftar kosong menghasilkan nol. Pencarian, filter dan pagination tidak mengubah denominator ringkasan.
+- `src/features/guests/components/guest-summary-cards.tsx`: komponen presentasi empat kartu terpisah, menerima hasil agregasi. Nilai bukan salinan PNG: fixture saat ini menghasilkan 120 tamu, 120 kursi, 100/120 ilustrasi terkirim (83%), 68 hadir (57%), 20 tidak hadir, 12 masih ragu dan 20 belum menjawab. RSVP MAYBE/PENDING tetap berbeda.
+- `src/features/guests/lib/guest-labels.ts`: pemetaan grup ke Keluarga, Teman dan Rekan kerja digunakan tabel serta select filter; nilai internal DTO/filter tetap sama.
+- `src/features/guests/components/guest-table.tsx`: label grup Indonesia, badge RSVP dengan teks, kursi aktual per DTO dan status pengiriman ilustratif. Desktop memakai tabel lima kolom; mobile menampilkan setiap baris sebagai kartu dengan kelima label terlihat. Satu DOM/data source, role tabel eksplisit untuk perubahan display CSS, header tetap tersedia bagi pembaca layar. Label visual mobile memakai `aria-hidden` agar tidak menggandakan nama sel aksesibel.
+- `src/features/guests/components/guest-management-preview.tsx`: tetap mengelola state/filter/tambah/CSV/pagination/reset lokal; memakai komponen ringkasan. Kedua tombol pagination memakai `button secondary` dan target 48 px.
+- `src/features/guests/styles.css`: selector guest scoped, grid empat kolom desktop ≥1024 px, dua pada 768–1023 px dan satu pada ≤767 px setelah resume responsif berikut. Transformasi tabel mobile hanya `.guest-table`; grid yang sama sekarang dipakai GST-03. GST-02 serta tabel hadiah tidak diubah.
+
+Seluruh operasi tetap preview sintetis. Tambah tamu disimpan di memori komponen dan reset saat reload; CSV tetap hanya data contoh tanpa kontak/token/tautan personal. Tidak menambah akses database, sesi private, mutasi server atau pengiriman nyata. Boundary customer/admin existing tidak diubah.
+
+### Koreksi tambahan CUS-07 dari bukti QA
+
+Bukti `/tmp/menujuakad-qa-resume-20261008/overflow-diagnosis.json`, skrip diagnosis dan laporan final QA dibaca sebelum mengubah CSS. Pada 768 px, dokumen melebar menjadi 779 px: teks harga `Rp 249.000` dengan spasi tak terputus dan font 32 px melampaui kartu tiga kolom; teks tabel komparasi terpisah sudah dibatasi scroll container. QA juga mereproduksi 769 px pada desktop tanpa sentuhan; bug tidak diklaim khusus perangkat sentuh. Hipotesis browser satu kolom mengembalikan lebar dokumen ke 768 px.
+
+`src/features/billing/styles.css` kini memberi kartu paket `min-width:0` serta `overflow-wrap:anywhere`, dan memakai satu kolom paket pada ≤1023 px, sebelum breakpoint lama 767 px. Perubahan scoped terhadap kartu/grid paket, tanpa mengubah nominal, order, checkout, tabel, provider atau autentikasi. Hasil browser kode baru masih menunggu QA final; diagnosis hipotesis bukan bukti source baru sudah lulus produksi.
+
+### Regresi dan hasil validasi increment
+
+TDD agregasi diuji RED terlebih dahulu: tiga regresi gagal karena field seats/sent/deliveryRatePercent belum tersedia. Sesudah implementasi, ketiganya GREEN. Input uji memiliki partySize 3/2/1, status pengiriman yang sengaja berbeda dari status RSVP, denominator kosong, serta tambahan lokal pending yang menaikkan tamu/kursi tanpa menaikkan pengiriman. Regresi render tabel juga gagal sebelum koreksi grup/kursi, lalu lulus; assertion final memeriksa isi hasil render, bukan class atau seluruh markup persis.
+
+| Pemeriksaan worker                     | Hasil                                                                                                             |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `npm test -- src/features/guests`      | 2 file, 8 test lulus                                                                                              |
+| `npm test` pada source increment       | 18 file, 243 test lulus; dijalankan ulang setelah label mobile dibuat eksplisit                                   |
+| `npm run typecheck`                    | Lulus; Prisma generate/TypeScript exit 0                                                                          |
+| `npm run lint`                         | Lulus; exit 0 tanpa keluaran error                                                                                |
+| Format berkas increment dan whitespace | Diperiksa dengan Prettier serta `git diff --check`                                                                |
+| `npm run build`, `npm run test:e2e`    | Tidak dijalankan worker sesuai instruksi ROOT; QA final menjadi pemilik build/browser                             |
+| Viewer sumber dan capture GST-01       | Dua panggilan `view_image` ditolak karena model tidak mendukung input gambar; tidak ada klaim pembandingan piksel |
+
+Regresi E2E baru tersedia di `tests/e2e/business.spec.ts`: empat kartu berbasis daftar penuh saat filter, perubahan total/kursi/pengiriman/RSVP setelah tambah lokal dan reset reload, empty tanpa NaN/Infinity, lima label/isi mobile terlihat, lebar sel/halaman serta target pagination 48 px. `tests/e2e/billing.spec.ts` menambahkan konteks desktop tanpa sentuhan dan Pixel 7 dengan sentuhan, DPR 1, lebar 768/769/800 px; pemeriksaan mencakup lebar dokumen, posisi teks harga terhadap kartu, dan pilihan paket tetap lokal. E2E baru belum dijalankan oleh worker.
+
+Sumber yang diminta: `../menujuakad-rancangan/docs/assets/stitch/gst-01-11e96c32f956400f90704e16fc036017.png` dan `/tmp/menujuakad-uiux-resume-20261008/gst-01-1440.png`. Worker mengandalkan audit DOM/CSS dan handoff reviewer karena viewer ditolak. Source tersedia dan unit/typecheck/lint teruji lokal; build, browser final, fidelity visual serta publikasi increment belum diklaim. Status grid GST-03, tab shell dan selector varian dilanjutkan pada resume responsif berikut; fidelity layar lain tetap terbuka.
+
+### Resume responsif GST-01/GST-03 dan kontrol — 8 Oktober 2026
+
+Scope ini menutup kode koreksi QA-FINAL-01 pada 701–767 px, grid empat kategori GST-03 (UIUX-08-GST-01), dan target sentuh tab domain/selector varian (UIUX-08-CONTROL-01). Source uncommitted sebelumnya dipertahankan. Worker membaca role fullstack, AGENTS, progres bersama, changelog dua folder, master spec, token resmi serta handoff UI/UX/QA/rencana sebelum edit. Tidak mengubah angka, fixture, dependency, scaffold, guard, auth, database, provider, changelog atau progres. Tidak commit, push atau deploy.
+
+| Berkas increment                                  | Tanggung jawab dan perubahan                                                                                                                                                               |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/features/guests/styles.css`                  | Batas mobile `.guest-summary` dan kartu berlabel `.guest-table` dari 700 menjadi 767 px; tablet tetap 768–1023 dan desktop ≥1024. Breakpoint filter existing tidak diubah.                 |
+| `src/features/guests/components/rsvp-preview.tsx` | Empat kategori RSVP memakai grid feature `.guest-summary`; hadir, tidak hadir, ragu dan pending tetap terpisah dengan nilai existing. Tidak mengubah tabel respons atau agregasi.          |
+| `src/app/styles/customer-shells.css`              | Kelima tab domain minimal 48×48 px, isi tengah, serta wrap; semua tab terlihat pada 320 px tanpa geser horizontal. Link, aria-current dan indikator focus-visible existing tetap tersedia. |
+| `src/app/styles/workspace.css`                    | Selector minimal 48×48 px; label dapat menyusut dan lebarnya dibatasi container, selector maksimum `min(300px, 100%)` dan tetap penuh pada mobile.                                         |
+| `tests/e2e/responsive-guests.spec.ts`             | Regresi browser geometri/layout, label mobile, empat status/nilai, target sentuh, overflow dan urutan fokus keyboard.                                                                      |
+| `docs/06-fullstack-slicing.md`                    | Konsolidasi hasil dan handoff increment ini dalam dokumen existing.                                                                                                                        |
+
+Regresi baru memiliki 14 skenario, dijalankan pada proyek Desktop Chrome dan Pixel 7: total 28 pemeriksaan. GST-01 dan GST-03 masing-masing diuji pada 701/767/768/1024 px; expected grid 1/1/2/4 kolom. GST-01 memeriksa kelima label mobile dan bidang berada dalam viewport; tablet/desktop tetap tabel. GST-03 memeriksa empat kategori dan nilai fixture 68/20/12/20, tanpa menggabungkan MAYBE/PENDING. Kontrol diuji pada 320/701/767/768/1024 px untuk selector GST-01/CUS-08 dan kelima tab domain: minimal 48×48, batas viewport, nav tidak perlu scroll horizontal, dokumen tidak melebar. Skenario keyboard 320 px menggunakan Tab sesungguhnya, memeriksa selector lalu kelima tab, pseudo-state focus-visible/outline, dan Enter pada Statistik menuju GST-06. Ini pemeriksaan DOM/browser, bukan bukti kontras visual atau screen reader fisik.
+
+| Pemeriksaan/command                                                                  | Bukti hasil dan log                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Baseline `npm run build` sebelum source fix                                          | Exit 0; `baseline-build.log`, BUILD_ID `-fsKdequzGk7TN5C5abOj` pada `baseline-build-id.txt`.                                                                                                                                                                                                     |
+| RED `npm run test:e2e -- tests/e2e/responsive-guests.spec.ts --workers=2`            | Exit 1; **20 gagal/8 lulus** dalam 44,2 s, `red-e2e.log`. GST-01 701/767 masih dua kolom, GST-03 768 masih tiga dan 1024 kartu keempat turun, selector hanya 40 px. Kegagalan assertion, bukan error koleksi/server.                                                                             |
+| RED kontrol `npm run test:e2e -- tests/e2e/responsive-guests.spec.ts --grep 'Kontrol | keyboard' --workers=2`                                                                                                                                                                                                                                                                           | Exit 1; **12 gagal**, `red-controls-e2e.log`. Assertion ukuran dibuat soft agar pemeriksaan seluruh kontrol tetap berlangsung: Tamu 41 px, RSVP 40 px, tab terakhir melampaui 320 px (tepi kanan 358), nav perlu scroll. Source belum diubah pada kedua run RED. |
+| GREEN `npm run check`                                                                | Exit 0; Prisma validate 7.10.0, typecheck, lint, **243 unit/18 file** dan build lulus. `check.log`/`check-exit.txt`.                                                                                                                                                                             |
+| GREEN `npm run test:e2e -- tests/e2e/responsive-guests.spec.ts --workers=2`          | Exit 0; **28/28 lulus dalam 36,2 s** dalam satu run, `green-e2e.log`/`green-exit.txt`. Desktop Chrome dan Pixel 7 masing-masing 14 lulus; test/assertion tidak dihapus atau dilonggarkan sesudah source fix.                                                                                     |
+| Format, whitespace dan review worker                                                 | Prettier enam berkas serta `git diff --check` lulus. Diff terhadap snapshot sebelum task hanya empat source di tabel, satu spec baru dan dokumen ini; review mandiri memeriksa scope, urutan breakpoint, reuse grid, link/fokus dan pembatasan width. Review mandiri bukan review independen QA. |
+| BUILD_ID final                                                                       | `mb6ybS2E4cGWPE7718LeW`; `build-id.txt` cocok dengan `.next/BUILD_ID` setelah check dan E2E. Ini kandidat lokal, belum BUILD_ID produksi baru.                                                                                                                                                   |
+
+Peringatan NO_COLOR/FORCE_COLOR pada Playwright berasal dari harness dan muncul di baseline serta GREEN; tidak dianggap kegagalan aplikasi. Test server port 3107 sudah berhenti sesudah run scoped.
+
+Log dan backup source sebelum edit berada di `/tmp/menujuakad-responsive-20261008/fullstack/`; diff terhadap snapshot awal pada `increment.diff`. Playwright mengelola server `npm run start` port 3107 dengan database dinonaktifkan melalui environment test dan menghentikannya sesudah run; worker tidak membuat server latar sendiri. Fixture tetap sintetis/noindex. Build/check tidak memakai data backend untuk pengujian ini.
+
+**Batas handoff:** source dan regresi scoped tersedia; status akhir lokal dilaporkan pada tabel validasi. Full E2E menjadi tugas QA sesudah worker selesai, bukan klaim run scoped ini. Inspeksi gambar/pembandingan Stitch dilakukan QA/ROOT; viewer tidak dipanggil pada resume ini, sehingga tidak ada klaim visual baru. Native zoom 200%, fidelity semua layar/state, auth/Mayar/backend dan publikasi perubahan ini belum diverifikasi. Tidak ada perubahan VPS/layanan/database produksi; produksi masih increment sebelumnya sampai rilis berikutnya.

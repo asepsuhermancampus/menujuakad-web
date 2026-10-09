@@ -18,7 +18,7 @@ afterEach(() => {
   browser.request = null;
 });
 
-describe("resolver belum terintegrasi auth", () => {
+describe("resolver menolak identitas palsu dari browser", () => {
   it.each<{ url: string; headers: Record<string, string> }>([
     { url: "/dashboard", headers: {} },
     {

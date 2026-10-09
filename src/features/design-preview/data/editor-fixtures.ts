@@ -13,7 +13,13 @@ export type EditorSection =
   | "video"
   | "countdown"
   | "live-stream"
-  | "hashtag";
+  | "hashtag"
+  | "location"
+  | "verse"
+  | "rundown"
+  | "protocol"
+  | "contact"
+  | "colophon";
 export type EditorCheckDto = Readonly<{
   id: string;
   label: string;
@@ -40,13 +46,47 @@ export type EditorPreviewDto = Readonly<{
   liveStream: Readonly<{ enabled: boolean; platformLabel: string }>;
   hashtag: string;
   publishChecks: readonly EditorCheckDto[];
+  /** Section baru EDT-15..20: nilai contoh, tidak mengirim ke peta/penyimpanan nyata. */
+  location: Readonly<{
+    venueName: string;
+    addressLabel: string;
+    mapLinkLabel: string;
+    showMap: boolean;
+  }>;
+  verse: Readonly<{
+    enabled: boolean;
+    sourceLabel: string;
+    text: string;
+    translationLabel: string;
+  }>;
+  rundown: Readonly<{
+    items: readonly Readonly<{ id: string; timeLabel: string; title: string; note: string }>[];
+  }>;
+  protocol: Readonly<{
+    enabled: boolean;
+    healthNote: string;
+    dressNote: string;
+    parkingNote: string;
+  }>;
+  contact: Readonly<{
+    contacts: readonly Readonly<{ id: string; roleLabel: string; nameLabel: string }>[];
+  }>;
+  colophon: Readonly<{
+    enabled: boolean;
+    creditLabel: string;
+    note: string;
+  }>;
 }>;
 
 export const editorSections: readonly Readonly<{ id: EditorSection; label: string }>[] = [
-  { id: "cover", label: "Cover" },
+  { id: "cover", label: "Sampul" },
   { id: "couple", label: "Pasangan" },
   { id: "story", label: "Kisah cinta" },
+  { id: "verse", label: "Ayat & mukadimah" },
   { id: "event", label: "Acara" },
+  { id: "location", label: "Lokasi & peta" },
+  { id: "rundown", label: "Susunan acara" },
+  { id: "protocol", label: "Protokol acara" },
   { id: "gallery", label: "Galeri" },
   { id: "rsvp", label: "RSVP" },
   { id: "music", label: "Musik latar" },
@@ -55,6 +95,8 @@ export const editorSections: readonly Readonly<{ id: EditorSection; label: strin
   { id: "countdown", label: "Hitung mundur" },
   { id: "live-stream", label: "Siaran langsung" },
   { id: "hashtag", label: "Tagar" },
+  { id: "contact", label: "Kontak narahubung" },
+  { id: "colophon", label: "Kolofon & kredit" },
   { id: "publish-check", label: "Periksa & terbitkan" },
 ];
 export const editorFixture: EditorPreviewDto = {
@@ -84,6 +126,42 @@ export const editorFixture: EditorPreviewDto = {
   countdown: { enabled: true, target: invitationFixture.eventDate },
   liveStream: { enabled: false, platformLabel: "Siaran contoh belum terhubung" },
   hashtag: "#SarahDimasContoh",
+  location: {
+    venueName: "Balai Kartini Contoh",
+    addressLabel: "Jl. Gatot Subroto Contoh No. 1, Jakarta",
+    mapLinkLabel: "Tautan peta contoh (belum aktif)",
+    showMap: true,
+  },
+  verse: {
+    enabled: true,
+    sourceLabel: "Kutipan contoh",
+    text: "Dan di antara tanda-tanda kebesaran-Nya, Dia menciptakan pasangan untukmu.",
+    translationLabel: "Terjemahan contoh; bukan rujukan resmi.",
+  },
+  rundown: {
+    items: [
+      { id: "demo-rundown-01", timeLabel: "08.00", title: "Persiapan & registrasi", note: "Ilustrasi" },
+      { id: "demo-rundown-02", timeLabel: "09.00", title: "Prosesi akad", note: "Ilustrasi" },
+      { id: "demo-rundown-03", timeLabel: "11.00", title: "Resepsi", note: "Ilustrasi" },
+    ],
+  },
+  protocol: {
+    enabled: true,
+    healthNote: "Protokol kesehatan contoh; bukan instruksi resmi.",
+    dressNote: "Panduan berpakaian contoh.",
+    parkingNote: "Informasi parkir contoh.",
+  },
+  contact: {
+    contacts: [
+      { id: "demo-contact-01", roleLabel: "Narahubung keluarga", nameLabel: "Kontak contoh 1" },
+      { id: "demo-contact-02", roleLabel: "Concierge acara", nameLabel: "Kontak contoh 2" },
+    ],
+  },
+  colophon: {
+    enabled: true,
+    creditLabel: "Desain & pengembangan contoh",
+    note: "Kolofon ilustratif; bukan kredit produksi final.",
+  },
   publishChecks: [
     { id: "demo-check-01", label: "Data pasangan", status: "COMPLETE", section: "couple" },
     { id: "demo-check-02", label: "Jadwal acara", status: "COMPLETE", section: "event" },

@@ -15,14 +15,27 @@ import {
 
 describe("kontrak preview sintetis", () => {
   it("screen_codes_are_unique_and_views_whitelisted", () => {
-    expect(previewScreens).toHaveLength(53);
-    expect(new Set(previewScreens.map((screen) => screen.code)).size).toBe(53);
-    expect(screenRecords).toHaveLength(64);
-    expect(new Set(screenRecords.map((screen) => screen.id)).size).toBe(64);
-    expect(previewScreens.flatMap((screen) => screen.variants)).toHaveLength(64);
+    expect(previewScreens).toHaveLength(63);
+    expect(new Set(previewScreens.map((screen) => screen.code)).size).toBe(63);
+    expect(screenRecords).toHaveLength(74);
+    expect(new Set(screenRecords.map((screen) => screen.id)).size).toBe(74);
+    expect(previewScreens.flatMap((screen) => screen.variants)).toHaveLength(74);
     expect(getPreviewScreen("pub-01")?.logicalRoute).toBe("/");
     expect(getPreviewScreen("PUB-05")?.logicalRoute).toBe("/pricing");
     expect(getPreviewScreen("ADM-01")?.audience).toBe("admin");
+    for (const [code, id, height] of [
+      ["CUS-05", "741ba152a6c54dc487f5e282c58ff753", 2048],
+      ["CUS-06", "d5aadc0f2aa546a2ae5d854d59e147c5", 4540],
+    ] as const) {
+      expect(getPreviewScreen(code)).toMatchObject({
+        id,
+        audience: "customer",
+        sourceStatus: "screenshot",
+        visualInspected: true,
+        width: 2560,
+        height,
+      });
+    }
     expect(getPreviewScreen("DS-01")?.audience).toBe("reference");
     expect(getPreviewScreen("INV-01")?.state).toBe("Default (data contoh Sarah & Dimas)");
     for (const code of [
@@ -33,8 +46,6 @@ describe("kontrak preview sintetis", () => {
       "%41DM-01",
       "ADM-01?role=SUPERADMIN",
       " CUS-01",
-      "CUS-05",
-      "CUS-06",
       "PUB-99",
     ]) {
       expect(getPreviewScreen(code)).toBeUndefined();
@@ -48,7 +59,7 @@ describe("kontrak preview sintetis", () => {
         .map((record) => record.code)
         .sort(),
     ).toEqual(["CUS-01", "CUS-02"]);
-    expect(screenRecords.filter((record) => record.sourceStatus === "screenshot")).toHaveLength(62);
+    expect(screenRecords.filter((record) => record.sourceStatus === "screenshot")).toHaveLength(72);
     expect(getPreviewScreen("CUS-01")?.sourceStatus).toBe("screenshot");
     expect(getPreviewScreen("CUS-02")?.sourceStatus).toBe("metadata-only");
     expect(getPreviewScreen("CUS-08")?.state).toBe("Default");

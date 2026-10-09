@@ -49,7 +49,7 @@ function toRecords(
   );
 }
 
-/** Semua 64 varian sumber, termasuk dua desktop yang hanya punya metadata. */
+/** Semua 66 varian sumber, termasuk dua desktop yang hanya punya metadata. */
 export const screenRecords: readonly PreviewScreenVariant[] = Object.freeze([
   ...toRecords(accSources, "customer"),
   ...toRecords(admSources, "admin"),
@@ -82,7 +82,7 @@ for (const record of screenRecords) {
   groups.set(record.code, variants);
 }
 
-/** Whitelist 53 kode; variants menyimpan seluruh sumber tanpa menduplikasi URL layar. */
+/** Whitelist 55 kode; variants menyimpan seluruh sumber tanpa menduplikasi URL layar. */
 export const previewScreens: readonly PreviewScreen[] = Object.freeze(
   Array.from(groups.values(), (variants) =>
     Object.freeze({
@@ -106,6 +106,36 @@ export function getPreviewVariant(id: string): PreviewScreenVariant | undefined 
 }
 
 export const previewSourceGaps = Object.freeze([
-  { code: "CUS-05", reason: "Preview undangan belum ditemukan di snapshot Stitch." },
-  { code: "CUS-06", reason: "Pengaturan undangan belum ditemukan di snapshot Stitch." },
+  { code: "CUS-01", reason: "Screenshot desktop belum valid; referensi mobile/tablet tersedia." },
+  { code: "CUS-02", reason: "Screenshot desktop belum valid; metadata saja." },
 ]);
+
+/*
+ * Navigasi Preview Studio: urutan kode per domain agar pengguna dapat berjalan
+ * maju/mundur tanpa kembali ke galeri. Domain mengikuti awalan kode (PUB, EDT, dst.).
+ */
+const domainScreens = new Map<string, string[]>();
+for (const screen of [...previewScreens].sort((a, b) => a.code.localeCompare(b.code))) {
+  const domain = screen.code.split("-")[0];
+  domainScreens.set(domain, [...(domainScreens.get(domain) ?? []), screen.code]);
+}
+
+/** Layar sebelum/sesudah dalam domain yang sama; undefined pada ujung urutan. */
+export function getPreviewNeighbors(code: string): Readonly<{
+  previous?: string;
+  next?: string;
+  domain: string;
+  index: number;
+  total: number;
+}> {
+  const domain = code.toUpperCase().split("-")[0];
+  const list = domainScreens.get(domain) ?? [];
+  const index = list.indexOf(code.toUpperCase());
+  return Object.freeze({
+    previous: index > 0 ? list[index - 1] : undefined,
+    next: index >= 0 && index < list.length - 1 ? list[index + 1] : undefined,
+    domain,
+    index: index >= 0 ? index + 1 : 0,
+    total: list.length,
+  });
+}

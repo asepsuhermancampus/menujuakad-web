@@ -2,28 +2,28 @@ export type AuthMode =
   "login" | "register" | "forgot-password" | "reset-password" | "verify-email" | "conflict";
 export const authCopy: Record<AuthMode, readonly [string, string, string]> = {
   login: [
-    "Selamat Datang Kembali",
-    "Masuk untuk melanjutkan cerita hari bahagia kalian.",
+    "Simulasi Masuk Akun",
+    "Form ini hanya simulasi. Gunakan halaman /login untuk masuk dengan akun uji yang disediakan.",
     "Tinjau form masuk",
   ],
   register: [
-    "Mulai Merancang Hari Bahagia",
-    "Satu undangan yang personal untuk satu cerita istimewa.",
+    "Simulasi Pendaftaran",
+    "Pendaftaran publik belum tersedia. Form contoh ini tidak membuat akun.",
     "Tinjau pendaftaran",
   ],
   "forgot-password": [
     "Pemulihan Kata Sandi",
-    "Masukkan email contoh untuk meninjau form pemulihan.",
+    "Pemulihan belum tersedia. Masukkan email contoh untuk meninjau simulasi ini.",
     "Tinjau permintaan pemulihan",
   ],
   "reset-password": [
     "Atur Kata Sandi Baru",
-    "Gunakan kata sandi contoh saat meninjau formulir ini.",
+    "Form ini tidak mengubah kata sandi akun. Gunakan kata sandi contoh untuk simulasi.",
     "Tinjau kata sandi baru",
   ],
   "verify-email": [
-    "Periksa Kotak Masuk Email Anda",
-    "Verifikasi email diperlukan sebelum menggunakan akun.",
+    "Pratinjau Verifikasi Email",
+    "Simulasi ini tidak mengirim email. Verifikasi email belum tersedia untuk akun uji.",
     "Tinjau pengiriman ulang",
   ],
   conflict: [

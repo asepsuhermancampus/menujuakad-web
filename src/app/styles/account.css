@@ -47,11 +47,17 @@
   text-align: left;
   padding: 16px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--radius-button);
   font-size: 13px;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+.account-settings-nav button:hover {
+  background: var(--color-accent-soft);
 }
 .account-settings-nav button[aria-pressed="true"] {
-  background: #efe3cc;
+  background: var(--color-primary-soft);
 }
 .notifications-layout {
   display: grid;
@@ -91,9 +97,9 @@
 .auth-state-card {
   border: 1px solid var(--color-border);
   padding: 20px;
-  background: #fbf9f4;
+  background: var(--color-background);
   text-align: center;
-  border-radius: 6px;
+  border-radius: var(--radius-button);
   overflow-wrap: anywhere;
 }
 .auth-state-card p {
@@ -110,12 +116,12 @@
   height: 80px;
   width: 80px;
   border-radius: 50%;
-  background: #efe6d5;
+  background: var(--color-primary-soft);
   display: grid;
   place-items: center;
   margin: 0 auto;
   font-size: 38px;
-  color: #755a2a;
+  color: var(--color-primary-deep);
 }
 .auth-instructions {
   padding-left: 20px;

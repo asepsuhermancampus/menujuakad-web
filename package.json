@@ -22,6 +22,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:export:neon": "tsx scripts/database/export-neon.ts",
+    "db:preflight:neon": "tsx scripts/database/neon-preflight.ts",
     "check": "npm run db:validate && npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {

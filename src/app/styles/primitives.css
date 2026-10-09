@@ -1,3 +1,13 @@
+/*
+ * Primitive UI diselaraskan dengan panduan komponen Stitch Editorial Ivory & Gold:
+ * - Tombol primary: Black #171717, teks Ivory #F8F6F1, hover Charcoal #292929.
+ * - Tombol secondary: Gold #C5A46D, teks Black, hover #B8945D.
+ * - Tombol outline: border Gold, teks Black, hover primary-soft.
+ * - Kartu: White, border Warm Beige 1px, radius 10px, padding 24px / 16px mobile.
+ * - Input: border Taupe #8A8176 1px, teks Charcoal, focus ring Black.
+ * - Badge: pill, uppercase Manrope 12px, tracking +0.08em.
+ * Target interaksi minimal 48x48 px dipertahankan.
+ */
 .button {
   display: inline-flex;
   align-items: center;
@@ -6,21 +16,55 @@
   padding: 12px 22px;
   gap: 12px;
   border: 1px solid var(--color-ink);
-  border-radius: 6px;
+  border-radius: var(--radius-button);
   background: var(--color-ink);
-  color: #fbf9f4;
+  color: var(--color-ink-fixed);
   cursor: pointer;
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
 }
 .button:hover {
-  background: #333;
+  background: var(--color-ink-soft);
+  border-color: var(--color-ink-soft);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+.button:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 .button.secondary {
+  background: var(--color-gold);
+  color: var(--color-ink);
+  border-color: var(--color-gold);
+}
+.button.secondary:hover {
+  background: var(--color-gold-hover);
+  border-color: var(--color-gold-hover);
+}
+.button.outline {
   background: transparent;
   color: var(--color-ink);
-  border-color: var(--color-border);
+  border-color: var(--color-gold);
+}
+.button.outline:hover {
+  background: var(--color-primary-soft);
+}
+.button.ghost {
+  background: transparent;
+  color: var(--color-ink-soft);
+  border-color: transparent;
+}
+.button.ghost:hover {
+  background: var(--color-beige);
+  box-shadow: none;
 }
 button:disabled {
   opacity: 0.55;
@@ -33,10 +77,46 @@ button:disabled {
   flex-wrap: wrap;
 }
 .card {
-  padding: 28px;
+  padding: 24px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-rest);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-gold);
+  transform: translateY(-2px);
+}
+/* Harga di kartu paket: serif editorial agar terasa premium, angka rata. */
+.card > strong {
+  font-family: var(--font-editorial);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-heading);
+  font-variant-numeric: tabular-nums;
+}
+.card ul {
+  padding-left: 0;
+  list-style: none;
+}
+.card ul li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+/* Tanda centang emas halus sebagai penanda daftar fitur. */
+.card ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--color-gold);
+  font-weight: 600;
 }
 .grid-two,
 .grid-three,
@@ -70,10 +150,24 @@ select,
   min-height: 48px;
   width: 100%;
   padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: #fff;
+  border: 1px solid var(--color-taupe);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
   color: var(--color-ink);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--color-ink-soft);
+}
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-ink);
+  box-shadow: 0 0 0 3px rgb(23 23 23 / 8%);
 }
 textarea {
   min-height: 110px;
@@ -83,7 +177,7 @@ input[type="checkbox"],
 input[type="radio"] {
   width: 20px;
   min-height: 20px;
-  accent-color: #171717;
+  accent-color: var(--color-ink);
 }
 label.check {
   display: flex;
@@ -92,25 +186,36 @@ label.check {
 }
 .notice {
   padding: 16px;
-  background: #f1e7d3;
-  border: 1px solid #e5ded3;
-  border-radius: 6px;
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-beige);
+  border-radius: var(--radius-button);
   font-size: 13px;
 }
 .badge {
   display: inline-block;
-  background: #efeae1;
-  border-radius: 99px;
-  padding: 4px 10px;
-  font-size: 11px;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.badge.gold {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+.badge.ink {
+  background: var(--color-ink);
+  color: var(--color-ink-fixed);
 }
 .success {
-  background: #e9efe8;
-  color: #3f6b4f;
+  background: var(--color-success-soft);
+  color: var(--color-success);
 }
 .danger {
-  color: #8a3a2a;
-  background: #f4e3dc;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 .status-page {
   padding-block: 100px;
@@ -119,14 +224,14 @@ label.check {
 }
 .status-number {
   font: 100px var(--font-editorial);
-  color: #a8854a;
+  color: var(--color-primary-deep);
 }
 .skip-link {
   position: absolute;
   left: 20px;
   top: -100px;
   z-index: 1000;
-  background: #fff;
+  background: var(--color-surface);
   padding: 16px;
 }
 .skip-link:focus {
@@ -139,15 +244,24 @@ label.check {
 }
 .tabs button {
   border: 1px solid var(--color-border);
-  background: #fff;
-  border-radius: 99px;
-  min-height: 44px;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  min-height: 48px;
   padding: 8px 16px;
   cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+.tabs button:hover {
+  border-color: var(--color-gold);
+  background: var(--color-primary-soft);
 }
 .tabs button[aria-pressed="true"] {
-  background: #171717;
-  color: #fff;
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-ink-fixed);
 }
 .toolbar {
   display: flex;
@@ -180,7 +294,7 @@ th {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #f4eee3;
+  background: var(--color-accent-soft);
 }
 .floral-art img {
   width: 85%;
@@ -223,7 +337,7 @@ th {
     max-width: 100%;
   }
   .card {
-    padding: 20px;
+    padding: 16px;
   }
   h1 {
     font-size: 36px;

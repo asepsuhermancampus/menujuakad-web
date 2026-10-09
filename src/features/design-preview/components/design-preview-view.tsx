@@ -1,3 +1,6 @@
+import { InvitationCustomerPreview } from "./invitation-customer-preview";
+import { InvitationSettingsPreview } from "./invitation-settings-preview";
+import { BusinessPreviewView, hasBusinessPreview } from "./business-preview-view";
 import { CustomerPreviewLayout } from "@/components/customer/customer-preview-layout";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AuthForm, type AuthMode } from "@/features/auth/components/auth-form";
@@ -16,11 +19,13 @@ import { PublicPreviewView, hasPublicPreview } from "./public-preview-view";
 import { SpecialistPreviewPlaceholder } from "./specialist-preview-placeholder";
 import { DesignReference } from "./design-reference";
 import { ErrorPreview } from "./error-preview";
+import { BillingPreviewView, hasBillingPreview } from "./billing-preview-view";
 const customerViews = {
   "CUS-01": <CustomerOverview />,
   "CUS-02": <InvitationList />,
   "CUS-03": <InvitationWizard />,
   "CUS-04": <InvitationDetail />,
+  "CUS-06": <InvitationSettingsPreview />,
   "ACC-01": <AccountPreview />,
   "ACC-02": <NotificationsPreview />,
   "SUP-01": <SupportPreview />,
@@ -34,6 +39,7 @@ const authViews: Record<string, AuthMode> = {
   "AUT-06": "conflict",
 };
 export function DesignPreviewView({ screen }: { screen: PreviewScreen }) {
+  if (screen.code === "CUS-05") return <InvitationCustomerPreview />;
   if (hasPublicPreview(screen.code)) return <PublicPreviewView code={screen.code} />;
   if (screen.audience === "auth")
     return (
@@ -60,13 +66,21 @@ export function DesignPreviewView({ screen }: { screen: PreviewScreen }) {
   if (screen.audience === "admin")
     return (
       <AdminShell code={screen.code}>
-        <SpecialistPreviewPlaceholder screen={screen} />
+        {hasBillingPreview(screen.code) ? (
+          <BillingPreviewView screen={screen} />
+        ) : (
+          <SpecialistPreviewPlaceholder screen={screen} />
+        )}
       </AdminShell>
     );
   if (screen.audience === "customer")
     return (
       <CustomerPreviewLayout screen={screen}>
-        {Object.hasOwn(customerViews, screen.code) ? (
+        {hasBillingPreview(screen.code) ? (
+          <BillingPreviewView screen={screen} />
+        ) : hasBusinessPreview(screen.code) ? (
+          <BusinessPreviewView screen={screen} />
+        ) : Object.hasOwn(customerViews, screen.code) ? (
           customerViews[screen.code as keyof typeof customerViews]
         ) : (
           <SpecialistPreviewPlaceholder screen={screen} />

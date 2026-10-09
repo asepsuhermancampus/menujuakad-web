@@ -1,6 +1,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Brand } from "./brand";
+
+/*
+ * Kerangka halaman autentikasi yang bersih: hanya merek di atas dan catatan
+ * hukum ringkas di bawah. Tautan "Kembali ke beranda" di header dihapus karena
+ * sudah tersedia di kaki kartu form, sehingga tidak ada tautan ganda.
+ */
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <>
@@ -9,15 +15,13 @@ export function AuthShell({ children }: { children: ReactNode }) {
       </a>
       <header className="container auth-header">
         <Brand />
-        <Link href="/">Kembali ke beranda</Link>
       </header>
       {children}
       <footer className="container auth-footer">
-        <span>© 2026 Menuju Akad · Akun contoh</span>
-        <nav aria-label="Informasi akun">
+        <span>© 2026 Menuju Akad</span>
+        <nav aria-label="Informasi hukum">
           <Link href="/terms">Ketentuan</Link>
           <Link href="/privacy">Privasi</Link>
-          <Link href="/preview-ui">Pratinjau UI</Link>
         </nav>
       </footer>
     </>

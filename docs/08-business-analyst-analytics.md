@@ -1,6 +1,57 @@
-# Audit dan Kontrak UI Tamu, RSVP, Ucapan, Hadiah, Analitik
+# Analitik Customer Actual dan Kontrak UI Tamu
 
-Tanggal: 7 Oktober 2026. **Status: audit metadata/kontrak selesai; implementasi pending followup koordinator.** Worker tidak mengubah source, route, fixture, database, provider, deployment, progres bersama atau Git. Fullstack sedang mengerjakan fondasi. Dokumen ini menetapkan kontrak untuk integrasi berikutnya, bukan menyatakan keenam view telah tersedia.
+## Analitik actual preproduction — 8 Oktober 2026
+
+**Status:** kode tersedia dan 16 pengujian analitik lokal lulus. Agregasi Prisma berjalan pada PostgreSQL PGlite terisolasi; integrasi Neon runtime, pemeriksaan browser, build akhir dan produksi increment ini belum diverifikasi worker. Tidak ada seed, migrasi, penulisan DB live, perubahan auth/billing/layout/fixture, build penuh, E2E atau commit dalam tugas ini. Catatan slicing tanggal 7 Oktober di bawah adalah riwayat preview; batas auth-null/persistence-pending historis tidak menggantikan kontrak actual terbaru pada dokumen03–06.
+
+### Route, export dan batas akses
+
+- Concrete route `/dashboard/analytics` mengungguli catchall existing; `force-dynamic`, Server Component tipis, satu section di dalam main shell fullstack. Guard customer di page dan `verifyWorkspaceRole("CUSTOMER")` pada setiap pemanggilan query memverifikasi sesi DB ulang. Superadmin, anonim dan sesi kedaluwarsa ditolak; userId tidak berasal dari query/browser.
+- `src/server/analytics/query.ts`: `getCustomerAnalytics(raw)` adalah entry point terlindungi, mengembalikan `CustomerAnalyticsDto`, bukan row pribadi. Tidak ada API HTTP tambahan atau mutasi; kebutuhan halaman tercakup query server.
+- `input.ts`: `analyticsInputSchema`, strict Zod object hanya `{period?: "all" | "7d" | "30d"}`. Default `all`. Field asing, array/repetisi period dan nilai lain ditolak400 melalui boundary data nyata; tidak memakai fixture saat invalid/backend gagal.
+- `repository.ts`: `readOwnedAnalytics(userId, window)` internal, mengecek User ACTIVE/CUSTOMER dan melakukan groupBy seluruh record, tanpa limit100/pagination. Undangan memfilter ownerUserId dan owner ACTIVE/CUSTOMER; permintaan memfilter requester userId, requester ACTIVE/CUSTOMER dan invitation.ownerUserId yang sama. Relasi FK saja tidak dianggap bukti ownership. Repository langsung tetap menolak identitas admin/nonaktif/hilang403.
+- `service.ts`: `analyticsWindow(period, now?)` untuk batas waktu; `summarizeAnalytics(window, groups)` untuk DTO angka. `types.ts` berisi kontrak window/groups/DTO server. Enum pembayaran diambil dari generated Prisma, tanpa menduplikasi pricing atau aturan transisi billing.
+- `src/features/analytics/components/customer-analytics-view.tsx`: `CustomerAnalyticsView({data})`, Server Component presentasi. Filter memakai link GET dengan label Indonesia, aria-current dan target minimal48px. Empty state berasal dari hitungan DB dan memberi jalan membuat draft/mengganti periode. Error DB menggunakan `workspaceView` existing dan pesan503 umum; tidak membocorkan detail koneksi.
+- Semua lima modul server memakai `server-only`. DTO hanya periode/batas UTC, hitungan dan nominal agregat; tanpa nama/email, id pemilik/undangan, referensi pembayaran, credential, token/session, reviewer atau rahasia provider. Tidak memakai cache lintas request. Transaksi baca mengelompokkan operasi; tidak mengklaim snapshot repeatable-read atau event historis.
+
+### Definisi metrik yang benar-benar tersedia
+
+| Metrik                                             | Definisi dan penggunaan                                                                                                                 |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Total undangan                                     | Semua Invitation milik pengguna dengan createdAt dalam periode; mengetahui cakupan akun.                                                |
+| Draft                                              | Subset status terkini DRAFT; membantu prioritas penyuntingan. Bukan bukti publikasi atau jumlah draft privat.                           |
+| Status lain                                        | Total dikurangi DRAFT, termasuk seluruh status enum lainnya; tidak disamakan dengan undangan aktif/berbayar.                            |
+| Permintaan pembayaran uji                          | Jumlah PaymentTestRequest milik pengguna dan undangan miliknya berdasarkan createdAt permintaan; tanpa filter waktu pembuatan undangan. |
+| Menunggu review                                    | Status terkini REQUESTED, jumlah dan sum amountIdr. Membantu membuka riwayat billing.                                                   |
+| Disetujui untuk pengujian                          | Status terkini APPROVED_TEST, jumlah dan sum amountIdr. Bukan PAID, pendapatan, penerimaan dana bank atau entitlement.                  |
+| Ditolak                                            | Status terkini REJECTED, jumlah dan sum amountIdr.                                                                                      |
+| Total nominal diajukan                             | Sum amountIdr semua tiga status; beberapa permintaan untuk undangan sama dihitung masing-masing. Bukan harga katalog atau omzet.        |
+| Tamu/RSVP, tayangan/unik, konversi/tingkat respons | **Belum tersedia**, bukan0: model/instrumentasi belum tersedia untuk query actual ini.                                                  |
+
+`all` berarti sejak awal sampai waktu query. `7d`/`30d` berarti tepat7/30 ×24jam mundur dari waktu query dalam UTC, bukan hari kalender Asia/Jakarta. Batas awal dan akhir inklusif (`gte`/`lte`); record satu milidetik sebelum awal/sesudah akhir dikecualikan. DTO mengirim ISO UTC batas aktual dan UI menjelaskan createdAt; status memakai keadaan terkini record tersebut, bukan perubahan status selama periode atau waktu reviewedAt. Tidak menjumlah pengunjung unik harian, memakai fixturevisitor atau mengirim telemetry. Angka count/sum wajib nonnegatif dan `Number.isSafeInteger`, termasuk hasil penjumlahan antarkelompok; nominal di luar rentang aman gagal503, bukan dibulatkan. Sum IDR dapat melebihi integer32bit satu row selama masih aman dalam JavaScript.
+
+### Cakupan journey dan keterbatasan produk
+
+| Tahap                                   | Status berdasarkan source/handoff yang tersedia                                                                                         |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Login customer/superadmin               | Auth DB dan sesi terverifikasi tersedia pada Security04; bukti live/browser dikonsolidasikan QA/ROOT.                                   |
+| Membuat/menyunting draft                | CRUD, editor dan section-save DB nyata tersedia serta teruji lokal pada Fullstack06.                                                    |
+| Analitik akun                           | Increment ini membaca agregat undangan/permintaan uji nyata; belum diuji pada Neon/produksi oleh worker.                                |
+| QRIS pengujian/review                   | Model TEST tersedia, billing dimiliki worker Payment; persetujuan manual bukan transaksi bank terverifikasi.                            |
+| Tamu, RSVP publik, ucapan/hadiah publik | Persistence/domain publik belum tersedia; GST tetap preview sintetis. Konfigurasi RSVP tersimpan tidak berarti respons publik diterima. |
+| Support, storage, notifikasi            | Layanan aktual belum tersedia pada workspace.                                                                                           |
+| Pembayaran komersial Mayar              | Pending integrasi provider/verifikasi server; tidak ada revenue/LTV/CAC/conversion actual atau target buatan.                           |
+
+Preview `/preview-ui/gst-06`, komponen `analytics-preview.tsx` dan fixture statistik tetap terpisah dan tidak diubah. Route actual bukan slicing grafik pengunjung GST-06: keterbatasan pengukuran ditampilkan eksplisit. Telemetry/funnel/growth yang belum diinstrumentasikan tetap usulan historis, tidak diklaim berjalan.
+
+### Bukti verifikasi increment analitik
+
+- `npx vitest run src/server/analytics`: **16/16 PASS**, dua berkas. Enam kasus repository memakai migrasi fondasi/PaymentTestRequest existing, Prisma asli dan PGlite; mencakup cross-owner, requester/owner mismatch, ACTIVE/CUSTOMER defense, kosong, dua batas waktu inklusif, exclusion1ms/future, semua waktu dan integer aggregate4294967294IDR untuk dua APPROVED_TEST. Sepuluh kasus query/service mencakup anonymous/admin/expired denial, strict input, agregasi/status kosong, PII-safe DTO tanpa PAID/revenue, fractional/negative/unsafe nominal serta outage tanpa fallback.
+- `npx tsc --noEmit`: **PASS** pada source workspace saat pemeriksaan; generated client existing dipakai tanpa perubahan schema.
+- `npx eslint` pada modul analitik, view dan page: **PASS**; scoped Prettier dan `git diff --check`: **PASS**. Daftar dokumen01–10 berurutan dan tidak ada file laporan duplikat.
+- Regresi `npm test -- --maxWorkers=2`: **428 PASS / 2 FAIL dari430**,47berkas. Dua kegagalan adalah timeout15000ms pada `auth-runtime-grants.test.ts` kasus grant minimal dan `auth-seed.test.ts` kasus collision admin/rollback; bukan assertion analitik. `npx vitest run tests/database/auth-runtime-grants.test.ts tests/database/auth-seed.test.ts --maxWorkers=1`: rerun serial **22/22 PASS** (84,64detik), tanpa mengubah test auth. Hasil ini tidak diubah menjadi klaim suite penuh430 lulus dalam satu run. Build/E2E/visual/Neon/produksi tetap gate integrasi QA/ROOT; worker tidak mengklaimnya lulus.
+
+Riwayat audit preview — 7 Oktober 2026. **Status: audit metadata/kontrak selesai; implementasi pending followup koordinator.** Worker tidak mengubah source, route, fixture, database, provider, deployment, progres bersama atau Git. Fullstack sedang mengerjakan fondasi. Dokumen ini menetapkan kontrak untuk integrasi berikutnya, bukan menyatakan keenam view telah tersedia.
 
 ## Sumber dan batas inspeksi
 
@@ -99,3 +150,13 @@ Followup implementasi wajib melakukan inspeksi PNG dengan viewer yang berfungsi,
 Pemeriksaan daftar dokumen: 01–05, 07 dan 08 tersedia saat audit; 06 masih milik fullstack yang aktif, sehingga worker tidak membuat penggantinya atau mengubah nomor.
 
 Asumsi scope: audit kontrak saja sesuai tugas ROOT; tidak membuat source sebelum followup. Layar GST-01 telah pernah diperiksa worker UI/UX, tetapi worker ini tidak menandai manifest `visual_inspected` karena tidak ada inspeksi visual baru yang berhasil.
+
+## Implementasi lanjutan setelah resume — 7 Oktober 2026
+
+ROOT mengganti slot GST-01–06 dan varian Empty GST-01 dengan komponen domain guests/wishes/gifts/analytics. Resolver business memakai whitelist enam kode; guard aktual customer/admin tetap terpisah. Manajemen tamu menyediakan kombinasi search/status/grup, pagination 10 record, tambah identitas sintetis otomatis serta CSV lokal dengan perlindungan formula spreadsheet. Impor memakai teks `nama;grup`, memvalidasi panjang nama/grup/kolom, mendeteksi duplikat existing maupun antarbari, menambahkan baris valid lokal dan mempertahankan input invalid. Impor dan manajemen adalah state contoh terpisah, tidak mengklaim sinkronisasi.
+
+RSVP dihitung dari DTO (120/68/20/12/20), denominator tamu; tambah lokal memperbarui ringkasan di layar manajemen. Moderasi ucapan toggle VISIBLE/HIDDEN tanpa persistence. Gift selalu DECLARED; nominal amplop 400.000 IDR bukan uang diterima, hadiah fisik tanpa taksiran. Toggle tampilan hadiah tidak menghasilkan rekening/alamat/QR. Analitik memakai pageViews 420 dan uniqueVisitors 180 periode penuh; subset tiga hari menghitung pageViews saja dan menampilkan unique tidak tersedia. Tidak ada telemetry/provider.
+
+Batas kesesuaian: PNG tersedia dan contact sheet lokal dibuat, tetapi `view_image` menolak karena model sesi tidak mendukung image input. Implementasi memakai handoff tekstual audit, **belum dibandingkan visual dengan sumber**. GST ini increment fungsional dasar, bukan seluruh detail Stitch selesai: tidak ada upload CSV file/parser RFC4180, kontak/link tamu, grafik donut lengkap, alur pengiriman, export gambar/report atau cross-screen state. Detail presentasi sumber tetap pekerjaan review visual berikutnya.
+
+Unit perilaku guests empat kasus lulus; gate gabungan 227 test/schema/typecheck/lint/build lulus. Bukti E2E final dicatat pada dokumen QA 10. Komponen terbesar 152 baris; presentasi dan fungsi validasi/agregasi/CSV terpisah. Runtime tidak membaca aset folder rancangan.

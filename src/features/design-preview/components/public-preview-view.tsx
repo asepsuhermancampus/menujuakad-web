@@ -9,6 +9,9 @@ import { FaqSection } from "@/features/marketing/components/faq-section";
 import { AboutOverview } from "@/features/marketing/components/about-overview";
 import { ContactOverview } from "@/features/marketing/components/contact-overview";
 import { LegalDocument } from "@/features/marketing/components/legal-document";
+import { BlogOverview } from "@/features/marketing/components/blog-overview";
+import { BlogDetail } from "@/features/marketing/components/blog-detail";
+import { blogArticles } from "@/features/marketing/config/blog-articles";
 import { templatesFixture } from "../data/fixtures";
 const publicViews = {
   "PUB-01": <HomeOverview />,
@@ -29,6 +32,8 @@ const publicViews = {
   "PUB-09": <AboutOverview />,
   "PUB-10": <LegalDocument />,
   "PUB-11": <LegalDocument privacyMode />,
+  "PUB-12": <BlogOverview />,
+  "PUB-13": <BlogDetail article={blogArticles[0]} />,
 } as const;
 export function PublicPreviewView({ code }: { code: keyof typeof publicViews }) {
   return (

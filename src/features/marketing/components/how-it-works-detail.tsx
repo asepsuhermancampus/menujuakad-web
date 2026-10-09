@@ -10,10 +10,10 @@ const steps = [
   ],
   [
     "02",
-    "Siapkan Akun",
-    "Tinjau metode masuk dan formulir akun. Autentikasi nyata belum aktif.",
+    "Tinjau Pendaftaran",
+    "Pendaftaran ini hanya simulasi. Login akun uji yang disediakan berada di /login.",
     "/preview-ui/aut-02",
-    "Tinjau akun",
+    "Tinjau simulasi",
   ],
   [
     "03",
@@ -38,7 +38,7 @@ const steps = [
   ],
   [
     "06",
-    "Siapkan Tautan untuk Tamu",
+    "Tinjau Undangan untuk Tamu",
     "Buka preview undangan. Penerbitan dan respons nyata masih belum terhubung.",
     "/preview-ui/inv-02",
     "Lihat undangan",
@@ -85,8 +85,8 @@ export function HowItWorksDetail() {
           <article className="card">
             <h3>Undangan Terstruktur</h3>
             <p>
-              Rancangan mengumpulkan cerita, acara, dan respons dalam satu pengalaman. Layanan
-              penyimpanan nyata belum tersedia.
+              Rancangan mengumpulkan cerita, acara, dan respons dalam satu pengalaman. Respons tamu
+              pada preview tidak disimpan; penyimpanan draft akun uji terpisah dari simulasi ini.
             </p>
           </article>
         </div>

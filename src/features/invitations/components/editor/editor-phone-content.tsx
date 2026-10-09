@@ -144,6 +144,71 @@ export function EditorPhoneContent({ code, draft }: { code: string; draft: Edito
         </small>
       </>
     );
+  if (code === "EDT-15")
+    return (
+      <>
+        <h2>{draft.locationVenue}</h2>
+        <div className="phone-media-symbol">⌖</div>
+        <p>{draft.locationAddress}</p>
+        <small>
+          {draft.locationShowMap === "true" ? "Peta contoh ditampilkan" : "Peta disembunyikan"} ·{" "}
+          {draft.locationMapLabel}
+        </small>
+      </>
+    );
+  if (code === "EDT-16")
+    return (
+      <>
+        <h2>{draft.verseSource}</h2>
+        <div className="phone-media-symbol">❝</div>
+        <p>{draft.verseText}</p>
+        <small>
+          {draft.verseEnabled === "true" ? "Bagian ayat contoh aktif" : "Bagian disembunyikan"} ·{" "}
+          {draft.verseTranslation}
+        </small>
+      </>
+    );
+  if (code === "EDT-17")
+    return (
+      <>
+        <h2>Susunan Acara</h2>
+        <div className="phone-media-symbol">☰</div>
+        <p>Urutan rundown contoh tersimpan pada fixture editor.</p>
+        <small>Perubahan hanya berlaku selama sesi preview.</small>
+      </>
+    );
+  if (code === "EDT-18")
+    return (
+      <>
+        <h2>Protokol Acara</h2>
+        <div className="phone-media-symbol">✚</div>
+        <p>{draft.protocolHealth}</p>
+        <small>
+          {draft.protocolDress} · {draft.protocolParking}
+        </small>
+      </>
+    );
+  if (code === "EDT-19")
+    return (
+      <>
+        <h2>Butuh Bantuan?</h2>
+        <div className="phone-media-symbol">☏</div>
+        <p>Kontak narahubung contoh tersedia pada undangan.</p>
+        <small>Nomor telepon tidak disertakan pada preview sintetis.</small>
+      </>
+    );
+  if (code === "EDT-20")
+    return (
+      <>
+        <h2>Kolofon</h2>
+        <div className="phone-media-symbol">✦</div>
+        <p>{draft.colophonCredit}</p>
+        <small>
+          {draft.colophonEnabled === "true" ? "Bagian kolofon contoh aktif" : "Bagian disembunyikan"}{" "}
+          · {draft.colophonNote}
+        </small>
+      </>
+    );
   return (
     <>
       <CoverPhonePreview draft={draft} />

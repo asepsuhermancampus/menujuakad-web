@@ -1,47 +1,4 @@
-const terms = [
-  [
-    "Ruang lingkup",
-    "Situs ini sedang dalam tahap pratinjau UI. Tampilan akun, editor dan pembayaran tidak menyatakan layanan komersial sudah aktif.",
-  ],
-  [
-    "Akun dan konten",
-    "Akun nyata belum dapat dibuat. Jangan memasukkan data rahasia, data tamu asli atau informasi rekening ke formulir contoh.",
-  ],
-  [
-    "Pembayaran",
-    "Harga dan kuota yang ditampilkan pada pratinjau merupakan ilustrasi. Tidak ada pembayaran atau hak akses yang diterbitkan dari interaksi lokal.",
-  ],
-  [
-    "Ketersediaan",
-    "Interaksi contoh tidak disimpan di server dan dapat hilang setelah memuat ulang halaman.",
-  ],
-  [
-    "Ketentuan layanan",
-    "Kebijakan komersial, pembatalan dan operasional akan ditetapkan sebelum layanan diaktifkan.",
-  ],
-];
-const privacy = [
-  [
-    "Data pada pratinjau",
-    "Nama, alamat email dan detail undangan yang ditampilkan berasal dari fixture sintetis.",
-  ],
-  [
-    "Formulir lokal",
-    "Form contoh hanya melakukan validasi atau perubahan di memori browser. Jangan memasukkan informasi pribadi.",
-  ],
-  [
-    "Layanan eksternal",
-    "Integrasi database, autentikasi, penyimpanan, email dan pembayaran belum diaktifkan dalam lingkup slicing ini.",
-  ],
-  [
-    "Penyimpanan",
-    "Perubahan UI contoh tidak menjadi catatan akun dan reset ketika halaman dimuat ulang.",
-  ],
-  [
-    "Kebijakan final",
-    "Dasar pemrosesan, masa retensi, hak pengguna dan kanal kontak akan ditetapkan sebelum pengumpulan data layanan dimulai.",
-  ],
-];
+import { terms, privacy } from "../config/legal-copy";
 export function LegalDocument({ privacyMode = false }: { privacyMode?: boolean }) {
   const sections = privacyMode ? privacy : terms;
   return (

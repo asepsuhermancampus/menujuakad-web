@@ -1,11 +1,11 @@
-# TEMPLATE BERSYARAT: impor hanya sesudah audit Caddy VPS target selesai.
-# Jangan menimpa Caddyfile utama atau menyalakan proxy kedua.
-# Ganti port sesuai rilis kandidat (3100 atau 3101).
+# Vhost tambahan ke Caddy existing; pertahankan breadwinner.my.id.
+# Aktifkan HTTPS setelah DNS apex/www menuju VPS 43.173.15.136.
+# Container Menuju Akad hanya menerbitkan port localhost 3100.
 menujuakad.com {
 	encode zstd gzip
 	reverse_proxy 127.0.0.1:3100
 }
 
 www.menujuakad.com {
-	redir https://menujuakad.com{uri} permanent
+	redir https://menujuakad.com{uri} 308
 }
