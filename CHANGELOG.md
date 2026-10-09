@@ -1,5 +1,14 @@
 # Changelog Implementasi Menuju Akad
 
+## Aktivasi login produksi — 10 Oktober 2026
+
+- **Login produksi kini berfungsi nyata.** `AUTH_SECRET` 64 karakter acak dan `AUTH_TRUST_PROXY=1` ditulis atomik ke `/etc/menujuakad/runtime.env` (root `0600`); nilainya tidak pernah dicatat pada dokumen, log, atau chat.
+- **Migrasi Neon diterapkan:** lima migrasi auth (`auth_preproduction`, `payment_test`, `auth_roles`, `auth_multimethod`, `auth_sms_policy`) di-`migrate deploy` setelah backup schema (`pg_dump` via image `postgres:18-bookworm`) dan preflight read-only (nol konflik identitas, data bisnis kosong). Semua aditif; `migrate status` up to date dan `migrate diff` tanpa drift.
+- **Grant runtime terbatas diterapkan** (`menujuakad_runtime_preproduction`) dan diverifikasi perilakunya: INSERT user `CLIENT`/`ACTIVE` berhasil; trigger menolak `SUPERADMIN`; escalation role, DDL, dan `DELETE` pada `User` ditolak.
+- **Bukti end-to-end terhadap HTTPS produksi:** login kredensial nyata berhasil (cookie HttpOnly+Secure), `/account`, `/account/security`, dan `/dashboard` dapat diakses dengan sesi nyata, registrasi via UI berhasil, kredensial salah → 401, mutasi tanpa CSRF → 403, logout → 200, throttle → 429 dengan `Retry-After: 900`.
+- **Keamanan proxy diverifikasi sebelum aktivasi:** Caddy diuji terisolasi dan terbukti **menimpa** `X-Forwarded-For` palsu dengan peer sebenarnya, sehingga spoofing tidak dapat melewati batas throttle.
+- Akun dan sesi uji sudah dihapus; database kembali bersih. Provider Google/Resend/Twilio belum dikonfigurasi sehingga verifikasi email, OTP SMS, dan OAuth belum dapat diuji end-to-end; Mayar/persistence bisnis dan restore database teruji tetap terbuka.
+
 ## Rilis produksi autentikasi multimethod — 10 Oktober 2026
 
 - **PR #1 di-merge ke `main` sebagai satu commit** (`d4348c4`, squash) setelah CI hijau; `feat/stitch-slicing` tetap ada untuk riwayat increment. Repo lokal dan `origin/main` sinkron pada `d4348c4`.

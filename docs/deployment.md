@@ -1,5 +1,48 @@
 # Deployment VPS Menuju Akad
 
+## Aktivasi login produksi: AUTH_SECRET, migrasi Neon, dan grant runtime — 10 Oktober 2026
+
+**Status fase 6: login produksi berfungsi nyata.** `AUTH_SECRET` (64 karakter acak, dibangkitkan server) dan `AUTH_TRUST_PROXY=1` aktif pada `/etc/menujuakad/runtime.env` (root `0600`, nilai tidak pernah dicatat pada dokumen/log/chat). Lima migrasi auth diterapkan ke Neon `menujuakad-preproduction`, dan grant runtime terbatas diterapkan. Container `menujuakad-web-1` tetap `preview-20261010-auth` BUILD_ID `O09eZzNI28H-sbZQG2szk` healthy; tidak ada image/schema bisnis baru.
+
+### Migrasi dan backup
+
+- Backup schema pra-migrasi: `/tmp/menujuakad-auth-20261010/db-backup/schema-before.sql` (519 baris, 9 tabel + `_prisma_migrations`) memakai `pg_dump --schema-only` dari image `postgres:18-bookworm` (server PostgreSQL 18.6; `pg_dump` host tidak tersedia dan `postgres:16-alpine` ditolak karena version mismatch).
+- Preflight read-only sebelum migrasi: konflik identitas `invalid_emails=0, email_conflicts=0, invalid_phones=0, phone_conflicts=0`; data bisnis kosong (`users=0, invitations=0, packages=0, templates=0`) sehingga migrasi tidak menyentuh data pengguna.
+- `prisma migrate deploy` menerapkan 5 migrasi tersisa (auth_preproduction, payment_test, auth_roles, auth_multimethod, auth_sms_policy) dalam satu kali jalan, exit 0. Semuanya aditif: tidak ada `DROP`/`TRUNCATE`/`DELETE`. `migrate status` = **up to date**; `migrate diff --from-config-datasource --to-schema` = **No difference detected** (tanpa schema drift).
+- Grant runtime `menujuakad_runtime_preproduction` diterapkan dari `scripts/database/auth-runtime-grants.sql`. Verifikasi perilaku role (pooled `DATABASE_URL`) membuktikan: INSERT `User` dengan role `CLIENT`/`ACTIVE` berhasil, trigger `User_runtime_registration_guard` **menolak** `SUPERADMIN` (`AUTH_REGISTRATION_ROLE_FORBIDDEN`), `AuthCredential`/`UserSession`/`AuthLoginThrottle`/`AuthAccount`/`AuthVerificationToken` sesuai hak minimum, dan **escalation role, DDL, serta `DELETE` pada `User` ditolak**. Role bukan superuser dan tidak bisa membuat role.
+
+### Aktivasi runtime
+
+- `AUTH_SECRET` 64 karakter acak ditulis atomik ke `/etc/menujuakad/runtime.env` (root `0600`); `DATABASE_URL` dipertahankan. `AUTH_TRUST_PROXY=1` diaktifkan **setelah** perilaku proxy diverifikasi.
+- Verifikasi proxy: Caddy diuji pada instance terisolasi (port 18081, `admin off`, `auto_https off`) dengan konfigurasi `reverse_proxy` yang sama. Header `X-Forwarded-For` palsu (`1.2.3.4` maupun rantai `9.9.9.9, 8.8.8.8`) **ditimpa** menjadi peer sebenarnya (`127.0.0.1`), sehingga spoofing XFF tidak mungkin melewati batas throttle. Container uji dibersihkan; hanya container/network uji yang dihapus.
+- Container direstart memakai dua Compose existing; `/app/.env` tetap tidak ada dan `AUTH_SECRET` hanya berasal dari env_file runtime.
+
+### Bukti login nyata (end-to-end terhadap HTTPS produksi)
+
+| Uji | Hasil |
+| --- | --- |
+| Halaman `/login` memuat, capabilities jujur | PASS (`google:false, emailRecovery:false, smsOtp:false`) |
+| Guard `/account` menolak sebelum login | PASS (dialihkan ke `/login`, tanpa konten privat) |
+| **Login kredensial nyata** | PASS → mendarat di `/dashboard`; cookie `menujuakad_session` **HttpOnly + Secure + SameSite=Lax** |
+| `/account` dengan sesi nyata | PASS (menampilkan "AKUN ANDA / Profil", bukan halaman galat) |
+| `/account/security` dengan sesi nyata | PASS |
+| `/dashboard` dengan sesi nyata | PASS |
+| Kredensial salah | **401** `INVALID_CREDENTIALS`, tanpa cookie sesi (bukan lagi 503) |
+| Mutasi tanpa token CSRF | **403** (perlindungan CSRF aktif) |
+| Logout | **200**, cookie sesi dibersihkan, `/account` kembali menolak |
+| Registrasi akun baru via UI | PASS (butuh persetujuan Ketentuan/Privasi; kartu "Selamat datang", sesi terbentuk, `/account` dapat diakses) |
+| Throttle login | PASS: percobaan ke-6 mengembalikan **429** dengan `Retry-After: 900` |
+
+Akun uji (`verifikasi2@menujuakad.test`, `daftar-*`, `probe-*`) dan sesinya sudah **dihapus** setelah pengujian; database kembali `users=0, sessions=0, credentials=0`. File kredensial sementara dihapus.
+
+### Batas yang masih terbuka
+
+- Provider **Google/Resend/Twilio belum dikonfigurasi**, jadi verifikasi email dan OTP SMS belum terkirim; `capabilities` melaporkan `false` secara jujur. Registrasi email berhasil membuat akun + sesi, tetapi penandaan `emailVerifiedAt` menunggu provider email.
+- **Google OAuth, pemulihan kata sandi, dan OTP SMS belum dapat diuji end-to-end** karena ketiga provider di atas.
+- Seed 11 akun preproduction tidak dijalankan (bukan kebutuhan login produksi).
+- Mayar/persistence bisnis, restore database teruji, dan fidelity seluruh Stitch tetap terbuka. `/vendor` belum dapat dipakai karena belum ada akun berrole VENDOR (role hanya diberikan owner secara eksplisit).
+- Throttle IP kini per-peer nyata berkat `AUTH_TRUST_PROXY=1`; batas ini hanya sah selama Caddy tetap satu-satunya upstream dan menimpa XFF seperti terbukti di atas.
+
 ## Rilis autentikasi multimethod dan akun lintas peran — 10 Oktober 2026
 
 **Status fase 5: `preview-20261010-auth` aktif dan smoke HTTPS produksi PASS pada 10 Oktober 2026, 04.42 UTC+8.** Produksi https://menujuakad.com memakai BUILD_ID **`O09eZzNI28H-sbZQG2szk`**, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment membawa backend autentikasi multimethod (email/password + verifikasi email, Google OAuth, OTP SMS, recovery, CSRF, throttle, request policy fail-closed), halaman akun canonical `/account` dan `/account/security` lintas peran, landing `/vendor`, empat alias dashboard 307, serta gate CI GitHub Actions. Rilis `preview-20261009-login` di bawah merupakan riwayat dan image rollback terdekat. Scope tetap frontend/auth lokal: `AUTH_SECRET` belum di-set di runtime produksi sehingga POST login menjawab 503 fail-safe (sesuai kontrak), provider Google/Resend/Twilio belum dikonfigurasi, migrasi/grant Neon belum diterapkan, dan Mayar/persistence bisnis belum selesai.
