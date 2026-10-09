@@ -1,0 +1,104 @@
+name: CI
+
+# Gate otomatis: validasi schema, typecheck, lint, unit test, build, dan E2E.
+# Semua langkah berjalan tanpa rahasia: prisma generate/validate tidak butuh DB,
+# dan webServer Playwright menyetel DATABASE_URL kosong (fail-closed).
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  CI: "true"
+
+jobs:
+  quality:
+    name: Kualitas (db, typecheck, lint, unit, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Siapkan Node dari .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependensi
+        run: npm ci
+
+      - name: Validasi schema Prisma
+        run: npm run db:validate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit test
+        run: npm test
+
+      - name: Build produksi
+        run: npm run build
+
+      - name: Unggah artefak build standalone
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-build
+          if-no-files-found: error
+          retention-days: 3
+          path: |
+            .next/standalone
+            .next/static
+            .next/BUILD_ID
+
+  e2e:
+    name: E2E Playwright (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Siapkan Node dari .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependensi
+        run: npm ci
+
+      - name: Install browser Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build produksi
+        run: npm run build
+
+      - name: E2E
+        run: npm run test:e2e
+
+      - name: Unggah jejak kegagalan
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-jejak-kegagalan
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            playwright-report
+            test-results

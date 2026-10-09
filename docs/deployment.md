@@ -260,3 +260,16 @@ Playwright memakai managed webServer konfigurasi existing, tanpa proses backgrou
 Tidak mengekspos port aplikasi internal ke Internet. Header nosniff/referrer/frame/permissions diperiksa setelah proxy; HSTS hanya setelah cakupan HTTPS terbukti. Metadata preview/auth/private noindex tidak menggantikan otorisasi server. Resource customer/admin dan pembayaran tidak aktif berdasarkan fixture/cookie/query.
 
 Setiap increment dinyatakan terverifikasi produksi hanya setelah domain HTTPS200, redirect HTTP/www, sertifikat, aset, liveness, interaksi dan proteksi route diuji pada artifact final. Release aktif `preview-20261008-responsive` menggantikan `preview-20261008-gst01`; kedua tag sebelumnya serta artifact/backup dipertahankan untuk rollback. Koneksi Neon serta status auth/Mayar tetap dicatat terpisah.
+
+## CI GitHub Actions dan alur Pull Request
+
+Gate otomatis berada di [`.github/workflows/ci.yml`](../.github/workflows/ci.yml), aktif pada `pull_request` dan `push` ke `main` serta `workflow_dispatch`. Dua job berjalan berurutan:
+
+1. `quality` — `npm ci`, `npm run db:validate`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`; artefak `.next/standalone`, `.next/static`, dan `BUILD_ID` diunggah dengan retensi 3 hari.
+2. `e2e` — `npm ci`, `npx playwright install --with-deps chromium`, `npm run build`, `npm run test:e2e`; saat gagal, `playwright-report` dan `test-results` diunggah dengan retensi 7 hari.
+
+CI **tidak memerlukan rahasia apa pun**: `prisma generate`/`validate` berjalan tanpa kredensial, dan `playwright.config.ts` menyetel `DATABASE_URL` kosong sehingga aplikasi fail-closed seperti smoke frontend. Konsekuensinya CI hanya membuktikan kode teruji lokal pada source final, bukan kesiapan produksi: provider (Google/Resend/Twilio), migrasi/grant Neon, dan deploy tidak disentuh CI. Job E2E dibatasi `needs: quality` agar kegagalan murah terdeteksi lebih dulu, dan `concurrency` membatalkan run lama pada ref yang sama.
+
+Alur kerja branch: increment dikerjakan pada `feat/stitch-slicing`, diajukan sebagai Pull Request ke `main`, dan hanya di-merge setelah CI hijau. Setelah merge, penerapan migrasi tetap mengikuti urutan penerbitan di atas — `npm run db:deploy` dijalankan hanya setelah preflight, backup, dan strategi rollback nyata tersedia. CI tidak melakukan deploy dan tidak boleh ditambahkan rahasia produksi ke dalamnya.
+
+Pengamanan yang disarankan pada repo (manual, di luar workflow): aktifkan branch protection `main` dengan wajib status check `Kualitas (db, typecheck, lint, unit, build)` dan `E2E Playwright (Chromium)`, larang force-push, dan wajibkan PR review sebelum merge.

@@ -1,5 +1,12 @@
 # Changelog Implementasi Menuju Akad
 
+## Gate CI GitHub Actions dan Pull Request — 10 Oktober 2026
+
+- Menambahkan [`.github/workflows/ci.yml`](.github/workflows/ci.yml) karena repo sebelumnya tidak memiliki workflow apa pun sehingga push tidak terverifikasi otomatis. Trigger `pull_request`/`push` ke `main` dan `workflow_dispatch`, dengan `concurrency` per ref dan `permissions: contents: read`.
+- Job `quality`: `npm ci`, `db:validate`, `typecheck`, `lint`, `npm test`, `npm run build`, lalu unggah artefak standalone (retensi3 hari). Job `e2e`: `npm ci`, Chromium `--with-deps`, build, `npm run test:e2e`, unggah jejak kegagalan (retensi7 hari). E2E menunggu `quality` (`needs`) agar kegagalan murah terdeteksi lebih dulu.
+- CI tanpa rahasia: `prisma generate`/`validate` tidak butuh kredensial dan `playwright.config.ts` menyetel `DATABASE_URL` kosong (fail-closed). Diverifikasi lokal pada worktree bersih tanpa `.env` (meniru runner): db:validate/typecheck/lint exit0, unit **606/606 (71 file)**, build exit0 `jzeHJFxQzhAw6_S5uF9C2` dengan artefak standalone lengkap, dan E2E 140/140 satu run. Ini membuktikan kode teruji lokal, bukan kesiapan produksi.
+- Prosedur CI, alur PR, dan saran branch protection didokumentasikan pada bagian "CI GitHub Actions dan alur Pull Request" di `docs/deployment.md`. PR `feat/stitch-slicing` → `main` dibuka dengan bukti validasi dan batas risiko. Tidak ada rahasia, deploy, atau penerapan migrasi dari increment ini.
+
 ## Checkpoint resume autentikasi — 9 Oktober 2026
 
 - Menyelaraskan [PM01](docs/authentication/01-pm-rencana.md) dengan backend lokal aktual dan bukti dokumen02–08: canonical akun lintas role `/account`/`/account/security`, `/vendor`, empat alias exact307 sebelum layout customer, verifikasi email signup exact sesi+browser tanpa fresh reauth awal, contact private fresh, OTP flag permanen/enforced202 pending HttpOnly tanpa sesi penuh, strict logout/DELETE dan minimum recovery/resend11 detik dengan residual.
