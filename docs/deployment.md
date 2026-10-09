@@ -1,5 +1,36 @@
 # Deployment VPS Menuju Akad
 
+## Rilis login bersih dan auth preproduction — 9 Oktober 2026
+
+**Status fase 4: `preview-20261009-login` aktif dan smoke HTTPS produksi PASS pada 9 Oktober 2026, 11.10 UTC+8.** Produksi https://menujuakad.com memakai BUILD_ID **`_ZmqTJPa-Hip-SCzksj0f`**, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment membawa halaman `/login` baru yang bersih (satu kartu fokus `auth-card-compact`, teks minimum), auth preproduction (API `/api/auth/login|logout`, guard sesi fail-closed, redirect role-safe), routing resmi (blog, workspace customer/admin), Preview Studio (63 kode/74 varian dalam 11 kelompok), dan 8 screen Stitch baru. Rilis `preview-20261008-responsive` di bawah merupakan riwayat dan image rollback terdekat. Scope tetap frontend/preview; `AUTH_SECRET` belum di-set di runtime produksi sehingga POST login menjawab 503 fail-safe (sesuai kontrak), Mayar/persistence bisnis dan fidelity seluruh Stitch belum selesai.
+
+### Identitas dan gate rilis login
+
+- Artifact `/tmp/menujuakad-login-20261009/release.tar.gz`, salinan `/srv/menujuakad/releases/preview-20261009-login/release.tar.gz`; SHA256 `cae0726314bb03821ba5f9d7c06016896ede5a13109b09f73e06ad557600e90c`. BUILD_ID cocok pada `.next`, standalone, artifact, kandidat dan container produksi.
+- Image aktif `menujuakad-web:preview-20261009-login`, ID `sha256:0557ccadba3ba242ccf88bf5cabf4aac6b600aed5d0f1a0fdadda19d27cacb13`. Context hanya `/srv/menujuakad/releases/preview-20261009-login/artifact`; base pinned `node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392`, build Docker `--pull=false --network=none`. Tidak membangun ulang Next, mengubah source/tests, dependency, DB/schema, provider atau `.env` sumber pada task publikasi.
+- Gate lokal (9 Oktober, sebelum commit): `npm run check` exit 0, **445 unit/50 file**, build `DYX2i0_2CR-6SHWz6IlyK`; **E2E 106/106 lulus satu run**. Build rilis ulang dengan `NEXT_PUBLIC_APP_URL=https://menujuakad.com` menghasilkan `_ZmqTJPa-Hip-SCzksj0f` (canonical/SEO dan origin login benar).
+- Commit rilis `18cd096` (276 file) di branch `feat/stitch-slicing`, di-push ke GitHub sebelum switch.
+- Gitleaks 8.30.1 `--redact=100`: source exit 0 dengan 7 temuan yang diperiksa — 6 field internal Next `previewModeSigningKey`/`previewModeEncryptionKey` di `.next/*` (sama dengan allowlist rilis sebelumnya) dan 1 deskripsi format scrypt di `docs/04-security-akses.md` (bukan kredensial). Artifact bersih tanpa `.env`/kunci privat; probe container produksi memastikan `/app/.env` tidak ada.
+- Release root `0555`; artifact read-only `root:root` dir `555`/file `444`; metadata/archive/Dockerfile/checksum `0444`. `release.json` diperbarui atomik dengan status verified-production/timestamp/smoke. Pointer `/srv/menujuakad/deploy/release.env` root `0600` ditulis atomik **setelah** smoke HTTPS PASS pada 11.10.33 UTC+8.
+
+### Switch produksi dan pemulihan
+
+- Kandidat terisolasi `menujuakad-login-candidate` di `127.0.0.1:3101` (overlay ports + dua Compose existing + Neon env) healthy, BUILD_ID `_ZmqTJPa-Hip-SCzksj0f`, `/app/.env` tidak ada. Smoke kandidat PASS: 11 flow, 4 guard, 2 keyboard, 12 pemeriksaan responsif, 15 screenshot, source frozen.
+- **Percobaan switch pertama 11.09.12–11.09.26 gagal karena bug skrip probe** (direktori penyimpanan header curl belum dibuat sebelum probe pertama), bukan kegagalan aplikasi. Rollback otomatis bekerja: produksi kembali ke `preview-20261008-responsive` (BUILD_ID `mb6ybS2E4cGWPE7718LeW`, healthy) dan pointer dipulihkan. Bukti `switch-report-attempt1.json`.
+- Percobaan kedua 11.09.49 PASS: Compose healthy 11.09.55, verifikasi selesai 11.10.33. Sebelas probe HTTP lulus (localhost live/ready/login; HTTPS home/login/live/ready dengan database ok; HTTP apex 308; HTTPS www 308; breadwinner 302; harikita 200). Probe login produksi: POST kredensial salah → 503 `ok:false` tanpa token (fail-safe, `AUTH_SECRET` runtime belum di-set). Smoke browser HTTPS produksi PASS 11 flow/4 guard/12 responsif/15 screenshot dengan Chromium pemetaan host `43.173.15.136` dan validasi TLS aktif.
+- Downtime tidak diukur sehingga tidak diklaim zero downtime. Caddy dan checksum dua Compose identik sebelum/sesudah: Caddy `2c44c0e564473872830ba19ae34404570da827aa296665befa15ab8ab83f6818`; utama `89db5bc3846946c09750bb57981fcbd541944201807ec95eb68f40e24c9856ac`; Neon `979188328c04bab41fd481164d717cc690136489096c7b0b44552a50caadac60`.
+- Rollback manual bila diperlukan:
+```bash
+sudo -n env MENUJUAKAD_IMAGE=menujuakad-web:preview-20261008-responsive docker compose \
+  --env-file /srv/menujuakad/backups/before-preview-20261009-login/release.env \
+  --project-name menujuakad \
+  -f /srv/menujuakad/deploy/compose.yaml \
+  -f /srv/menujuakad/deploy/compose.neon.yaml \
+  up -d --wait --wait-timeout 90 web
+```
+- Bukti privat `/tmp/menujuakad-login-20261009/devops/`: `candidate-smoke/` dan `production-smoke/` (report + 15 PNG masing-masing), `capture-login.cjs`, `switch-login.py`, `switch-report.json` (+attempt1), `release-final.json`, log switch/rollback/cleanup. Kandidat dihentikan via Compose `down` setelah PASS; port 3101 kosong kembali.
+- Batas: 503 login adalah perilaku fail-safe yang diharapkan sampai `AUTH_SECRET` di-set; seeder 11 akun + 30 customer journey belum di-apply ke Neon; auth nyata, Mayar, persistence bisnis, dan fidelity seluruh Stitch tetap terbuka.
+
 ## Rilis responsif GST-01/GST-03 dan kontrol — 8 Oktober 2026
 
 **Status fase 3: `preview-20261008-responsive` aktif dan smoke HTTPS produksi PASS pada 8 Oktober 2026, 06.14 UTC+8.** Produksi https://menujuakad.com memakai BUILD_ID **`mb6ybS2E4cGWPE7718LeW`**, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment menyelaraskan mobile GST-01 sampai 767 px, grid empat kategori GST-03 mengikuti 4/2/1 kolom, serta target tab domain/selector varian minimal 48×48 px tanpa overflow. Rilis GST-01/CUS-07 di bawah merupakan riwayat dan image rollback terdekat. Scope tetap frontend/preview sintetis; auth, Mayar, persistence bisnis dan fidelity seluruh Stitch belum selesai. Neon preproduction baca terbatas dipertahankan melalui dua Compose.

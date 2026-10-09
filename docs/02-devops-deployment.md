@@ -1,5 +1,17 @@
 # Audit DevOps dan Deployment Menuju Akad
 
+## Rilis login dan auth preproduction — 9 Oktober 2026
+
+**Checkpoint 11.10 UTC+8: rilis `preview-20261009-login` aktif di produksi, smoke HTTPS PASS.** Produksi https://menujuakad.com memakai BUILD_ID `_ZmqTJPa-Hip-SCzksj0f`, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment membawa halaman `/login` bersih, auth preproduction (API login/logout, guard fail-closed), routing resmi, Preview Studio, dan 8 screen Stitch baru; commit `18cd096` (276 file) sudah di-push ke GitHub. `AUTH_SECRET` belum di-set di runtime sehingga POST login menjawab 503 fail-safe. Detail penuh, identitas rilis, probe dan rollback pada [deployment](deployment.md).
+
+### Ringkasan operasional rilis login
+
+- Artifact SHA256 `cae0726314bb03821ba5f9d7c06016896ede5a13109b09f73e06ad557600e90c`; image `menujuakad-web:preview-20261009-login` ID `sha256:0557ccadba3ba242ccf88bf5cabf4aac6b600aed5d0f1a0fdadda19d27cacb13`; rollback terdekat `preview-20261008-responsive` (BUILD_ID `mb6ybS2E4cGWPE7718LeW`).
+- Switch 11.09.49–11.09.55, verifikasi selesai 11.10.33; pointer `/srv/menujuakad/deploy/release.env` root0600 diperbarui atomik setelah PASS. Percobaan pertama 11.09.12 di-rollback otomatis karena bug skrip probe (bukan aplikasi), lalu percobaan kedua bersih; bukti di `/tmp/menujuakad-login-20261009/devops/`.
+- Sebelas probe HTTP lulus; smoke browser HTTPS produksi 11 flow/4 guard/2 keyboard/12 responsif/15 screenshot PASS dengan validasi TLS aktif; Caddy dan dua Compose checksum identik sebelum/sesudah.
+- Kandidat `menujuakad-login-candidate` dihentikan via Compose `down` setelah PASS; port3101 kosong; MenujuAkad/HariKita/command-center tetap sehat.
+- **Belum:** `AUTH_SECRET` runtime, migrasi/seed Neon (11 akun + 30 customer journey), auth nyata, Mayar, persistence bisnis. QR asli tetap harus dilayani melalui endpoint terlindungi.
+
 ## Persiapan auth dan QRIS TEST — 8 Oktober 2026
 
 **Checkpoint operasional 12.32 UTC+8: backup dan restore DB PASS; sanitizer build siap. Migrasi/seed/build final/deploy auth belum dijalankan; menunggu gate QA final yang dikonfirmasi ROOT.** Rilis publik tetap `preview-20261008-responsive`, BUILD_ID `mb6ybS2E4cGWPE7718LeW`, container healthy dan HTTPS readiness200. Worker tidak melakukan reset/commit/push. Bagian rilis preview di bawah adalah riwayat, bukan bukti auth terbaru.
