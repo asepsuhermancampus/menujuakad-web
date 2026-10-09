@@ -1,5 +1,36 @@
 # Deployment VPS Menuju Akad
 
+## Rilis autentikasi multimethod dan akun lintas peran — 10 Oktober 2026
+
+**Status fase 5: `preview-20261010-auth` aktif dan smoke HTTPS produksi PASS pada 10 Oktober 2026, 04.42 UTC+8.** Produksi https://menujuakad.com memakai BUILD_ID **`O09eZzNI28H-sbZQG2szk`**, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment membawa backend autentikasi multimethod (email/password + verifikasi email, Google OAuth, OTP SMS, recovery, CSRF, throttle, request policy fail-closed), halaman akun canonical `/account` dan `/account/security` lintas peran, landing `/vendor`, empat alias dashboard 307, serta gate CI GitHub Actions. Rilis `preview-20261009-login` di bawah merupakan riwayat dan image rollback terdekat. Scope tetap frontend/auth lokal: `AUTH_SECRET` belum di-set di runtime produksi sehingga POST login menjawab 503 fail-safe (sesuai kontrak), provider Google/Resend/Twilio belum dikonfigurasi, migrasi/grant Neon belum diterapkan, dan Mayar/persistence bisnis belum selesai.
+
+### Identitas dan gate rilis auth
+
+- Source rilis adalah commit `d4348c4` pada `main` (squash merge PR #1), tree `5ff67334c8d5f029819056ba6fc1dfa87279316c` — **identik dengan tree head CI `6aa99f5`** yang sudah hijau, sehingga gate CI berlaku untuk artifact yang diterbitkan.
+- Artifact `/tmp/menujuakad-auth-20261010/release.tar.gz`, salinan `/srv/menujuakad/releases/preview-20261010-auth/release.tar.gz`; SHA256 `c114bdca7e80d66d7d4d303cd226658e136a08e81cadd8bc70b9106e885aa3a6`. BUILD_ID cocok pada `.next`, standalone, artifact, kandidat, dan container produksi.
+- Image aktif `menujuakad-web:preview-20261010-auth`, ID `sha256:a66fb64815f4ef8d3520fb8b0e8cc1d943e394ae7bd3b79f370af4359e27b4ce`. Context hanya `/srv/menujuakad/releases/preview-20261010-auth/artifact`; base pinned `node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392`, build Docker `--pull=false --network=none`. Tidak membangun ulang Next, mengubah source/tests, dependency, DB/schema, provider, atau `.env` sumber pada task publikasi.
+- Gate pada source final: `npm run build` dengan `NEXT_PUBLIC_APP_URL=https://menujuakad.com` exit 0; unit **606/606 (71 file)**; E2E **140/140 lulus satu run** pada build rilis; CI GitHub Actions hijau pada kedua job (`quality`, `e2e`) untuk head `6aa99f5`.
+- Packaging memakai [script existing](../deploy/scripts/package-standalone.sh) dan ditolak bila menemukan `.env`/kunci/symlink tidak aman. Probe artifact: nol berkas environment/kunci, symlink Prisma tetap di dalam standalone, dan pembandingan internal 3 nilai rahasia lokal terhadap 2.236 berkas standalone menghasilkan **nol kecocokan** tanpa mencetak nilai. Container produksi membuktikan `/app/.env` tidak ada.
+- Release root `0555`; artifact `root:root` dir `555`/file `444`; metadata/archive/Dockerfile/overlay/checksum `0444`. `release.json` memperbarui status verified-production, timestamp, dan smoke. Pointer `/srv/menujuakad/deploy/release.env` root `0600` ditulis atomik **setelah** smoke HTTPS PASS pada 04.42.03 UTC+8.
+
+### Switch produksi dan pemulihan
+
+- Kandidat terisolasi `menujuakad-auth-candidate` di `127.0.0.1:3101` (overlay ports + dua Compose existing + Neon env) healthy, BUILD_ID `O09eZzNI28H-sbZQG2szk`, `/app/.env` tidak ada.
+- Smoke kandidat PASS: 16 flow, 7 guard, 4 alias, 12 pemeriksaan responsif, 3 screenshot, `sourceFrozen` true, nol write tak terduga, nol provider request, nol console error tak terduga. Guard `/account`, `/account/security`, `/vendor`, `/dashboard`, `/admin` mengalihkan ke login **tanpa** konten privat (`privateContent: 0`); cookie/parameter identitas palsu ditolak; keempat alias mengembalikan 307 ke rute canonical.
+- Switch 04.41.23–04.41.30 UTC+8 PASS pada percobaan pertama. Verifikasi selesai 04.42.03. Tiga belas probe HTTP lulus: localhost live/ready/login/account; HTTPS home/login/register/live/ready (database ok); HTTP apex 308; HTTPS www 308; breadwinner 302; harikita 200. Probe login produksi: POST kredensial salah → **503 `ok:false` tanpa token** (fail-safe, `AUTH_SECRET` belum di-set). Smoke browser HTTPS produksi PASS dengan Chromium pemetaan host `43.173.15.136` dan validasi TLS aktif. Downtime tidak diukur sehingga tidak diklaim zero downtime.
+- Caddy dan checksum dua Compose identik sebelum/sesudah: Caddy `2c44c0e564473872830ba19ae34404570da827aa296665befa15ab8ab83f6818`; utama `89db5bc3846946c09750bb57981fcbd541944201807ec95eb68f40e24c9856ac`; Neon `979188328c04bab41fd481164d717cc690136489096c7b0b44552a50caadac60`. Rollback otomatis tersedia pada script switch dan **tidak terpicu**.
+- Rollback manual bila diperlukan:
+```bash
+sudo -n env MENUJUAKAD_IMAGE=menujuakad-web:preview-20261009-login docker compose \
+  --env-file /srv/menujuakad/backups/before-preview-20261010-auth/release.env \
+  --project-name menujuakad \
+  -f /srv/menujuakad/deploy/compose.yaml \
+  -f /srv/menujuakad/deploy/compose.neon.yaml \
+  up -d --wait --wait-timeout 90 web
+```
+- Bukti privat `/tmp/menujuakad-auth-20261010/devops/`: `candidate-smoke/` dan `production-smoke/` (browser-report + screenshot), `capture-auth.cjs`, `switch-auth.py`, `switch-report.json`, `release.json`, log build/E2E/switch/cleanup. Kandidat dihentikan via Compose `down`; port 3101 kosong kembali; hanya container/network kandidat dihapus tanpa prune image/volume.
+- Batas: 503 login adalah perilaku fail-safe yang diharapkan sampai `AUTH_SECRET` di-set; `/account` dan `/vendor` hanya dapat dipakai setelah sesi nyata tersedia. Provider live, migrasi/grant Neon, seeder, Mayar, persistence bisnis, dan fidelity seluruh Stitch tetap terbuka. `capabilities` melaporkan `{google:false, emailRecovery:false, smsOtp:false}` secara jujur, bukan klaim kesiapan.
+
 ## Rilis login bersih dan auth preproduction — 9 Oktober 2026
 
 **Status fase 4: `preview-20261009-login` aktif dan smoke HTTPS produksi PASS pada 9 Oktober 2026, 11.10 UTC+8.** Produksi https://menujuakad.com memakai BUILD_ID **`_ZmqTJPa-Hip-SCzksj0f`**, container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Increment membawa halaman `/login` baru yang bersih (satu kartu fokus `auth-card-compact`, teks minimum), auth preproduction (API `/api/auth/login|logout`, guard sesi fail-closed, redirect role-safe), routing resmi (blog, workspace customer/admin), Preview Studio (63 kode/74 varian dalam 11 kelompok), dan 8 screen Stitch baru. Rilis `preview-20261008-responsive` di bawah merupakan riwayat dan image rollback terdekat. Scope tetap frontend/preview; `AUTH_SECRET` belum di-set di runtime produksi sehingga POST login menjawab 503 fail-safe (sesuai kontrak), Mayar/persistence bisnis dan fidelity seluruh Stitch belum selesai.
@@ -259,7 +290,7 @@ Playwright memakai managed webServer konfigurasi existing, tanpa proses backgrou
 
 Tidak mengekspos port aplikasi internal ke Internet. Header nosniff/referrer/frame/permissions diperiksa setelah proxy; HSTS hanya setelah cakupan HTTPS terbukti. Metadata preview/auth/private noindex tidak menggantikan otorisasi server. Resource customer/admin dan pembayaran tidak aktif berdasarkan fixture/cookie/query.
 
-Setiap increment dinyatakan terverifikasi produksi hanya setelah domain HTTPS200, redirect HTTP/www, sertifikat, aset, liveness, interaksi dan proteksi route diuji pada artifact final. Release aktif `preview-20261008-responsive` menggantikan `preview-20261008-gst01`; kedua tag sebelumnya serta artifact/backup dipertahankan untuk rollback. Koneksi Neon serta status auth/Mayar tetap dicatat terpisah.
+Setiap increment dinyatakan terverifikasi produksi hanya setelah domain HTTPS200, redirect HTTP/www, sertifikat, aset, liveness, interaksi dan proteksi route diuji pada artifact final. Release aktif **`preview-20261010-auth`** (BUILD_ID `O09eZzNI28H-sbZQG2szk`) menggantikan `preview-20261009-login`; seluruh tag sebelumnya serta artifact/backup dipertahankan untuk rollback. Koneksi Neon serta status auth/Mayar tetap dicatat terpisah: provider Google/Resend/Twilio belum dikonfigurasi dan migrasi/grant Neon belum diterapkan, sehingga `/account` dan `/vendor` baru dapat dipakai setelah `AUTH_SECRET` dan sesi nyata tersedia.
 
 ## CI GitHub Actions dan alur Pull Request
 

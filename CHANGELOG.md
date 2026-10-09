@@ -1,5 +1,13 @@
 # Changelog Implementasi Menuju Akad
 
+## Rilis produksi autentikasi multimethod — 10 Oktober 2026
+
+- **PR #1 di-merge ke `main` sebagai satu commit** (`d4348c4`, squash) setelah CI hijau; `feat/stitch-slicing` tetap ada untuk riwayat increment. Repo lokal dan `origin/main` sinkron pada `d4348c4`.
+- **Publikasi ke produksi:** release `preview-20261010-auth` aktif di https://menujuakad.com, BUILD_ID `O09eZzNI28H-sbZQG2szk`, image `menujuakad-web:preview-20261010-auth` (`sha256:a66fb64815f4…`), artifact SHA256 `c114bdca7e80d66d7d4d303cd226658e136a08e81cadd8bc70b9106e885aa3a6`. Switch 04.41.23–04.41.30 UTC+8, verifikasi selesai 04.42.03; rollback otomatis tidak terpicu. Detail pada `docs/deployment.md`.
+- **Gate source final:** tree `main` identik dengan tree head CI `6aa99f5`; build produksi `NEXT_PUBLIC_APP_URL=https://menujuakad.com` exit0, unit 606/606 (71 file), E2E 140/140 satu run pada build rilis, dan CI GitHub Actions hijau pada kedua job.
+- **Smoke kandidat dan produksi PASS:** 16 flow, 7 guard, 4 alias, 12 pemeriksaan responsif, nol write tak terduga, nol provider request. Guard `/account`, `/account/security`, `/vendor`, `/dashboard`, `/admin` fail-closed ke login tanpa konten privat; keempat alias akun 307; tiga belas probe HTTP termasuk HTTPS apex/www dan liveness/readiness `database ok`; POST login produksi 503 `ok:false` tanpa token (fail-safe tanpa `AUTH_SECRET`).
+- **Batas yang belum tertutup:** `AUTH_SECRET` runtime belum di-set sehingga login/akun belum dapat dipakai nyata; provider Google/Resend/Twilio belum dikonfigurasi (`capabilities` melaporkan `false`); migrasi/grant Neon, seeder, Mayar, dan persistence bisnis belum diterapkan. Tidak ada migrasi, seed, atau perubahan Caddy/Compose pada rilis ini (checksum identik sebelum/sesudah).
+
 ## Gate CI GitHub Actions dan Pull Request — 10 Oktober 2026
 
 - Menambahkan [`.github/workflows/ci.yml`](.github/workflows/ci.yml) karena repo sebelumnya tidak memiliki workflow apa pun sehingga push tidak terverifikasi otomatis. Trigger `pull_request`/`push` ke `main` dan `workflow_dispatch`, dengan `concurrency` per ref dan `permissions: contents: read`.
