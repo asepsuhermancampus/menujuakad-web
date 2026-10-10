@@ -10,3 +10,4 @@
 @import "./styles/editor-controls.css";
 @import "../features/billing/styles.css";
 @import "../features/guests/styles.css";
+@import "../features/planner/styles.css";

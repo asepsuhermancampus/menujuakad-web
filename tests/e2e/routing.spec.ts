@@ -29,10 +29,14 @@ test("slug artikel asing menghasilkan halaman tidak ditemukan", async ({ page })
 
 test("navigasi publik memuat tautan Blog", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("navigation", { name: "Navigasi utama" }).getByRole("link", { name: "Blog" })).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Navigasi utama" }).getByRole("link", { name: "Blog" }),
+  ).toBeVisible();
 });
 
 test("route workspace menolak akses tanpa sesi terverifikasi", async ({ page }) => {
+  // 31 rute × navigasi berurutan lebih lama dari timeout default 30 detik.
+  test.setTimeout(120_000);
   const protectedPaths = [
     "/dashboard",
     "/dashboard/guests",
@@ -42,17 +46,38 @@ test("route workspace menolak akses tanpa sesi terverifikasi", async ({ page }) 
     "/dashboard/notifications",
     "/dashboard/support",
     "/dashboard/analytics",
+    "/dashboard/planner",
+    "/dashboard/planner/savings",
+    "/dashboard/planner/budget",
+    "/dashboard/planner/expenses",
+    "/dashboard/planner/tasks",
+    "/dashboard/planner/rundown",
+    "/dashboard/planner/vendors",
+    "/dashboard/planner/seserahan",
+    "/dashboard/planner/requirements",
+    "/dashboard/planner/engagement",
+    "/dashboard/planner/moodboard",
+    "/dashboard/planner/wedding-kit",
+    "/dashboard/planner/couple",
+    "/dashboard/planner/onboarding",
     "/admin",
     "/admin/payments",
     "/admin/webhooks",
+    "/admin/user-management",
+    "/admin/upgrades",
+    "/admin/content",
+    "/admin/payment-settings",
+    "/admin/audit",
+    "/admin/landing-preview",
   ];
   for (const path of protectedPaths) {
-    await page.goto(path, { waitUntil: "networkidle" });
+    await page.goto(path, { waitUntil: "domcontentloaded" });
     await expect(page, path).toHaveURL(/\/login\?next=/);
   }
 });
 
 test("cookie dan parameter identitas palsu tidak membuka workspace", async ({ context, page }) => {
+  test.setTimeout(60_000);
   await context.addCookies([
     {
       name: "menujuakad_session",

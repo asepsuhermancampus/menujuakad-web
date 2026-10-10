@@ -5,10 +5,10 @@ export const publicSeoPages = [
   ["/", "Sebuah Awal yang Indah"],
   ["/templates", "Katalog Desain Undangan"],
   ["/about", "Tentang Menuju Akad"],
-  ["/how-it-works", "Cara Kerja Pratinjau"],
+  ["/how-it-works", "Cara Membuat Undangan"],
   ["/blog", "Blog & Panduan Pernikahan"],
-  ["/faq", "Pertanyaan Umum"],
-  ["/contact", "Informasi Bantuan"],
+  ["/faq", "Pertanyaan yang Sering Diajukan"],
+  ["/contact", "Hubungi Concierge"],
 ] as const;
 
 /** Path berasal dari whitelist kode, tidak pernah dari Host atau query request. */

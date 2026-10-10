@@ -41,8 +41,8 @@ export function CoverPanel(props: EditorFieldProps) {
             value={props.draft.coverTypography}
             onChange={(e) => props.update("coverTypography", e.target.value)}
           >
-            <option value="DISPLAY">Noto Serif · Editorial</option>
-            <option value="UI">Manrope · Kontemporer</option>
+            <option value="DISPLAY">Plus Jakarta Sans · Tegas</option>
+            <option value="UI">Plus Jakarta Sans · Ringan</option>
           </select>
         </label>
         <label>

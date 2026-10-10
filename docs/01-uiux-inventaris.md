@@ -1,6 +1,48 @@
 # Inventaris dan Handoff Visual Stitch Menuju Akad
 
-## Audit kelengkapan terbaru — 8 Oktober 2026
+## Snapshot terbaru — 13 layar baru selesai (10 Oktober 2026, pembaruan kedua)
+
+`list_screens` dibaca ulang: proyek `MENUJU-AKAD-UIUX` kini memuat **69 layar** (dari 56). **13 layar baru** selesai, semuanya terverifikasi memakai tema Luminous Aura Minimal + Plus Jakarta Sans (HTML diunduh dan diperiksa langsung, nol sisa Ivory & Gold):
+
+| Layar baru                                        | Perangkat         | Kategori                       |
+| ------------------------------------------------- | ----------------- | ------------------------------ |
+| PUB-01 — Beranda Mobile                           | MOBILE 780×9992   | Varian responsif               |
+| PUB-06 — Cara Membuat                             | DESKTOP 2560×8958 | **Halaman publik baru**        |
+| PUB-07 — FAQ Layanan                              | DESKTOP 2560×3460 | Halaman publik baru            |
+| PUB-08 — Kontak & Concierge                       | DESKTOP 2560×2740 | Halaman publik baru            |
+| PUB-10/11 — Kebijakan Privasi & Syarat Layanan    | DESKTOP 2560×7242 | Halaman publik baru (gabungan) |
+| ERR-404/500 — Halaman Error & Pemeliharaan        | DESKTOP 2560×3102 | **State baru**                 |
+| CUS-01 — Ringkasan Akun Mobile                    | MOBILE 780×2092   | Varian responsif               |
+| CUS-08 — Checkout Sesi Expired                    | DESKTOP 2560×2260 | State kritis                   |
+| EDT-06 — Editor Galeri Kuota Penuh & Error Upload | DESKTOP 2560×3878 | State kritis                   |
+| GST-01 — Manajemen Tamu Empty State               | DESKTOP 2560×3312 | State kritis                   |
+| INV-01 — Cover Undangan Mobile                    | MOBILE 780×1768   | Varian responsif               |
+| INV-01 — Cover Undangan Token Tidak Valid         | DESKTOP 2560×2246 | State kritis                   |
+| INV-02 — Undangan Lengkap Mobile                  | MOBILE 780×12876  | Varian responsif               |
+
+**Cakupan kode:** 42 dari 44 kode inti gelombang 1 tersedia (kurang **PUB-04** demo dan **PUB-09** about). Tambahan di luar brief: **EDT-09…EDT-20**, **ERR-404/500**, **PUB-10/11**. Varian state terbanyak: INV-02 (5), INV-01 (3), dan 2 masing-masing untuk PUB-01, CUS-01, CUS-08, EDT-06, GST-01, ADM-02.
+
+**Sudah diimplementasikan (10 Oktober 2026):** konten halaman publik diperbarui mengikuti desain baru — `how-it-works` (6 langkah + estimasi + perbandingan), `faq` (kategori + pencarian + accordion), `contact` (3 kanal + pendampingan + form), `privacy`/`terms` (6 bagian bernomor + daftar isi), dan halaman error 404/500. Semua klaim komersial dari desain sumber (harga, "15 menit", nomor kontak, PCI-DSS, entitas hukum) **diganti label contoh/pratinjau** karena belum resmi.
+
+**Belum digambar:** 17 layar modul perencanaan (PLN-01…17) dan 7 layar admin operasional (ADM-03…09) — brief-nya sudah ditulis pada `13-uiux-prompt-stitch-gelombang2.txt` dengan RULESET Luminous Aura Minimal.
+
+## Refactor tema Horizon Modern Style — 10 Oktober 2026
+
+`list_screens` dibaca ulang pada 10 Oktober 2026: **56 layar** di proyek `MENUJU-AKAD-UIUX`. Sebanyak **51 layar berjudul "— Horizon Modern Style"** memakai design system baru **Luminous Aura Minimal** (`assets/843c886398d54e628035654c638f4515` v1); sisanya adalah 3 varian state INV-02, satu modal ADM-02, dan satu lampiran gambar.
+
+Verifikasi langsung pada HTML tiap layar (`htmlCode.downloadUrl`) untuk PUB-01, AUT-01, EDT-01, GST-01, INV-01, dan ADM-01: seluruhnya memuat palet `#FAF8FF`/`#5F3ADD`/`#131B2E` dan font **Plus Jakarta Sans**, tanpa sisa token Ivory & Gold. Konfigurasi Tailwind di dalam HTML memuat palet, radius, dan skala tipografi lengkap sebagai acuan implementasi.
+
+**Perubahan tema ringkas:** font dua keluarga (Noto Serif + Manrope) → satu keluarga **Plus Jakarta Sans**; primary gold `#C5A46D` → **violet `#5F3ADD`**; kanvas ivory `#F8F6F1` → **lavender `#FAF8FF`**; teks `#171717/#292929` → **slate `#131B2E/#484555`**; radius tombol 6px → **pill 999px**, kartu 10px → **24px**; ditambah **frosted glass** dan **aura mesh gradients**.
+
+**Kode aplikasi dipindahkan** ke tema ini pada `src/app/styles/tokens.css`, `base.css`, `primitives.css`, dan `workspace.css`; nama variabel lama dipertahankan sebagai alias semantik sehingga komponen existing berpindah otomatis. Rincian keputusan pada [design-system](design-system.md).
+
+**Tambahan kode layar:** **EDT-09…EDT-20** (12 section editor: Musik Latar, Panduan Tamu & Dress Code, Video Sinematik, Penghitung Waktu Mundur, Siaran Langsung, Filter Instagram & Tagar, Lokasi & Peta Digital, Ayat Suci & Mukadimah, Susunan Acara & Rundown, Protokol Acara & Info Tambahan, Kontak Narahubung & Concierge, Kolofon & Kredit Desain) kini tersedia di Stitch.
+
+**Belum digambar:** 17 layar modul perencanaan (PLN-01…17) dan 7 layar admin operasional (ADM-03…09) — brief-nya sudah ditulis pada `13-uiux-prompt-stitch-gelombang2.txt` dengan RULESET Luminous Aura Minimal.
+
+Angka 67/66 dan referensi Ivory `#F8F6F1`/Gold `#C5A46D`/Noto Serif/Manrope pada bagian historis di bawah merekam snapshot 7–8 Oktober 2026, bukan status terbaru.
+
+## Audit kelengkapan — 8 Oktober 2026 (riwayat)
 
 `list_screens` dibaca ulang pada increment ini: **67 entri: 66 desain dan satu lampiran TXT, dengan 55 kode unik**. Registry aplikasi dan manifest canonical kini sinkron: **55 kode/66 varian, 64 PNG valid, nol HTML desain valid**. Dua desktop CUS-01/02 tetap metadata saja. Angka 64/53 dan gap CUS-05/06 pada bagian historis berikut merekam snapshot 7 Oktober, bukan status terbaru.
 

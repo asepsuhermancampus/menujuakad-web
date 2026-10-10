@@ -1,87 +1,86 @@
+/*
+ * @font-face Plus Jakarta Sans — keluarga font tunggal tema Luminous Aura Minimal.
+ * Sumber: https://github.com/tokotype/PlusJakartaSans (SIL Open Font License 1.1,
+ * salinan lisensi di public/fonts/plus-jakarta-sans-OFL.txt).
+ * Lima weight: 400 body, 500 label, 600 tombol/heading, 700 tebal, 800 aksen.
+ */
 @font-face {
-  font-family: Manrope;
-  src: url("/fonts/manrope-400.ttf") format("truetype");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/pjs-400.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: Manrope;
-  src: url("/fonts/manrope-500.ttf") format("truetype");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/pjs-500.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: Manrope;
-  src: url("/fonts/manrope-600.ttf") format("truetype");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/pjs-600.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: Manrope;
-  src: url("/fonts/manrope-700.ttf") format("truetype");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/pjs-700.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Noto Serif";
-  src: url("/fonts/noto-serif-400.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Noto Serif";
-  src: url("/fonts/noto-serif-500.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Noto Serif";
-  src: url("/fonts/noto-serif-600.ttf") format("truetype");
-  font-weight: 600;
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/pjs-800.ttf") format("truetype");
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 /*
- * Token design system Editorial Ivory & Gold.
- * Sumber nilai: metadata Stitch MENUJU-AKAD-UIUX (assets/45753e5cf13241a99242f6592f667257 v1)
- * yang tersalin di ../menujuakad-rancangan/docs/design-system.md.
- * Alias lama (--color-ivory, --color-olive, dst.) dipertahankan agar komponen existing
- * tidak putus; nilai intinya diselaraskan ke token Stitch.
+ * Token design system Luminous Aura Minimal — tema "Horizon Modern Style".
+ * Sumber nilai: design system Stitch assets/843c886398d54e628035654c638f4515 v1
+ * (snapshot di ../menujuakad-rancangan/docs/design-system.md) dan 51 layar
+ * refactor MENUJU-AKAD-UIUX bertanggal 10 Oktober 2026.
+ *
+ * Nama variabel lama (--color-gold, --color-paper, --font-editorial, dst.)
+ * DIPERTAHANKAN sebagai alias semantik agar seluruh komponen existing ikut
+ * berpindah tema tanpa menyentuh setiap file. Nilai barunya memetakan:
+ *   gold/primary lama  -> violet primary
+ *   paper/ivory lama   -> canvas lavender
+ *   ink/ink-soft lama  -> deep obsidian slate
+ *   taupe/muted lama   -> slate muted
  */
 :root {
-  /* --- Warna inti Editorial Ivory & Gold --- */
-  --color-paper: #f8f6f1;
-  --color-background: #fbf9f4;
-  --color-ivory: #fbf9f4;
-  --color-surface: #fff;
-  --color-beige: #e5ded3;
-  --color-border: #e5ded3;
-  --color-gold: #c5a46d;
-  --color-primary: #c5a46d;
-  --color-primary-deep: #a8854a;
-  --color-primary-soft: #f1e7d3;
-  --color-gold-hover: #b8945d;
-  --color-accent-soft: #efeae1;
-  --color-ink: #171717;
-  --color-ink-soft: #292929;
-  /*
-   * Dua token untuk kebutuhan berbeda, sesuai aturan kontras yang mengikat di
-   * docs/design-system.md: Taupe #8A8176 (3,55:1 di paper) hanya untuk teks
-   * besar/ikon/dekorasi; teks kecil memakai varian yang lebih gelap.
-   * --color-taupe  = token resmi Stitch (border, ikon, teks besar).
-   * --color-muted  = turunan gelap untuk teks kecil (5,38:1 di paper, lolos AA);
-   *                  dipertahankan dari nilai sebelumnya agar tidak menurunkan aksesibilitas.
-   */
-  --color-taupe: #8a8176;
-  --color-muted: #6d6459;
+  /* --- Warna inti Luminous Aura Minimal --- */
+  --color-primary: #5f3add;
+  --color-primary-container: #7857f8;
+  --color-primary-soft: #e6deff;
+  --color-primary-hover: #4f2fc4;
+  --color-secondary: #9f4122;
+  --color-secondary-container: #fd8863;
+  --color-secondary-soft: #ffdbd0;
+  --color-tertiary: #005da8;
+  --color-tertiary-container: #2676c8;
+  --color-tertiary-soft: #d4e3ff;
 
-  /* --- Warna status (metadata Stitch) --- */
+  --color-background: #faf8ff;
+  --color-surface: #ffffff;
+  --color-surface-low: #f2f3ff;
+  --color-surface-container: #eaedff;
+  --color-surface-container-high: #e2e7ff;
+  --color-surface-variant: #dae2fd;
+  --color-canvas: #fafafc;
+
+  --color-on-surface: #131b2e;
+  --color-on-surface-variant: #484555;
+  --color-outline: #797587;
+  --color-outline-variant: #c9c4d8;
+  --color-muted: #64748b;
+
+  /* --- Warna status (token fungsional, tetap) --- */
   --color-success: #3f6b4f;
   --color-success-soft: #e9efe8;
   --color-danger: #8a3a2a;
@@ -93,35 +92,67 @@
   --color-error: #ba1a1a;
   --color-error-soft: #ffdad6;
 
-  /* --- Surface container (metadata Stitch) --- */
-  --color-surface-container: #f0eee9;
-  --color-surface-container-high: #eae8e3;
-  --color-surface-variant: #e4e2dd;
-  --color-outline: #747878;
-  --color-outline-variant: #c4c7c7;
-
   /* --- Alias kompatibilitas komponen existing --- */
-  --color-soft: #efeae1;
-  --color-olive: #171717;
-  --color-olive-hover: #292929;
-  --color-ink-fixed: #f8f6f1;
+  --color-paper: #faf8ff;
+  --color-ivory: #faf8ff;
+  --color-beige: #e6deff;
+  --color-border: #dae2fd;
+  --color-gold: #5f3add;
+  --color-gold-hover: #4f2fc4;
+  --color-primary-deep: #4f2fc4;
+  --color-accent-soft: #f2f3ff;
+  --color-ink: #131b2e;
+  --color-ink-soft: #484555;
+  --color-taupe: #797587;
+  --color-soft: #f2f3ff;
+  --color-olive: #131b2e;
+  --color-olive-hover: #283044;
+  --color-ink-fixed: #faf8ff;
 
-  /* --- Tipografi --- */
-  --font-body: Manrope, system-ui, sans-serif;
-  --font-editorial: "Noto Serif", Georgia, serif;
+  /* --- Tipografi (satu keluarga: Plus Jakarta Sans) --- */
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-editorial: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
 
-  /* --- Radius (panduan komponen Stitch) --- */
-  --radius-control: 4px;
-  --radius-button: 6px;
-  --radius-card: 10px;
-  --radius-modal: 16px;
+  /* --- Radius: bahasa bentuk baru jauh lebih membulat --- */
+  --radius-control: 12px;
+  --radius-button: 999px;
+  --radius-card: 24px;
+  --radius-card-lg: 32px;
+  --radius-modal: 40px;
   --radius-pill: 999px;
+  --radius-input: 14px;
 
-  /* --- Shadow (metadata Stitch) --- */
-  --shadow-rest: 0 4px 20px rgba(23, 23, 23, 0.05);
-  --shadow-hover: 0 8px 30px rgba(23, 23, 23, 0.08);
+  /* --- Shadow: berlapis lembut dengan tint violet --- */
+  --shadow-rest: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 12px 32px -4px rgba(124, 92, 252, 0.04);
+  --shadow-hover:
+    0 16px 40px -8px rgba(15, 23, 42, 0.06), 0 24px 48px -12px rgba(124, 92, 252, 0.06);
+  --shadow-float:
+    0 24px 64px -12px rgba(15, 23, 42, 0.08), 0 32px 72px -16px rgba(124, 92, 252, 0.08);
+  --shadow-glow: 0 8px 24px rgba(124, 92, 252, 0.25);
 
-  /* --- Spasi (token Stitch) --- */
+  /* --- Frosted glass (Level 2) --- */
+  --glass-surface: rgba(255, 255, 255, 0.82);
+  --glass-blur: blur(16px);
+  --glass-border: rgba(255, 255, 255, 0.8);
+
+  /* --- Aura mesh gradients --- */
+  --aura-lavender: radial-gradient(
+    circle at 50% 0%,
+    rgba(124, 92, 252, 0.12) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  --aura-dawn: radial-gradient(
+    circle at 80% 20%,
+    rgba(255, 138, 101, 0.1) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  --aura-sky: radial-gradient(
+    circle at 20% 80%,
+    rgba(96, 165, 250, 0.08) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+
+  /* --- Spasi (token sama) --- */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
@@ -133,31 +164,28 @@
 
   /* --- Layout --- */
   --container-max: 1200px;
+  --container-wide: 1440px;
 
-  /* --- Layer (metadata Stitch) --- */
+  /* --- Layer --- */
   --layer-header: 20;
   --layer-dropdown: 30;
   --layer-drawer: 40;
   --layer-dialog: 50;
   --layer-notification: 60;
 
-  /*
-   * Motion system — membuat interaksi terasa hidup tanpa berlebihan.
-   * Easing lembut (out-quint) untuk hover/focus; semua animasi dinonaktifkan
-   * otomatis oleh guard prefers-reduced-motion di primitives.css.
-   */
+  /* --- Motion --- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --duration-fast: 150ms;
   --duration-base: 240ms;
   --duration-slow: 400ms;
 
-  /* --- Tipografi lanjutan (line-height & tracking dari skala Stitch) --- */
-  --leading-tight: 1.15;
-  --leading-snug: 1.3;
+  /* --- Tipografi lanjutan --- */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
   --leading-normal: 1.6;
   --leading-relaxed: 1.75;
-  --tracking-display: -0.02em;
-  --tracking-heading: -0.01em;
-  --tracking-label: 0.08em;
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.02em;
+  --tracking-label: 0.02em;
 }

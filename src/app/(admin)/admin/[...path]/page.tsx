@@ -1,13 +1,18 @@
 import { notFound } from "next/navigation";
 import { requireSuperadminSession } from "@/server/authorization/guards";
-import {
-  workspaceView,
-  PreviewOnlyFeature,
-} from "@/features/workspace/components/data-boundary";
+import { workspaceView, PreviewOnlyFeature } from "@/features/workspace/components/data-boundary";
 import {
   AdminUsersView,
   AdminInvitationsView,
 } from "@/features/workspace/components/admin-workspace-views";
+import {
+  AdminAuditView,
+  AdminContentView,
+  AdminLandingPreviewView,
+  AdminPaymentSettingsView,
+  AdminUpgradeRequestsView,
+  AdminUserManagementView,
+} from "@/features/planner/components/admin-operational-views";
 import { BillingPreviewView } from "@/features/design-preview/components/billing-preview-view";
 import type { PreviewScreen } from "@/features/design-preview/types";
 export const dynamic = "force-dynamic";
@@ -75,6 +80,17 @@ export default async function Page({
           <BillingPreviewView screen={admScreens["ADM-02"]} />
         </PreviewOnlyFeature>
       );
+    /*
+     * Menu operasional baru (benchmark Meet to Marry). Dipisahkan dari
+     * /admin/users yang membaca database preproduction, karena layar ini
+     * masih memakai fixture dan belum boleh mengklaim mutasi nyata.
+     */
+    if (path[0] === "user-management") return <AdminUserManagementView />;
+    if (path[0] === "upgrades") return <AdminUpgradeRequestsView />;
+    if (path[0] === "content") return <AdminContentView />;
+    if (path[0] === "payment-settings") return <AdminPaymentSettingsView />;
+    if (path[0] === "audit") return <AdminAuditView />;
+    if (path[0] === "landing-preview") return <AdminLandingPreviewView />;
     notFound();
   });
 }

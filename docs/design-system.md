@@ -4,25 +4,52 @@
 
 [Sumber design system lengkap](../../menujuakad-rancangan/docs/design-system.md) berada di folder rancangan. Dokumen ini hanya menjelaskan pemakaiannya pada implementasi; token dan riwayat desain tidak diduplikasi di sini.
 
-Gunakan [brief web aktif](../../menujuakad-rancangan/docs/11-uiux-prompt-stitch-web.txt), [pustaka SVG](../../menujuakad-rancangan/docs/12-uiux-aset-svg.txt), dan `../../menujuakad-rancangan/docs/assets/ivory-gold/` sebagai bahan handoff. Arahan aktif adalah Stitch **Editorial Ivory & Gold**, dengan **Noto Serif** untuk display dan **Manrope** untuk UI/body. Snapshot token lengkap berada pada sumber design system rancangan. Brief tema sebelumnya dan pratinjau Cormorant merupakan riwayat.
+## Tema aktif: Luminous Aura Minimal — "Horizon Modern Style" (10 Oktober 2026)
+
+User me-refactor seluruh proyek Stitch `MENUJU-AKAD-UIUX` ke tema baru pada 10 Oktober 2026. Seluruh **51 layar** kini berjudul "— Horizon Modern Style" dan memakai design system **Luminous Aura Minimal** (`assets/843c886398d54e628035654c638f4515`, versi 1). Design system **Editorial Ivory & Gold** dan font **Noto Serif + Manrope** adalah riwayat; jangan dipakai untuk pekerjaan baru.
+
+Ringkasan perubahan tema:
+
+| Aspek         | Sebelum (Ivory & Gold)               | Sesudah (Luminous Aura Minimal)                    |
+| ------------- | ------------------------------------ | -------------------------------------------------- |
+| Font          | Noto Serif (display) + Manrope (UI)  | **Plus Jakarta Sans** (satu keluarga, 400–800)     |
+| Primary       | Gold `#C5A46D`                       | **Violet `#5F3ADD`** (hover `#7857F8`)             |
+| Secondary     | —                                    | **Peach `#FD8863`**                                |
+| Tertiary      | —                                    | **Sky `#2676C8`**                                  |
+| Canvas        | Ivory `#F8F6F1`                      | **Lavender `#FAF8FF`**                             |
+| Teks          | Black `#171717` / Charcoal `#292929` | **Slate `#131B2E`** / `#484555`                    |
+| Border        | Warm Beige `#E5DED3`                 | **`#DAE2FD` / `#C9C4D8`**                          |
+| Radius tombol | 6px                                  | **999px (pill)**                                   |
+| Radius kartu  | 10px                                 | **24px** (panel besar 32px, modal 40px)            |
+| Depth         | Shadow tunggal ringan                | **Shadow berlapis tint violet** + frosted glass    |
+| Dekorasi      | Floral opsional terbatas             | **Aura mesh gradients** (lavender/dawn/sky radial) |
+| Ikon          | Lucide outline                       | Material Symbols Outlined (di sumber Stitch)       |
+
+Karakter brand baru: _quiet luxury, intentional stillness, structured confidence_ — kanvas breathable, tipografi immaculate, frosted glass plane, aura glow kromatik. Larangan lama tetap berlaku: tanpa foil metalik, wreath botanikal, glitter, atau script calligraphy.
 
 ## Status implementasi
 
-Menurut [laporan fullstack 06](06-fullstack-slicing.md), Noto Serif dan Manrope kini berupa tujuh TTF lokal beserta lisensi/checksum; token/styles dipetakan ke Editorial Ivory & Gold. CSS dibagi per tanggung jawab. Floral yang dipakai berasal dari aset pilihan user; media foto/video/audio belum tersedia sebagai aset final dan memakai ilustrasi/placeholder berlabel. Kode UI nyata mencakup **43 kode/52 varian**; **10 kode/12 varian** specialist masih stub pada resolver snapshot checkpoint.
+Token dan primitives di `src/app/styles/` sudah dipindahkan ke Luminous Aura Minimal:
 
-Gate awal fullstack 209 unit test/18 E2E lulus; refinemen terakhir melaporkan 211 unit test/typecheck/lint. Fix QA-FS-01/03/04 dan SEC-INT-01, integrasi specialist, SEO serta gate/visual final masih berjalan. Viewer fullstack tidak mendukung gambar; handoff tekstual UI/UX/QA dipakai, sementara QA melihat komposisi seluruh 62 PNG melalui contact sheet. Ini tidak membuktikan seluruh React identik dengan Stitch.
+- `tokens.css` — lima @font-face Plus Jakarta Sans (TTF lokal + lisensi OFL di `public/fonts/`), palet lengkap, radius baru, shadow berlapis, frosted-glass, dan tiga aura gradient.
+- `base.css` — satu keluarga font untuk heading/body, weight 600 untuk heading dengan tracking rapat, aura mesh di `body`, focus ring violet.
+- `primitives.css` — tombol pill (primary violet, secondary frosted glass), kartu radius 24px, input radius 14px dengan focus halo violet, badge pill.
+
+Nama variabel lama (`--color-gold`, `--color-paper`, `--color-ink`, `--font-editorial`, dst.) **dipertahankan sebagai alias semantik** sehingga seluruh komponen existing ikut berpindah tema tanpa menyentuh setiap file. Artinya `var(--color-gold)` kini bernilai violet; jangan mengandalkan namanya untuk menebak warnanya.
+
+Media foto/video/audio belum tersedia sebagai aset final dan memakai ilustrasi/placeholder berlabel. Viewer fullstack tidak mendukung gambar; handoff tekstual UI/UX/QA dipakai. Ini tidak membuktikan seluruh React identik dengan Stitch.
 
 Slicing/publikasi sudah diizinkan; hasil aktual dan langkah berikutnya berada pada [rencana PM](03-pm-rencana-slicing.md) serta [progres bersama](../../menujuakad-rancangan/docs/00-progres-proyek.md). Token/font lokal tersedia tidak menyatakan auth/DB/payment/provider atau produksi aktif.
 
-## Sumber slicing terpilih: Stitch — 7 Oktober 2026
+## Sumber slicing terpilih: Stitch — 10 Oktober 2026
 
-Sumber aktif tetap **MENUJU-AKAD-UIUX**, project ID `12559574101879777472`, design system **Editorial Ivory & Gold**, `assets/45753e5cf13241a99242f6592f667257`, versi `1`. Snapshot terbaru memuat **64 desain/varian, 53 kode unik, 62 PNG resolusi penuh valid dan 0 HTML desain valid**, seperti [inventaris UI/UX](01-uiux-inventaris.md) dan [manifest sumber](../../menujuakad-rancangan/docs/assets/stitch/manifest.json). Respons HTML adalah login Google, bukan markup Menuju Akad. Gunakan PNG valid dan token, bukan halaman login.
+Sumber aktif **MENUJU-AKAD-UIUX**, project ID `12559574101879777472`, design system **Luminous Aura Minimal**, `assets/843c886398d54e628035654c638f4515`, versi `1`.
 
-Dari 44 kode inti brief, 42 memiliki metadata; CUS-05/06 belum ditemukan. Desktop CUS-01/02 hanya metadata; CUS-01 mobile/tablet tersedia. Inventaris UI/UX membaca 16 sampel; QA kemudian melihat komposisi seluruh 62 PNG melalui contact sheet, dengan keterbatasan copy mikro. Fidelity hasil React semua state/perangkat belum terverifikasi. Pelaksana membuka sumber setiap layar dan mencatat rekonstruksi/gap sebelum mengklaim fidelity.
+Snapshot 10 Oktober 2026: **56 layar**, terdiri atas 51 layar berjudul "Horizon Modern Style" (44 layar inti lama + 12 section editor EDT-09…20 yang baru digambar), 3 varian state INV-02, satu modal ADM-02, dan satu lampiran gambar. Rentang kode yang tersedia: PUB-01…05, AUT-01…06, CUS-01…08, EDT-01…20, GST-01…06, INV-01…02, ACC-01…02, SUP-01, ADM-01…02. HTML tiap layar dapat diunduh dari `htmlCode.downloadUrl` dan memuat konfigurasi Tailwind lengkap (palet + radius + font) sebagai acuan implementasi.
 
-User telah memberi izin eksplisit melanjutkan slicing seluruh UI/UX yang tersedia dan publikasi menujuakad.com, menggantikan batas brainstorming sebelumnya. Noto Serif display dan Manrope UI/body adalah keputusan aktif. Form auth hanya visual sampai provider nyata tersedia; actual customer/admin tetap denied. Preview lintas peran menggunakan fixture sintetis berlabel/noindex tanpa DB/provider/mutasi asli. Akses VPS dan pemeriksaan final masih diperlukan untuk membuktikan publikasi.
+Yang **belum** ada di Stitch dan menjadi target gelombang berikutnya: 17 layar modul perencanaan (PLN-01…17) dan 7 layar admin operasional (ADM-03…09) — seluruhnya sudah ditulis pada `../menujuakad-rancangan/docs/13-uiux-prompt-stitch-gelombang2.txt` yang kini diselaraskan ke Luminous Aura Minimal.
 
-Perbandingan visual dilakukan pada render aplikasi terhadap screenshot valid serta token resmi; metadata/snapshot tidak membuktikan aksesibilitas atau fidelity final; ketersediaan font lokal dilaporkan report06 dan render final tetap diperiksa. Figma V4 tetap riwayat dengan context/screenshot belum berhasil diakses karena kuota Starter; tidak menghalangi sumber Stitch aktif. [Arsitektur aplikasi](architecture.md) menjelaskan batas modul, bukan bukti semua modul selesai.
+User telah memberi izin eksplisit melanjutkan slicing seluruh UI/UX yang tersedia dan publikasi menujuakad.com. Form auth hanya visual sampai provider nyata tersedia; actual customer/admin tetap denied. Preview lintas peran menggunakan fixture sintetis berlabel/noindex tanpa DB/provider/mutasi asli.
 
 ## Penggunaan aset
 

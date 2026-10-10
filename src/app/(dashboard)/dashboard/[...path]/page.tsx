@@ -16,6 +16,7 @@ import { WishesPreview } from "@/features/wishes/components/wishes-preview";
 import { GiftsPreview } from "@/features/gifts/components/gifts-preview";
 import { NotificationsPreview } from "@/features/account/components/notifications-preview";
 import { SupportPreview } from "@/features/support/components/support-preview";
+import { resolvePlannerRoute } from "@/features/planner/components/planner-routes";
 export const dynamic = "force-dynamic";
 
 /*
@@ -89,6 +90,9 @@ export default async function Page({ params }: { params: Promise<{ path: string[
     }
     if (path.length === 2 && path[0] === "billing" && path[1] === "packages")
       return <PendingFeature title="Paket Pengujian" preview="/preview-ui/cus-07" />;
+    const planner = resolvePlannerRoute(path);
+    if (planner === false) notFound();
+    if (planner) return planner;
     if (path.length === 1 && path[0] in previewOnly) {
       const feature = previewOnly[path[0] as keyof typeof previewOnly];
       return (

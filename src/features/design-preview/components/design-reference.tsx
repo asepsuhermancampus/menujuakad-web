@@ -4,21 +4,23 @@ import { useState } from "react";
 /*
  * DS-01 Component Sheet & Design Tokens Guide.
  * Nilai token disalin dari snapshot resmi Stitch (docs/design-system.md):
- * metadata proyek MENUJU-AKAD-UIUX, design system Editorial Ivory & Gold v1.
+ * metadata proyek MENUJU-AKAD-UIUX, design system Luminous Aura Minimal v1
+ * (tema "Horizon Modern Style" yang menggantikan Editorial Ivory & Gold).
  * Halaman ini referensi internal, bukan rute produksi customer/admin.
  */
 const coreColors = [
-  ["paper", "#F8F6F1", "Kanvas publik & undangan"],
-  ["background", "#fbf9f4", "Latar aplikasi"],
+  ["background", "#faf8ff", "Latar aplikasi (lavender canvas)"],
   ["surface", "#FFFFFF", "Kartu & panel"],
-  ["beige", "#E5DED3", "Border & bidang lembut"],
-  ["gold / primary", "#C5A46D", "Aksen; JANGAN untuk teks kecil"],
-  ["primary-deep", "#A8854A", "Teks aksen & tautan"],
-  ["primary-soft", "#F1E7D3", "Sorotan lembut"],
-  ["accent-soft", "#EFEAE1", "Bidang netral hangat"],
-  ["ink", "#171717", "Teks utama & tombol primary"],
-  ["ink-soft", "#292929", "Hover tombol & teks isi"],
-  ["taupe / muted", "#8A8176", "Border, ikon, teks besar"],
+  ["surface-container", "#eaedff", "Bidang lembut & chip"],
+  ["border / outline-variant", "#c9c4d8", "Hairline & batas"],
+  ["primary", "#5f3add", "Tombol utama & aksen (violet)"],
+  ["primary-container", "#7857f8", "Hover tombol primary"],
+  ["primary-soft", "#e6deff", "Sorotan lembut & badge"],
+  ["secondary-container", "#fd8863", "Aksen hangat (peach)"],
+  ["tertiary-container", "#2676c8", "Aksen tenang (sky)"],
+  ["on-surface", "#131b2e", "Teks utama & heading"],
+  ["on-surface-variant", "#484555", "Teks isi & label"],
+  ["muted", "#64748b", "Metadata & helper"],
 ];
 
 const statusColors = [
@@ -30,25 +32,24 @@ const statusColors = [
 ];
 
 const typeScale = [
-  ["display-hero", "Noto Serif", "72px / 80px", "400", "-0.02em"],
-  ["headline-lg", "Noto Serif", "56px / 64px", "500", "-0.02em"],
-  ["headline-md", "Noto Serif", "40px / 48px", "500", "-0.02em"],
-  ["headline-sm", "Noto Serif", "28px / 36px", "500", "-0.01em"],
-  ["headline-xs", "Noto Serif", "22px / 30px", "500", "-0.01em"],
-  ["body-lg", "Manrope", "18px / 28px", "400", "—"],
-  ["body-md", "Manrope", "15px / 24px", "400", "—"],
-  ["body-sm", "Manrope", "13px / 20px", "400", "—"],
-  ["caption", "Manrope", "12px / 16px", "400", "—"],
-  ["label-eyebrow", "Manrope", "12px / 16px", "600", "+0.08em"],
-  ["label-lg", "Manrope", "14px / 20px", "600", "—"],
-  ["label-md", "Manrope", "13px / 18px", "500", "—"],
+  ["display-hero", "Plus Jakarta Sans", "56px / 68px", "600", "-0.03em"],
+  ["headline-lg", "Plus Jakarta Sans", "40px / 48px", "600", "-0.025em"],
+  ["headline-md", "Plus Jakarta Sans", "28px / 36px", "600", "-0.02em"],
+  ["headline-sm", "Plus Jakarta Sans", "22px / 30px", "600", "-0.015em"],
+  ["body-lg", "Plus Jakarta Sans", "16px / 26px", "400", "-0.005em"],
+  ["body-md", "Plus Jakarta Sans", "14px / 22px", "400", "—"],
+  ["label-lg", "Plus Jakarta Sans", "14px / 20px", "600", "+0.01em"],
+  ["label-md", "Plus Jakarta Sans", "12px / 16px", "500", "+0.02em"],
+  ["caption", "Plus Jakarta Sans", "11px / 14px", "500", "+0.03em"],
 ];
 
 const radii = [
-  ["control", "4px"],
-  ["button", "6px"],
-  ["card", "10px"],
-  ["modal", "16px"],
+  ["control", "12px"],
+  ["input", "14px"],
+  ["button", "999px (pill)"],
+  ["card", "24px"],
+  ["card-lg", "32px"],
+  ["modal", "40px"],
   ["pill / badge", "999px"],
 ];
 
@@ -67,11 +68,12 @@ export function DesignReference() {
   const [message, setMessage] = useState("");
   return (
     <main id="main" className="container section component-sheet">
-      <p className="eyebrow">EDITORIAL IVORY & GOLD · REFERENSI INTERNAL</p>
+      <p className="eyebrow">LUMINOUS AURA MINIMAL · REFERENSI INTERNAL</p>
       <h1>Komponen & Token Desain</h1>
       <p>
-        Snapshot token dari Stitch MENUJU-AKAD-UIUX (design system Editorial Ivory &amp; Gold v1).
-        Halaman ini referensi internal untuk konsistensi slicing, bukan rute produksi.
+        Snapshot token dari Stitch MENUJU-AKAD-UIUX (design system Luminous Aura Minimal v1, tema
+        &ldquo;Horizon Modern Style&rdquo;). Halaman ini referensi internal untuk konsistensi
+        slicing, bukan rute produksi.
       </p>
 
       <section className="section">
@@ -133,8 +135,8 @@ export function DesignReference() {
 
       <section className="section">
         <h2>Tipografi</h2>
-        <h3>Noto Serif · Sebuah Awal yang Indah</h3>
-        <p>Manrope · UI, form, navigasi, dan informasi.</p>
+        <h3>Plus Jakarta Sans · Sebuah Awal yang Indah</h3>
+        <p>Satu keluarga font untuk display, UI, form, navigasi, dan informasi.</p>
         <div className="table-scroll">
           <table>
             <thead>
@@ -204,8 +206,7 @@ export function DesignReference() {
         <p>
           <span className="badge success">Lengkap</span>{" "}
           <span className="badge danger">Perlu Ditinjau</span>{" "}
-          <span className="badge gold">Premium</span>{" "}
-          <span className="badge ink">Baru</span>
+          <span className="badge gold">Premium</span> <span className="badge ink">Baru</span>
         </p>
         <p className="notice">Informasi contoh dengan kontras yang terbaca.</p>
       </section>

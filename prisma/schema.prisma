@@ -93,6 +93,11 @@ model User {
   verificationTokens   AuthVerificationToken[]
   paymentTestRequests  PaymentTestRequest[]    @relation("PaymentTestRequester")
   paymentsTestReviewed PaymentTestRequest[]    @relation("PaymentTestReviewer")
+  plannerWorkspaces    PlannerWorkspace[]      @relation("PlannerOwner")
+  plannerMemberships   PlannerMember[]         @relation("PlannerMemberUser")
+  upgradeRequests      UpgradeRequest[]        @relation("UpgradeRequester")
+  upgradeReviews       UpgradeRequest[]        @relation("UpgradeReviewer")
+  adminAuditLogs       AdminAuditLog[]         @relation("AdminAuditActor")
 }
 
 model Template {
@@ -321,4 +326,464 @@ model AuthVerificationToken {
   @@index([userId, purpose])
   @@index([identifier, purpose])
   @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Domain perencanaan pernikahan (benchmark Meet to Marry, increment 10 Oktober 2026).
+// Semua nominal uang integer IDR. Model ditambahkan bertahap saat domainnya
+// dikerjakan; belum ada UI yang menulis ke model ini sampai backend aktif.
+// ---------------------------------------------------------------------------
+
+enum EventContext {
+  WEDDING
+  ENGAGEMENT
+}
+
+enum PlannerMemberRole {
+  OWNER
+  PARTNER
+}
+
+enum PlannerInviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum SavingsOwner {
+  SELF
+  PARTNER
+  SHARED
+}
+
+enum PlannerTaskStatus {
+  PENDING
+  DONE
+}
+
+enum PlannerTaskPic {
+  SELF
+  PARTNER
+  SHARED
+}
+
+enum VendorPaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
+
+enum SeserahanCategory {
+  SESERAHAN_WANITA
+  SESERAHAN_PRIA
+  HANTARAN_LAMARAN
+}
+
+enum SeserahanStatus {
+  NOT_BOUGHT
+  BOUGHT
+  PREPARED
+}
+
+enum MoodboardCategory {
+  DEKORASI
+  BUSANA
+  UNDANGAN
+  KUE
+  FOTOGRAFI
+}
+
+enum WeddingKitFormat {
+  SPREADSHEET
+  MOODBOARD
+  CHECKLIST
+}
+
+enum WeddingKitOrderStatus {
+  PENDING_PAYMENT
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
+enum UpgradeRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ContentSectionKey {
+  BRAND
+  LANDING
+  PRICING
+  FAQ
+  ANNOUNCEMENT
+}
+
+enum AdminAuditResult {
+  SUCCESS
+  FAILED
+}
+
+/// Workspace perencanaan pasangan; pemilik seluruh data perencanaan.
+/// Undangan tetap dimiliki `Invitation`; workspace tidak menggantikan owner.
+model PlannerWorkspace {
+  id                String    @id @default(cuid())
+  ownerUserId       String
+  partnerName       String?
+  weddingDate       DateTime? @db.Date
+  timezone          String    @default("Asia/Jakarta")
+  savingsTargetIdr  Int?
+  savingsTargetDate DateTime? @db.Date
+  onboardingDoneAt  DateTime? @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+
+  owner        User                   @relation("PlannerOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  members      PlannerMember[]
+  invites      PlannerInvite[]
+  accounts     SavingsAccount[]
+  categories   BudgetCategory[]
+  expenses     Expense[]
+  tasks        PlannerTask[]
+  rundowns     RundownItem[]
+  vendors      Vendor[]
+  seserahan    SeserahanItem[]
+  requirements RequirementItem[]
+  engagement   EngagementPlan?
+  moodboards   MoodboardBoard[]
+  kitOrders    WeddingKitOrder[]
+
+  @@index([ownerUserId])
+}
+
+model PlannerMember {
+  id          String            @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        PlannerMemberRole @default(PARTNER)
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User             @relation("PlannerMemberUser", fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+/// Undangan pasangan; token di-hash, maksimal satu undangan aktif per workspace.
+model PlannerInvite {
+  id          String              @id @default(cuid())
+  workspaceId String
+  tokenHash   String              @unique
+  invitedLabel String
+  status      PlannerInviteStatus @default(PENDING)
+  expiresAt   DateTime            @db.Timestamptz(3)
+  acceptedAt  DateTime?           @db.Timestamptz(3)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status])
+}
+
+model SavingsAccount {
+  id           String       @id @default(cuid())
+  workspaceId  String
+  label        String
+  bank         String
+  owner        SavingsOwner @default(SHARED)
+  accountNumber String?
+  balanceIdr   Int          @default(0)
+  notes        String?
+  sortOrder    Int          @default(0)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+
+  workspace  PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transfersFrom SavingsTransfer[] @relation("SavingsFrom")
+  transfersTo   SavingsTransfer[] @relation("SavingsTo")
+  expenses   Expense[]
+
+  @@index([workspaceId, sortOrder])
+}
+
+/// Transfer antar rekening; dicatat sebagai pasangan debit/kredit.
+model SavingsTransfer {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  fromAccountId String
+  toAccountId   String
+  amountIdr     Int
+  note          String?
+  transferredAt DateTime @db.Date
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  fromAccount SavingsAccount @relation("SavingsFrom", fields: [fromAccountId], references: [id], onDelete: Restrict)
+  toAccount   SavingsAccount @relation("SavingsTo", fields: [toAccountId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, transferredAt])
+}
+
+model BudgetCategory {
+  id           String       @id @default(cuid())
+  workspaceId  String
+  name         String
+  budgetIdr    Int          @default(0)
+  eventContext EventContext @default(WEDDING)
+  sortOrder    Int          @default(0)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@index([workspaceId, eventContext, sortOrder])
+}
+
+model Expense {
+  id           String       @id @default(cuid())
+  workspaceId  String
+  categoryId   String?
+  accountId    String?
+  description  String
+  amountIdr    Int
+  spentAt      DateTime     @db.Date
+  eventContext EventContext @default(WEDDING)
+  note         String?
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  category  BudgetCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  account   SavingsAccount?  @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, spentAt])
+  @@index([workspaceId, categoryId])
+}
+
+model PlannerTask {
+  id           String            @id @default(cuid())
+  workspaceId  String
+  title        String
+  description  String?
+  pic          PlannerTaskPic    @default(SHARED)
+  dueDate      DateTime?         @db.Date
+  status       PlannerTaskStatus @default(PENDING)
+  eventContext EventContext      @default(WEDDING)
+  sortOrder    Int               @default(0)
+  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime          @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status, dueDate])
+}
+
+model RundownItem {
+  id           String         @id @default(cuid())
+  workspaceId  String
+  startTime    String         @db.VarChar(5)
+  endTime      String?        @db.VarChar(5)
+  title        String
+  description  String?
+  pic          PlannerTaskPic @default(SHARED)
+  eventContext EventContext   @default(WEDDING)
+  sortOrder    Int            @default(0)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, eventContext, sortOrder])
+}
+
+model Vendor {
+  id           String              @id @default(cuid())
+  workspaceId  String
+  name         String
+  category     String?
+  contact      String?
+  totalIdr     Int                 @default(0)
+  paidIdr      Int                 @default(0)
+  status       VendorPaymentStatus @default(UNPAID)
+  eventContext EventContext        @default(WEDDING)
+  note         String?
+  createdAt    DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime            @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status])
+}
+
+model SeserahanItem {
+  id          String            @id @default(cuid())
+  workspaceId String
+  name        String
+  category    SeserahanCategory
+  estimateIdr Int               @default(0)
+  status      SeserahanStatus   @default(NOT_BOUGHT)
+  purchaseUrl String?
+  note        String?
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime          @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, category, sortOrder])
+}
+
+model RequirementItem {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  name         String
+  done         Boolean   @default(false)
+  dueDate      DateTime? @db.Date
+  note         String?
+  attachmentKey String?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, done, sortOrder])
+}
+
+model EngagementPlan {
+  id          String   @id @default(cuid())
+  workspaceId String   @unique
+  active      Boolean  @default(false)
+  eventName   String?
+  eventDate   DateTime? @db.Date
+  budgetIdr   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model MoodboardBoard {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  items     MoodboardItem[]
+
+  @@index([workspaceId, sortOrder])
+}
+
+model MoodboardItem {
+  id        String            @id @default(cuid())
+  boardId   String
+  title     String
+  category  MoodboardCategory
+  imageRef  String?
+  sourceUrl String?
+  sortOrder Int               @default(0)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+
+  board MoodboardBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([boardId, sortOrder])
+}
+
+model WeddingKitProduct {
+  id        String          @id @default(cuid())
+  slug      String          @unique
+  name      String
+  summary   String?
+  priceIdr  Int
+  format    WeddingKitFormat
+  contents  Json            @default("[]")
+  status    TemplateStatus  @default(DRAFT)
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime        @updatedAt @db.Timestamptz(3)
+
+  orders WeddingKitOrder[]
+}
+
+model WeddingKitOrder {
+  id          String               @id @default(cuid())
+  workspaceId String
+  productId   String
+  status      WeddingKitOrderStatus @default(PENDING_PAYMENT)
+  amountIdr   Int
+  reference   String?
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(3)
+
+  workspace PlannerWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  product   WeddingKitProduct @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, createdAt])
+}
+
+/// Permintaan upgrade paket; keputusan admin dicatat, email terpisah.
+model UpgradeRequest {
+  id              String               @id @default(cuid())
+  userId          String
+  fromPackageSlug String?
+  toPackageSlug   String
+  status          UpgradeRequestStatus @default(PENDING)
+  proofKey        String?
+  decidedAt       DateTime?            @db.Timestamptz(3)
+  decidedByUserId String?
+  decisionNote    String?
+  createdAt       DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime             @updatedAt @db.Timestamptz(3)
+
+  user      User  @relation("UpgradeRequester", fields: [userId], references: [id], onDelete: Restrict)
+  decidedBy User? @relation("UpgradeReviewer", fields: [decidedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
+/// Konten publik yang dapat diedit admin tanpa deploy; publikasi eksplisit.
+model ContentSection {
+  id          String           @id @default(cuid())
+  key         ContentSectionKey @unique
+  draftJson   Json             @default("{}")
+  publishedJson Json?          @default("{}")
+  draftSavedAt DateTime?       @db.Timestamptz(3)
+  publishedAt DateTime?        @db.Timestamptz(3)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(3)
+}
+
+/// Pengaturan pembayaran manual (QRIS statis + rekening); bukan integrasi provider.
+model PaymentSetting {
+  id              String   @id @default(cuid())
+  qrisKey         String?
+  qrisLabel       String?
+  accountsJson    Json     @default("[]")
+  adminWhatsapp   String?
+  messageTemplate String?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+}
+
+/// Audit aksi admin; tidak boleh dihapus dari UI.
+model AdminAuditLog {
+  id         String           @id @default(cuid())
+  actorUserId String
+  action     String
+  targetType String
+  targetId   String?
+  reason     String?
+  result     AdminAuditResult @default(SUCCESS)
+  createdAt  DateTime         @default(now()) @db.Timestamptz(3)
+
+  actor User @relation("AdminAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
 }

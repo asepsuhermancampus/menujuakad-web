@@ -27,12 +27,16 @@
 }
 .workspace-header {
   padding: 20px 32px;
-  background: var(--color-surface);
+  background: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: var(--layer-header);
 }
 .workspace-layout {
   display: grid;
@@ -42,23 +46,26 @@
 .workspace-nav {
   padding: 28px 20px;
   border-right: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--glass-surface);
+  backdrop-filter: var(--glass-blur);
 }
 .workspace-nav a {
   display: block;
   padding: 12px 16px;
   text-decoration: none;
-  font-size: 12px;
-  border-radius: var(--radius-button);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-control);
   transition:
     background-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out);
 }
 .workspace-nav a:hover {
-  background: var(--color-primary-soft);
+  background: var(--color-surface-container);
 }
 .workspace-nav a[aria-current="page"] {
-  background: var(--color-primary-soft);
+  background: rgba(95, 58, 221, 0.1);
+  color: var(--color-primary);
   font-weight: 600;
 }
 .workspace-main {

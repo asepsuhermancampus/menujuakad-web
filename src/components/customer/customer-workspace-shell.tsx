@@ -7,6 +7,7 @@ const links = [
   ["/dashboard", "Dashboard"],
   ["/dashboard/invitations", "Undangan Saya"],
   ["/dashboard/invitations/new", "Buat Undangan"],
+  ["/dashboard/planner", "Perencanaan"],
   ["/dashboard/guests", "Daftar Tamu"],
   ["/dashboard/rsvp", "Konfirmasi RSVP"],
   ["/dashboard/wishes", "Buku Ucapan"],

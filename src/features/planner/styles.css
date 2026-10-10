@@ -1,0 +1,514 @@
+/* Modul perencanaan pernikahan — mengikuti token Ivory & Gold aktif. */
+
+.planner-shell {
+  min-width: 0;
+}
+
+.planner-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  margin-bottom: 24px;
+}
+
+.planner-context strong {
+  font-size: 13px;
+}
+
+.planner-context-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.planner-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.planner-summary article {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 20px;
+}
+
+.planner-summary h2 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-taupe);
+  margin: 0 0 8px;
+}
+
+.planner-summary strong {
+  display: block;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.planner-summary small {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-taupe);
+  font-size: 12px;
+}
+
+.planner-money {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.planner-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-beige);
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.planner-progress span {
+  display: block;
+  height: 100%;
+  background: var(--color-gold);
+}
+
+.planner-progress[data-status="NEAR_LIMIT"] span {
+  background: var(--color-warning);
+}
+
+.planner-progress[data-status="OVER_BUDGET"] span {
+  background: var(--color-danger);
+}
+
+.planner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-paper);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.planner-badge[data-tone="success"] {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.planner-badge[data-tone="warning"] {
+  border-color: var(--color-warning);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.planner-badge[data-tone="danger"] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.planner-list {
+  display: grid;
+  gap: 12px;
+}
+
+.planner-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.planner-row h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.planner-row p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-taupe);
+}
+
+.planner-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.planner-group {
+  margin-bottom: 28px;
+}
+
+.planner-group h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+
+.planner-group h2 small {
+  color: var(--color-taupe);
+  font-weight: 400;
+}
+
+.planner-empty {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  padding: 28px;
+  text-align: center;
+}
+
+.planner-empty p {
+  margin: 0 0 16px;
+  color: var(--color-taupe);
+}
+
+.planner-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.planner-form-grid .planner-span-2 {
+  grid-column: 1 / -1;
+}
+
+.planner-impact {
+  grid-column: 1 / -1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-accent-soft);
+  padding: 16px;
+  font-size: 13px;
+}
+
+.planner-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.planner-checkbox-row input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+.planner-checkbox-row[data-done="true"] .planner-checkbox-title {
+  text-decoration: line-through;
+  color: var(--color-taupe);
+}
+
+.planner-checkbox-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.planner-checkbox-title strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.planner-checkbox-title small {
+  color: var(--color-taupe);
+  font-size: 12px;
+}
+
+.planner-timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.planner-timeline-item {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-gold);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.planner-timeline-time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.planner-timeline-item h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.planner-timeline-item p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-taupe);
+}
+
+.planner-grid-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.planner-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.planner-card h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.planner-card p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-taupe);
+}
+
+.planner-card strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.planner-placeholder {
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-beige);
+  display: grid;
+  place-items: center;
+  color: var(--color-taupe);
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+}
+
+.planner-chart {
+  display: grid;
+  gap: 8px;
+}
+
+.planner-chart-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 72px;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.planner-chart-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-beige);
+  overflow: hidden;
+}
+
+.planner-chart-bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-ink-soft);
+}
+
+.planner-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.planner-tabs button {
+  border: 0;
+  background: none;
+  padding: 10px 4px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-taupe);
+  cursor: pointer;
+}
+
+.planner-tabs button[aria-selected="true"] {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-ink);
+}
+
+.planner-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 23, 23, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.planner-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-modal);
+  padding: 24px;
+  width: min(560px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+}
+
+.planner-modal h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.planner-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.planner-wizard-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.planner-wizard-steps span {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-taupe);
+}
+
+.planner-wizard-steps span[data-active="true"] {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.planner-member {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.planner-member-initials {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 999px;
+  background: var(--color-beige);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+  .planner-summary,
+  .planner-grid-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .planner-chart-row {
+    grid-template-columns: 100px minmax(0, 1fr) 64px;
+  }
+}
+
+@media (max-width: 767px) {
+  .planner-summary,
+  .planner-grid-cards,
+  .planner-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .planner-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .planner-row-actions {
+    justify-content: flex-start;
+  }
+  .planner-timeline-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .planner-chart-row {
+    grid-template-columns: minmax(0, 1fr) 56px;
+  }
+  .planner-chart-row strong {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planner-progress span,
+  .planner-chart-bar span {
+    transition: none;
+  }
+}
+
+/* Sub-navigasi horizontal modul perencanaan (menghindari sidebar bersarang). */
+.planner-subnav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+  scrollbar-width: thin;
+}
+
+.planner-subnav a {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--color-ink-soft);
+}
+
+.planner-subnav a[aria-current="page"] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.planner-subnav a:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}

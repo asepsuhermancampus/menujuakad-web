@@ -8,3 +8,7 @@ export * from "./gifts-fixtures";
 export * from "./analytics-fixtures";
 export * from "./billing-fixtures";
 export * from "./account-fixtures";
+export * from "./planner-finance-fixtures";
+export * from "./planner-work-fixtures";
+export * from "./planner-misc-fixtures";
+export * from "./planner-admin-fixtures";

@@ -1,8 +1,8 @@
 import { publicPageMetadata } from "@/config/seo";
 export const metadata = publicPageMetadata(
   "/how-it-works",
-  "Cara Kerja Pratinjau",
-  "Tinjau alur desain, simulasi pendaftaran dan editor undangan contoh. Login akun uji terpisah dari preview; penerbitan undangan belum tersedia.",
+  "Cara Membuat Undangan",
+  "Enam langkah menyiapkan undangan digital: pilih desain, isi data, kurasi media, kelola tamu, periksa kesiapan, lalu bagikan tautan. Status pratinjau dijelaskan jujur pada tiap langkah.",
 );
 import { HowItWorksDetail } from "@/features/marketing/components/how-it-works-detail";
 export default function Page() {
