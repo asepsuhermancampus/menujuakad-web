@@ -38,11 +38,11 @@
   align-items: start;
 }
 .billing-selected-row {
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
 }
 .billing-webhook-detail pre {
   background: var(--color-ink);
-  color: var(--color-accent-soft);
+  color: var(--color-surface-low);
   padding: 24px;
   border-radius: 6px;
   font-size: 12px;

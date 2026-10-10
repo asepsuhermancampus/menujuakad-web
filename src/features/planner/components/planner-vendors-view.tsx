@@ -99,7 +99,7 @@ export function PlannerVendorsView() {
                   <td>
                     {vendor.name}
                     <br />
-                    <small style={{ color: "var(--color-taupe)" }}>{vendor.note}</small>
+                    <small style={{ color: "var(--color-outline)" }}>{vendor.note}</small>
                   </td>
                   <td>{vendor.category}</td>
                   <td className="planner-money">{formatIdrPlain(vendor.totalIdr)}</td>

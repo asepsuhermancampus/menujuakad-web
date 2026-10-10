@@ -93,7 +93,7 @@ export function PlannerRundownView() {
               <div className="planner-timeline-time">
                 {item.startTime}
                 <br />
-                <small style={{ color: "var(--color-taupe)", fontWeight: 400 }}>
+                <small style={{ color: "var(--color-outline)", fontWeight: 400 }}>
                   s.d. {item.endTime}
                 </small>
               </div>

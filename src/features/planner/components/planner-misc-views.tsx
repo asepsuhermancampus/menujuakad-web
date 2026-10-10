@@ -331,7 +331,7 @@ export function PlannerCoupleView() {
             </span>
             <div style={{ flex: 1 }}>
               <strong>{member.name}</strong>
-              <p style={{ margin: 0, fontSize: 12, color: "var(--color-taupe)" }}>
+              <p style={{ margin: 0, fontSize: 12, color: "var(--color-outline)" }}>
                 {member.maskedEmail} · {member.role === "OWNER" ? "Pemilik" : "Pasangan"}
               </p>
             </div>
