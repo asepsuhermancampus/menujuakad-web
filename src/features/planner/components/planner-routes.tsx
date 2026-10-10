@@ -10,6 +10,7 @@ import {
   PlannerRequirementsView,
   PlannerSeserahanView,
 } from "./planner-seserahan-requirements-view";
+import { PlannerAnnouncementView } from "./planner-announcement-view";
 import {
   PlannerCoupleView,
   PlannerEngagementView,
@@ -37,6 +38,7 @@ const plannerScreens: Readonly<Record<string, () => ReactNode>> = {
   "wedding-kit": () => <PlannerWeddingKitView />,
   couple: () => <PlannerCoupleView />,
   onboarding: () => <PlannerOnboardingView />,
+  announcements: () => <PlannerAnnouncementView />,
 };
 
 /**

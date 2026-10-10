@@ -209,3 +209,116 @@ export const adminFixtureSummary = {
   pendingPaymentTests: 2,
   activeAnnouncements: 0,
 } as const;
+
+/**
+ * Katalog template admin (ADM-04). Metadata kurasi saja — jumlah adopsi,
+ * skor kepuasan, dan status publikasi di bawah adalah angka contoh untuk
+ * menguji tata letak, bukan statistik layanan nyata.
+ */
+export type AdminTemplateRowDto = Readonly<{
+  id: string;
+  name: string;
+  category: "EDITORIAL" | "MODERN" | "FLORAL" | "DARK";
+  tier: "PREMIUM" | "BEBAS_ROYALTI";
+  status: "PUBLISHED" | "DRAFT";
+  adoptedLabel: string;
+  ratingLabel: string;
+}>;
+
+export const adminTemplatesFixture: readonly AdminTemplateRowDto[] = [
+  {
+    id: "demo-tpl-01",
+    name: "Serenade No. 1",
+    category: "EDITORIAL",
+    tier: "PREMIUM",
+    status: "PUBLISHED",
+    adoptedLabel: "412 pasangan aktif (contoh)",
+    ratingLabel: "4,9 / 5,0 (contoh)",
+  },
+  {
+    id: "demo-tpl-02",
+    name: "Lumière Atelier",
+    category: "MODERN",
+    tier: "PREMIUM",
+    status: "PUBLISHED",
+    adoptedLabel: "318 pasangan aktif (contoh)",
+    ratingLabel: "4,8 / 5,0 (contoh)",
+  },
+  {
+    id: "demo-tpl-03",
+    name: "Archiviste Sans",
+    category: "MODERN",
+    tier: "BEBAS_ROYALTI",
+    status: "PUBLISHED",
+    adoptedLabel: "246 pasangan aktif (contoh)",
+    ratingLabel: "4,7 / 5,0 (contoh)",
+  },
+  {
+    id: "demo-tpl-04",
+    name: "Botanical Garden",
+    category: "FLORAL",
+    tier: "PREMIUM",
+    status: "DRAFT",
+    adoptedLabel: "Belum diterbitkan",
+    ratingLabel: "Belum ada penilaian",
+  },
+] as const;
+
+export const adminTemplateCategoryLabels: Readonly<Record<AdminTemplateRowDto["category"], string>> = {
+  EDITORIAL: "Editorial",
+  MODERN: "Luminous Modern",
+  FLORAL: "Floral Minimal",
+  DARK: "Dark Luxury",
+};
+
+export const adminTemplateTierLabels: Readonly<Record<AdminTemplateRowDto["tier"], string>> = {
+  PREMIUM: "Premium",
+  BEBAS_ROYALTI: "Bebas royalti",
+};
+
+export const adminTemplateStatusLabels: Readonly<Record<AdminTemplateRowDto["status"], string>> = {
+  PUBLISHED: "Terbit",
+  DRAFT: "Draf",
+};
+
+/**
+ * Kondisi infrastruktur yang benar-benar dapat diketahui aplikasi (ADM-08).
+ *
+ * Sengaja TIDAK memuat angka uptime, jumlah pod, kapasitas memori, atau
+ * jaminan enkripsi seperti pada gambar desain sumber: aplikasi tidak memiliki
+ * telemetri tersebut, dan menampilkannya akan menjadi klaim palsu. Yang
+ * ditampilkan hanyalah status yang berasal dari health check nyata.
+ */
+export type AdminServiceHealthDto = Readonly<{
+  id: string;
+  name: string;
+  status: "ok" | "not_configured" | "unavailable";
+  note: string;
+}>;
+
+export const adminServiceHealthFixture: readonly AdminServiceHealthDto[] = [
+  {
+    id: "svc-app",
+    name: "Aplikasi Web",
+    status: "ok",
+    note: "Proses Next.js melayani permintaan.",
+  },
+  {
+    id: "svc-db",
+    name: "Basis Data",
+    status: "not_configured",
+    note: "Status diambil dari /api/health saat halaman dibuka.",
+  },
+  {
+    id: "svc-payment",
+    name: "Gateway Pembayaran",
+    status: "not_configured",
+    note: "Mayar belum dikonfigurasi pada lingkungan ini.",
+  },
+  {
+    id: "svc-email",
+    name: "Email Transaksional",
+    status: "not_configured",
+    note: "Provider email belum dikonfigurasi.",
+  },
+] as const;

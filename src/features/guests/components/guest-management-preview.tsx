@@ -46,10 +46,16 @@ export function GuestManagementPreview({ empty = false }: { empty?: boolean }) {
   }
   return (
     <section className="business stack">
-      <header>
-        <p className="eyebrow">TAMU / DATA CONTOH</p>
-        <h1>Manajemen Tamu</h1>
-        <p>Kelola daftar sintetis dan tinjau respons. Tidak ada undangan yang dikirim.</p>
+      <header className="guest-page-head">
+        <div>
+          <p className="aura-label">Tamu · data contoh</p>
+          <h1>Daftar Tamu &amp; RSVP</h1>
+          <p>
+            Kelola rincian undangan, status kehadiran, alokasi kursi, dan pratinjau pengiriman
+            tautan. Tidak ada undangan yang benar-benar dikirim.
+          </p>
+        </div>
+        <span className="planner-badge">{summary.total} tamu terdaftar</span>
       </header>
       <GuestSummaryCards summary={summary} />
       <div className="actions">

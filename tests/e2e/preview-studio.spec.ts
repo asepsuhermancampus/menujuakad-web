@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 /*
- * Preview Studio menggabungkan 63 kode / 74 varian ke satu halaman berkelompok.
+ * Preview Studio menggabungkan seluruh kode layar sumber Stitch ke satu halaman
+ * berkelompok. Snapshot 10 Oktober 2026: 86 kode / 120 varian, 12 kelompok
+ * domain (PUB, AUT, CUS, EDT, GST, INV, ACC, SUP, PLN, ADM, ERR, DS).
  * Test ini mengunci perilaku penggabungan: pengelompokan domain, pencarian,
  * filter area, navigasi prev/next, dan ketahanan tanpa overflow.
  */
@@ -9,10 +11,10 @@ test("Preview Studio mengelompokkan layar per domain tanpa overflow", async ({ p
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/preview-ui");
   await expect(page.getByRole("heading", { name: "Preview Studio" })).toBeVisible();
-  // 11 kelompok domain (PUB, AUT, CUS, EDT, GST, INV, ACC, SUP, ADM, ERR, DS).
-  await expect(page.locator(".preview-domain")).toHaveCount(11);
-  // Seluruh 63 kode tampil sebagai baris ringkas, bukan kartu besar.
-  await expect(page.locator(".preview-row")).toHaveCount(63);
+  // 12 kelompok domain (PUB, AUT, CUS, EDT, GST, INV, ACC, SUP, PLN, ADM, ERR, DS).
+  await expect(page.locator(".preview-domain")).toHaveCount(12);
+  // Seluruh 86 kode tampil sebagai baris ringkas, bukan kartu besar.
+  await expect(page.locator(".preview-row")).toHaveCount(86);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
   ).toBe(true);
@@ -26,9 +28,9 @@ test("pencarian dan filter area menyaring baris tanpa menghilangkan domain", asy
   await page.getByLabel("Area layar").selectOption("customer");
   const rows = await page.locator(".preview-row").count();
   expect(rows).toBeGreaterThan(0);
-  expect(rows).toBeLessThan(63);
+  expect(rows).toBeLessThan(86);
   await page.getByLabel("Area layar").selectOption("all");
-  await expect(page.locator(".preview-row")).toHaveCount(63);
+  await expect(page.locator(".preview-row")).toHaveCount(86);
 });
 
 test("kelompok domain dapat diringkas dan dibuka kembali", async ({ page }) => {

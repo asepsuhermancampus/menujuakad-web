@@ -13,7 +13,12 @@ export function BillingPreviewView({ screen }: { screen: PreviewScreen }) {
     case "CUS-07":
       return <PackageSelectionPreview />;
     case "CUS-08": {
-      const expired = screen.state === "Expired";
+      /*
+       * Judul varian sumber berbunyi "Checkout & Pembayaran — Sesi Expired",
+       * sehingga state tersimpan sebagai "Sesi Expired". Pemeriksaan memakai
+       * kata kunci agar tetap cocok bila penamaan sumber bergeser.
+       */
+      const expired = screen.state.toLowerCase().includes("expired");
       return (
         <PaymentCheckoutPreview
           key={screen.id}

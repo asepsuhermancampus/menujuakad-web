@@ -7,6 +7,7 @@ import {
   PlannerEmpty,
   PlannerModal,
   PlannerShell,
+  PlannerStat,
 } from "@/features/planner/components/planner-shell";
 import { daysLabel, daysUntil, picLabels } from "@/features/planner/lib/presentation";
 
@@ -41,6 +42,8 @@ export function PlannerTasksView() {
   const visible = withLocalState.filter((task) => picFilter === "ALL" || task.pic === picFilter);
   const groups = groupTasks(visible);
   const doneCount = withLocalState.filter((task) => task.status === "DONE").length;
+  const donePercent =
+    withLocalState.length === 0 ? 0 : Math.round((doneCount / withLocalState.length) * 100);
 
   function toggle(id: string) {
     setDone((previous) => {
@@ -62,23 +65,28 @@ export function PlannerTasksView() {
   return (
     <PlannerShell title="Tugas" code="PLN-06" subnav="/dashboard/planner/tasks">
       <div className="planner-summary">
-        <article>
-          <h2>Progres tugas</h2>
-          <strong>
-            {doneCount}/{withLocalState.length}
-          </strong>
-          <small>Selesai (termasuk centang contoh di sesi ini)</small>
-        </article>
-        <article>
-          <h2>Terlambat</h2>
-          <strong>{groups.late.length}</strong>
-          <small>Perlu perhatian</small>
-        </article>
-        <article>
-          <h2>Jatuh tempo minggu ini</h2>
-          <strong>{groups.week.length}</strong>
-          <small>7 hari ke depan</small>
-        </article>
+        <PlannerStat
+          label="Progres tugas"
+          value={`${doneCount}/${withLocalState.length}`}
+          note="Selesai (termasuk centang contoh di sesi ini)"
+          icon="task-alt"
+          tone="primary"
+          progressPercent={donePercent}
+        />
+        <PlannerStat
+          label="Terlambat"
+          value={String(groups.late.length)}
+          note="Perlu perhatian"
+          icon="error"
+          tone="secondary"
+        />
+        <PlannerStat
+          label="Jatuh tempo minggu ini"
+          value={String(groups.week.length)}
+          note="7 hari ke depan"
+          icon="schedule"
+          tone="tertiary"
+        />
       </div>
 
       <div className="actions" style={{ marginBottom: 20 }}>

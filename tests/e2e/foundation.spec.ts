@@ -8,12 +8,16 @@ test("beranda dapat dibaca, digunakan dengan keyboard, dan tidak melebar di pons
   await page.goto("/");
   await expect(page).toHaveTitle(/Menuju Akad/);
   await expect(page.locator("html")).toHaveAttribute("lang", "id");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Undangan untuk hari kalian.");
+  // Judul beranda mengikuti desain PUB-01 "Horizon Modern Style".
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Momen sakral, dibalut presisi digital.",
+  );
   await expect(page.getByText("Foto pasangan belum disediakan · ilustrasi").first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("beranda.png"), fullPage: true });
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Langsung ke konten" })).toBeFocused();
-  await page.getByRole("link", { name: "Pilih Desain →", exact: true }).click();
+  // Bilah masuk cepat mengarah ke katalog desain.
+  await page.getByRole("link", { name: "Mulai dari katalog" }).click();
   await expect(page).toHaveURL(/\/templates$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,

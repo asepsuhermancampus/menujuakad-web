@@ -1,7 +1,11 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
+  // Shell kini memakai usePathname untuk menandai halaman aktif.
+  usePathname: () => "/dashboard",
+}));
 import { CustomerWorkspaceShell } from "@/components/customer/customer-workspace-shell";
 import { WorkspaceNotFound } from "./data-boundary";
 vi.mock("server-only", () => ({}));

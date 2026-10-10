@@ -2,31 +2,251 @@
  * Halaman undangan memakai token Editorial Ivory & Gold.
  * Radius nav pill dan cover mengikuti skala Stitch (undangan 0-16 px untuk dokumen).
  */
+/*
+ * INV-01 — Cover undangan (Horizon Modern Style).
+ *
+ * Kanvas dengan aura, bingkai tipis di tepi, kepala monogram, kartu sampul
+ * kaca, dan blok "Kepada Yth.". Semua dekorasi diberi `pointer-events: none`.
+ */
+.invitation-canvas {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 12px;
+  overflow-x: clip;
+  background-image: var(--aura-lavender), var(--aura-sky);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+/* Bingkai tipis di tepi layar, sesuai desain. */
+.invitation-canvas::before {
+  content: "";
+  position: fixed;
+  inset: 12px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  pointer-events: none;
+  z-index: 0;
+}
+.invitation-head,
+.invitation-cover,
+.invitation-cover-foot,
+.invitation-document,
+.invitation-nav {
+  position: relative;
+  z-index: 1;
+}
+.invitation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: min(920px, 100%);
+  margin-inline: auto;
+  padding: 20px 8px 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.invitation-head-brand,
+.invitation-head-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.invitation-head-brand .icon {
+  color: var(--color-primary);
+}
+.invitation-head-badge {
+  padding: 6px 14px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
 .invitation-cover {
-  max-width: 480px;
-  margin: 60px auto;
-  padding: 36px;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-rest);
+  width: min(680px, 100%);
+  margin: 32px auto;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card-lg);
+  box-shadow: var(--shadow-float);
   text-align: center;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-modal);
   transition: box-shadow var(--duration-slow) var(--ease-out);
 }
 .invitation-cover:hover {
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-float);
+}
+.invitation-cover-top {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.invitation-seal {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 8px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffffff 0%, #f2efff 100%);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+/* Garis pemisah tipis yang memudar di kedua ujung. */
+.invitation-rule {
+  width: 48px;
+  height: 1px;
+  margin: 10px auto;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
 }
 .invitation-cover h1 {
-  font-size: 36px;
-  margin-top: 20px;
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
 }
-.invitation-cover .floral-art {
-  height: 300px;
-  margin-block: 24px;
+.invitation-partners {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
 }
-.invitation-cover .button {
+.invitation-figure {
+  position: relative;
+  margin: 24px 0;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  overflow: hidden;
+  background: var(--color-surface-low);
+}
+.invitation-figure figcaption {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  left: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(19, 27, 46, 0.5);
+}
+.invitation-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  border-block: 1px solid var(--hairline-outline);
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.invitation-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.invitation-meta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-outline-variant);
+}
+.invitation-addressee {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: rgba(255, 255, 255, 0.75);
+}
+.invitation-addressee > p:first-child {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.invitation-addressee h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.invitation-addressee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: 999px;
+  background: var(--color-surface-low);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.invitation-addressee > p:last-child {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+}
+.invitation-cover-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+.invitation-cover-actions .button {
   width: 100%;
-  margin-top: 20px;
+}
+.invitation-cover-actions small {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+.invitation-cover-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: min(920px, 100%);
+  margin: 0 auto 20px;
+  padding: 20px 8px 0;
+  border-top: 1px solid var(--hairline-outline);
+  font-size: 11px;
+  color: var(--color-outline);
+}
+/* State tautan tidak valid: satu kartu fokus tanpa tombol buka. */
+.invitation-cover-invalid {
+  max-width: 520px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  margin-block: auto;
+}
+.invitation-cover-invalid h1 {
+  font-size: clamp(22px, 3vw, 30px);
+}
+.invitation-cover-invalid > p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+.invitation-cover-invalid .button {
+  margin-top: 8px;
+}
+.invitation-cover-invalid small {
+  color: var(--color-outline);
 }
 .invitation-document {
   max-width: 740px;
@@ -66,7 +286,7 @@
   gap: 8px;
   flex-wrap: wrap;
   background: var(--color-ink);
-  color: var(--color-ink-fixed);
+  color: #ffffff;
   border-radius: var(--radius-pill);
   padding: 14px;
   font-size: 12px;
@@ -97,19 +317,19 @@
 .invitation-demo-label {
   padding: 12px;
   text-align: center;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   font-size: 12px;
 }
 .couple-portrait {
   width: 130px;
   height: 180px;
   margin: 20px auto;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   border-radius: 60px 60px 0 0;
   display: grid;
   place-items: center;
   font: 40px var(--font-editorial);
-  color: var(--color-primary-deep);
+  color: var(--color-primary-hover);
 }
 @media (max-width: 767px) {
   .invitation-cover {

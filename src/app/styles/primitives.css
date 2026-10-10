@@ -307,7 +307,7 @@ th {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
 }
 .floral-art img {
   width: 85%;
@@ -374,4 +374,13 @@ th {
 }
 .local-preview-waiting {
   grid-column: 1/-1;
+}
+/*
+ * Ikon SVG lokal (src/components/ui/icon.tsx). Ikon mewarisi warna teks induk,
+ * sehingga tidak perlu kelas warna khusus di tiap pemakaian.
+ */
+.icon {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
 }

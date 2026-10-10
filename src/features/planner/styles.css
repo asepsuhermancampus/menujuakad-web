@@ -1,29 +1,260 @@
-/* Modul perencanaan pernikahan — mengikuti token Ivory & Gold aktif. */
+/*
+ * Modul perencanaan pernikahan — tema Horizon Modern Style (Luminous Aura Minimal).
+ *
+ * Struktur kelas dipertahankan dari versi sebelumnya agar kontrak markup dan
+ * pengujian tetap sah; yang berubah adalah nilainya: kartu radius 24px dengan
+ * hairline + shadow aura, lencana pill, bilah progres violet/peach/biru, serta
+ * bilah modul (.planner-nav) yang menggantikan sub-navigasi lama.
+ */
 
 .planner-shell {
   min-width: 0;
 }
 
-.planner-context {
+/* --- Bilah modul (PLN-01/02) --- */
+.planner-nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  scrollbar-width: thin;
+}
+
+.planner-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--color-on-surface-variant);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+.planner-nav a .icon {
+  color: var(--color-outline);
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.planner-nav a:hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.planner-nav a[aria-current="page"] {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.planner-nav a[aria-current="page"] .icon {
+  color: var(--color-primary);
+}
+
+/* --- Judul halaman dan pemilih konteks --- */
+.planner-topbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.planner-topbar-lead {
+  min-width: 0;
+}
+
+.planner-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--color-outline);
+}
+
+.planner-topbar h1 {
+  margin: 0 0 6px;
+}
+
+.planner-lead {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+
+.planner-topbar-side {
+  display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
+  flex-wrap: wrap;
+}
+
+.planner-code {
+  padding: 6px 12px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 999px;
   background: var(--color-surface);
-  margin-bottom: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-outline);
 }
 
-.planner-context strong {
-  font-size: 13px;
+.planner-context {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 999px;
+  background: var(--color-surface-low);
 }
 
+.planner-context button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+.planner-context button[aria-pressed="true"] {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Nama lama tetap ada agar selektor lama tidak hilang. */
 .planner-context-options {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.planner-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Catatan data contoh: banner lembut, bukan blok peringatan keras. */
+.planner-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-low);
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-note .icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-primary);
+}
+
+/* --- Kartu metrik --- */
+.planner-stat {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
+  overflow: hidden;
+}
+
+.planner-stat header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.planner-stat[data-tone="secondary"] .planner-stat-icon {
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary);
+}
+
+.planner-stat[data-tone="tertiary"] .planner-stat-icon {
+  background: var(--color-tertiary-soft);
+  color: var(--color-tertiary);
+}
+
+.planner-stat strong {
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.15;
+}
+
+.planner-stat small {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+/* Bilah progres kartu metrik: track netral, isian mengikuti tone. */
+.planner-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-container-high);
+  overflow: hidden;
+}
+
+.planner-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.planner-stat[data-tone="secondary"] .planner-bar span {
+  background: var(--color-secondary-container);
+}
+
+.planner-stat[data-tone="tertiary"] .planner-bar span {
+  background: var(--color-tertiary-container);
 }
 
 .planner-summary {
@@ -34,22 +265,24 @@
 }
 
 .planner-summary article {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--hairline-outline);
   border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
   padding: 20px;
 }
 
 .planner-summary h2 {
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   margin: 0 0 8px;
 }
 
 .planner-summary strong {
   display: block;
   font-size: 24px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
@@ -57,7 +290,7 @@
 .planner-summary small {
   display: block;
   margin-top: 6px;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   font-size: 12px;
 }
 
@@ -70,7 +303,7 @@
 .planner-progress {
   height: 8px;
   border-radius: 999px;
-  background: var(--color-beige);
+  background: var(--color-surface-container-high);
   overflow: hidden;
   min-width: 120px;
 }
@@ -78,7 +311,9 @@
 .planner-progress span {
   display: block;
   height: 100%;
-  background: var(--color-gold);
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 .planner-progress[data-status="NEAR_LIMIT"] span {
@@ -93,30 +328,31 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-paper);
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container);
   font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 .planner-badge[data-tone="success"] {
-  border-color: var(--color-success);
+  border-color: transparent;
   background: var(--color-success-soft);
   color: var(--color-success);
 }
 
 .planner-badge[data-tone="warning"] {
-  border-color: var(--color-warning);
+  border-color: transparent;
   background: var(--color-warning-soft);
   color: var(--color-warning);
 }
 
 .planner-badge[data-tone="danger"] {
-  border-color: var(--color-danger);
-  background: var(--color-danger-soft);
-  color: var(--color-danger);
+  border-color: transparent;
+  background: var(--color-error-soft);
+  color: var(--color-error);
 }
 
 .planner-list {
@@ -130,7 +366,7 @@
   gap: 12px;
   align-items: center;
   padding: 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--hairline-outline);
   border-radius: var(--radius-card);
   background: var(--color-surface);
 }
@@ -143,7 +379,7 @@
 .planner-row p {
   margin: 0;
   font-size: 12px;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-row-actions {
@@ -164,21 +400,21 @@
 }
 
 .planner-group h2 small {
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   font-weight: 400;
 }
 
 .planner-empty {
-  border: 1px dashed var(--color-border);
+  border: 1px dashed var(--color-outline-variant);
   border-radius: var(--radius-card);
-  background: var(--color-paper);
+  background: var(--color-surface-low);
   padding: 28px;
   text-align: center;
 }
 
 .planner-empty p {
   margin: 0 0 16px;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-form-grid {
@@ -193,9 +429,9 @@
 
 .planner-impact {
   grid-column: 1 / -1;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-primary-soft);
   border-radius: var(--radius-card);
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   padding: 16px;
   font-size: 13px;
 }
@@ -205,7 +441,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--hairline-outline);
   border-radius: var(--radius-card);
   background: var(--color-surface);
 }
@@ -218,7 +454,7 @@
 
 .planner-checkbox-row[data-done="true"] .planner-checkbox-title {
   text-decoration: line-through;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-checkbox-title {
@@ -233,7 +469,7 @@
 }
 
 .planner-checkbox-title small {
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   font-size: 12px;
 }
 
@@ -248,8 +484,8 @@
   gap: 16px;
   align-items: start;
   padding: 16px;
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-gold);
+  border: 1px solid var(--hairline-outline);
+  border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-card);
   background: var(--color-surface);
 }
@@ -268,7 +504,7 @@
 .planner-timeline-item p {
   margin: 0;
   font-size: 12px;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-grid-cards {
@@ -278,9 +514,10 @@
 }
 
 .planner-card {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--hairline-outline);
   border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
   padding: 16px;
   display: grid;
   gap: 8px;
@@ -294,7 +531,7 @@
 .planner-card p {
   margin: 0;
   font-size: 12px;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-card strong {
@@ -303,12 +540,12 @@
 
 .planner-placeholder {
   aspect-ratio: 3 / 4;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-beige);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-container);
   display: grid;
   place-items: center;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   font-size: 12px;
   text-align: center;
   padding: 8px;
@@ -330,20 +567,22 @@
 .planner-chart-bar {
   height: 12px;
   border-radius: 999px;
-  background: var(--color-beige);
+  background: var(--color-surface-container-high);
   overflow: hidden;
 }
 
 .planner-chart-bar span {
   display: block;
   height: 100%;
-  background: var(--color-ink-soft);
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 .planner-tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--hairline-outline);
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
@@ -357,23 +596,25 @@
   font: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
   cursor: pointer;
 }
 
 .planner-tabs button[aria-selected="true"] {
-  color: var(--color-ink);
-  border-bottom-color: var(--color-ink);
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .planner-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(23, 23, 23, 0.4);
+  background: rgba(19, 27, 46, 0.4);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
   padding: 20px;
-  z-index: 50;
+  z-index: var(--layer-dialog);
 }
 
 .planner-modal {
@@ -385,6 +626,7 @@
   overflow-y: auto;
   display: grid;
   gap: 16px;
+  box-shadow: var(--shadow-float);
 }
 
 .planner-modal h2 {
@@ -403,21 +645,23 @@
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .planner-wizard-steps span {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-pill);
   font-size: 12px;
   text-align: center;
-  color: var(--color-taupe);
+  color: var(--color-on-surface-variant);
 }
 
 .planner-wizard-steps span[data-active="true"] {
-  border-color: var(--color-ink);
-  color: var(--color-ink);
+  border-color: transparent;
+  background: var(--color-primary);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -426,7 +670,7 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--hairline-outline);
   border-radius: var(--radius-card);
   background: var(--color-surface);
 }
@@ -436,10 +680,360 @@
   height: 48px;
   min-width: 48px;
   border-radius: 999px;
-  background: var(--color-beige);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
   display: grid;
   place-items: center;
   font-weight: 600;
+}
+
+/*
+ * Kompatibilitas nama lama: sub-navigasi horizontal kini memakai gaya bilah
+ * modul yang sama dengan .planner-nav agar tidak ada dua bahasa visual.
+ */
+.planner-subnav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--glass-bg);
+  scrollbar-width: thin;
+}
+
+.planner-subnav a {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+}
+
+.planner-subnav a[aria-current="page"] {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* --- Panel lebar penuh (PLN-01/02) --- */
+.planner-split {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+.planner-panel {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
+}
+
+.planner-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.planner-panel-head h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.planner-panel-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-label-attention {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  color: var(--color-error);
+}
+
+/* Hitung mundur: empat kotak angka. */
+.planner-countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.planner-countdown > div {
+  display: grid;
+  gap: 2px;
+  padding: 14px 10px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-low);
+  text-align: center;
+}
+
+.planner-countdown span {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+}
+
+.planner-countdown small {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-panel-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline-outline);
+}
+
+.planner-foot-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  flex: none;
+}
+
+.planner-panel-foot strong {
+  display: block;
+  font-size: 13px;
+}
+
+.planner-panel-foot small {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+/* Alokasi anggaran berlapis: tiga segmen kategori + sisa pagu. */
+.planner-allocation {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--color-surface-container-high);
+  overflow: hidden;
+}
+
+.planner-allocation span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+.planner-allocation span:nth-child(2) {
+  background: var(--color-secondary-container);
+}
+
+.planner-allocation span:nth-child(3) {
+  background: var(--color-tertiary-container);
+}
+
+.planner-allocation .planner-allocation-rest {
+  background: var(--color-outline-variant);
+}
+
+.planner-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--hairline-outline);
+  list-style: none;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.planner-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  flex: none;
+}
+
+.planner-legend li:nth-child(2) .planner-legend-dot {
+  background: var(--color-secondary-container);
+}
+
+.planner-legend li:nth-child(3) .planner-legend-dot {
+  background: var(--color-tertiary-container);
+}
+
+.planner-legend .planner-legend-rest .planner-legend-dot {
+  background: var(--color-outline-variant);
+}
+
+/* Blok "hari ini & perhatian". */
+.planner-attention {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+.planner-attention-tasks {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.planner-attention-tasks h3 {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-low);
+}
+
+.planner-task-row[data-late="true"] {
+  border-color: rgba(186, 26, 26, 0.2);
+  background: var(--color-error-soft);
+}
+
+.planner-task-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.planner-task-row h4 {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.planner-task-row p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-task-check {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  flex: none;
+}
+
+.planner-expense-card {
+  display: grid;
+  gap: 14px;
+  align-content: space-between;
+  padding: 20px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+}
+
+.planner-expense-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.planner-expense-card > header small {
+  color: var(--color-outline);
+}
+
+.planner-expense-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.planner-expense-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-input);
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary);
+  flex: none;
+}
+
+.planner-expense-main h3 {
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.planner-expense-main p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.planner-expense-main strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.planner-expense-card > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline-outline);
+  font-size: 12px;
+}
+
+.planner-expense-card > footer small {
+  color: var(--color-on-surface-variant);
+}
+
+.planner-expense-card > footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.planner-expense-card > footer a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 1023px) {
@@ -449,6 +1043,10 @@
   }
   .planner-chart-row {
     grid-template-columns: 100px minmax(0, 1fr) 64px;
+  }
+  .planner-split,
+  .planner-attention {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -473,42 +1071,430 @@
   .planner-chart-row strong {
     grid-column: 1 / -1;
   }
+  .planner-countdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .planner-legend {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .planner-panel {
+    padding: 16px;
+  }
+  .planner-task-row {
+    flex-wrap: wrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .planner-progress span,
-  .planner-chart-bar span {
+  .planner-chart-bar span,
+  .planner-bar span {
     transition: none;
   }
 }
 
-/* Sub-navigasi horizontal modul perencanaan (menghindari sidebar bersarang). */
-.planner-subnav {
+/* --- ADM-04: katalog template --- */
+.admin-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.admin-template-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
+  overflow: hidden;
+}
+
+/* Ganti gambar template: bidang aura dengan inisial nama, bukan foto palsu. */
+.admin-template-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #ffffff 0%, #f2efff 100%);
+  border-bottom: 1px solid var(--hairline-outline);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.admin-template-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  flex: 1;
+}
+
+.admin-template-body header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-template-body h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.admin-template-body > p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-template-meta {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 0;
+  border-block: 1px solid var(--hairline-outline);
+  font-size: 12px;
+}
+
+.admin-template-meta > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-template-meta dt {
+  color: var(--color-outline);
+}
+
+.admin-template-meta dd {
+  margin: 0;
+  text-align: right;
+}
+
+.admin-template-body footer {
   display: flex;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
-  scrollbar-width: thin;
+  flex-wrap: wrap;
+  margin-top: auto;
 }
 
-.planner-subnav a {
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
+/* --- ADM-08: status layanan --- */
+.admin-service-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-service-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-low);
+}
+
+.admin-service-list li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-service-list strong {
+  display: block;
+  font-size: 14px;
+}
+
+.admin-service-list small {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-service-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
+  flex: none;
+  background: var(--color-success);
+}
+
+.admin-service-list li[data-status="not_configured"] .admin-service-dot {
+  background: var(--color-warning);
+}
+
+.admin-service-list li[data-status="unavailable"] .admin-service-dot {
+  background: var(--color-error);
+}
+
+.admin-limits {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   font-size: 13px;
-  white-space: nowrap;
-  color: var(--color-ink-soft);
 }
 
-.planner-subnav a[aria-current="page"] {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
-  color: var(--color-paper);
+.admin-limits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--color-on-surface-variant);
 }
 
-.planner-subnav a:focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: 2px;
+.admin-limits .icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-warning);
+}
+
+/* --- PLN-17: pengumuman rilis --- */
+.announce-shell {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+  padding: 32px 20px;
+}
+
+.announce-card {
+  position: relative;
+  width: min(880px, 100%);
+  padding: 32px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+
+/* Aura lembut di dua sudut, mengikuti desain PLN-17. */
+.announce-card::before,
+.announce-card::after {
+  content: "";
+  position: absolute;
+  width: 224px;
+  height: 224px;
+  border-radius: 999px;
+  filter: blur(56px);
+  pointer-events: none;
+}
+
+.announce-card::before {
+  top: -64px;
+  left: -64px;
+  background: rgba(230, 222, 255, 0.7);
+}
+
+.announce-card::after {
+  right: -64px;
+  bottom: -64px;
+  background: rgba(226, 231, 255, 0.8);
+}
+
+.announce-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.announce-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: 999px;
+  background: var(--color-surface-low);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.announce-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+.announce-close:hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.announce-card h1 {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 10px;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.announce-lead {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 28px;
+  max-width: 66ch;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+
+.announce-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.announce-feature {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  transition: border-color var(--duration-base) var(--ease-out);
+}
+
+.announce-feature:hover {
+  border-color: var(--color-primary);
+}
+
+.announce-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-input);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.announce-feature h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.announce-feature p {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+}
+
+.announce-feature footer {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairline-outline);
+}
+
+.announce-feature footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.announce-feature footer a:hover {
+  text-decoration: underline;
+}
+
+.announce-feature footer small {
+  font-size: 11px;
+  color: var(--color-outline);
+}
+
+.announce-status {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-primary-soft);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-low);
+}
+
+.announce-status .icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-primary);
+}
+
+.announce-status strong {
+  display: block;
+  font-size: 13px;
+}
+
+.announce-status p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.announce-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline-outline);
+}
+
+.announce-actions > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.announce-actions > a:hover {
+  text-decoration: underline;
+}
+
+.announce-empty {
+  display: grid;
+  gap: 12px;
+  place-items: start;
+  padding: 48px 20px;
+  text-align: left;
+}
+
+@media (max-width: 767px) {
+  .announce-card {
+    padding: 20px;
+  }
+  .admin-template-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

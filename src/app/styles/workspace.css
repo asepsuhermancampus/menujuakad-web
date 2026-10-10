@@ -1,6 +1,6 @@
 .preview-banner {
   background: var(--color-ink);
-  color: var(--color-ink-fixed);
+  color: #ffffff;
   padding: 12px 24px;
   display: flex;
   align-items: center;
@@ -10,7 +10,7 @@
   font-size: 12px;
 }
 .preview-banner a {
-  color: var(--color-ink-fixed);
+  color: #ffffff;
 }
 /* Label ikut membungkus agar varian panjang tidak memperlebar viewport. */
 .preview-banner label {
@@ -25,11 +25,17 @@
   max-width: min(300px, 100%);
   font-size: 11px;
 }
+/*
+ * Shell workspace (customer & admin) mengikuti desain Horizon: header kaca
+ * buram dengan bilah bawah hairline, sidebar kaca yang menempel, dan navigasi
+ * berpenanda pil violet untuk halaman aktif.
+ */
 .workspace-header {
-  padding: 20px 32px;
-  background: var(--glass-surface);
+  padding: 14px 24px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--hairline-outline);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,42 +44,66 @@
   top: 0;
   z-index: var(--layer-header);
 }
+.workspace-header small {
+  color: var(--color-on-surface-variant);
+}
 .workspace-layout {
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 70vh;
 }
 .workspace-nav {
-  padding: 28px 20px;
-  border-right: 1px solid var(--color-border);
-  background: var(--glass-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 14px;
+  border-right: 1px solid var(--hairline-outline);
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
 }
 .workspace-nav a {
   display: block;
-  padding: 12px 16px;
+  padding: 10px 14px;
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
-  border-radius: var(--radius-control);
+  border-radius: 999px;
+  color: var(--color-on-surface-variant);
   transition:
     background-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out);
 }
 .workspace-nav a:hover {
   background: var(--color-surface-container);
+  color: var(--color-on-surface);
 }
 .workspace-nav a[aria-current="page"] {
-  background: rgba(95, 58, 221, 0.1);
+  background: var(--color-primary-soft);
   color: var(--color-primary);
   font-weight: 600;
 }
+/* Kelompok tautan sidebar: label kecil di atas, tautan di bawahnya. */
+.workspace-nav-group {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+.workspace-nav-label {
+  margin: 0 0 4px;
+  padding-inline: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-outline);
+}
 .workspace-main {
-  padding: 40px;
+  padding: 32px;
   min-width: 0;
 }
 .workspace-main h1 {
-  font-size: 36px;
+  font-size: clamp(26px, 2.6vw, 34px);
 }
 .workspace-main .section {
   padding-block: 24px;
@@ -98,31 +128,181 @@
 }
 .editor-layout {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr) 320px;
+  grid-template-columns: 264px minmax(0, 1fr) 320px;
   gap: 0;
 }
-.editor-nav {
-  background: var(--color-surface);
-  padding: 24px 12px;
-  border-right: 1px solid var(--color-border);
+/*
+ * Bilah status editor (EDT-01): breadcrumb, identitas template, indikator
+ * simpan otomatis, progres kelengkapan, dan aksi terbitkan. Latar kaca buram
+ * dengan hairline, sesuai desain Horizon.
+ */
+.editor-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--layer-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--hairline-outline);
 }
-.editor-nav a {
-  display: block;
-  padding: 12px;
-  font-size: 12px;
+.editor-header-lead,
+.editor-header-status,
+.editor-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.editor-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
   text-decoration: none;
+  white-space: nowrap;
+}
+/* Ikon panah desain menunjuk ke kiri pada breadcrumb kembali. */
+.editor-back .icon {
+  transform: rotate(180deg);
+}
+.editor-back:hover {
+  color: var(--color-primary);
+}
+.editor-header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-outline-variant);
+  flex: none;
+}
+.editor-header-title strong {
+  display: block;
+  font-size: 13px;
+}
+.editor-header-title small {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+.editor-save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-success);
+  white-space: nowrap;
+}
+.editor-progress {
+  width: 80px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-container-high);
+  overflow: hidden;
+  flex: none;
+}
+.editor-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+.editor-header-status small {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+.editor-nav {
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  padding: 16px 10px;
+  border-right: 1px solid var(--hairline-outline);
+  overflow-y: auto;
+}
+.editor-nav-label {
+  margin: 0 0 2px;
+  padding-inline: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.editor-nav-hint {
+  margin: 0 0 12px;
+  padding-inline: 10px;
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
 }
 .editor-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-input);
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--color-on-surface-variant);
   transition:
     background-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out);
 }
+.editor-nav-index {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-surface-container);
+  font-size: 11px;
+  font-weight: 600;
+  flex: none;
+}
+.editor-nav-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-nav a .icon {
+  color: var(--color-success);
+  opacity: 0.5;
+}
 .editor-nav a:hover {
-  background: var(--color-primary-soft);
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
 }
 .editor-nav a[aria-current="page"] {
-  background: var(--color-primary-soft);
+  background: var(--color-primary);
+  color: #ffffff;
   font-weight: 600;
+}
+.editor-nav a[aria-current="page"] .editor-nav-index {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+.editor-nav a[aria-current="page"] .icon {
+  color: #ffffff;
+  opacity: 1;
+}
+@media (max-width: 1023px) {
+  .editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .editor-nav {
+    border-right: 0;
+    border-bottom: 1px solid var(--hairline-outline);
+    max-height: 220px;
+  }
+  .editor-header-status {
+    order: 3;
+    width: 100%;
+  }
 }
 .editor-panel {
   padding: 32px;
@@ -183,7 +363,7 @@
 }
 .swatch:hover {
   transform: scale(1.08);
-  border-color: var(--color-gold);
+  border-color: var(--color-primary);
 }
 .notification-card {
   padding: 24px;
@@ -202,7 +382,7 @@
     transform var(--duration-base) var(--ease-out);
 }
 .preview-index-card:hover {
-  border-color: var(--color-gold);
+  border-color: var(--color-primary);
   box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
@@ -213,7 +393,7 @@
 }
 .gallery-placeholder {
   min-height: 180px;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,7 +410,7 @@
   min-height: 180px;
 }
 .stat-bars div {
-  background: var(--color-gold);
+  background: var(--color-primary);
   min-width: 35px;
   width: 15%;
   text-align: center;
@@ -238,7 +418,7 @@
 }
 .support-message {
   padding: 16px;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   margin-bottom: 12px;
   border-radius: var(--radius-button);
 }
@@ -366,13 +546,13 @@
   font-size: 12px;
 }
 .preview-neighbors a {
-  color: var(--color-ink-fixed);
+  color: #ffffff;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color var(--duration-base) var(--ease-out);
 }
 .preview-neighbors a:hover {
-  border-bottom-color: var(--color-gold);
+  border-bottom-color: var(--color-primary);
 }
 .preview-neighbors small {
   color: var(--color-primary-soft);
@@ -394,14 +574,28 @@
 .preview-domain {
   padding-block: 40px;
 }
+/*
+ * Kepala domain: judul di kiri, tombol ringkas/buka di kanan. Pada lebar
+ * sempit tombol dibiarkan membungkus ke baris berikutnya agar tidak melebihi
+ * viewport (terbukti overflow 3px pada 320px sebelum perbaikan ini).
+ */
 .preview-domain .section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 16px;
   margin-bottom: 8px;
 }
+.preview-domain .section-heading > * {
+  min-width: 0;
+}
 .preview-domain h2 {
   font-size: 28px;
   margin-bottom: 4px;
+  overflow-wrap: anywhere;
 }
 .preview-domain h2 small {
   display: block;
@@ -424,7 +618,7 @@
   transition: background-color var(--duration-base) var(--ease-out);
 }
 .preview-row:hover {
-  background: var(--color-paper);
+  background: var(--color-surface-low);
 }
 .preview-row-main {
   flex: 1;
@@ -439,7 +633,7 @@
   overflow-wrap: anywhere;
 }
 .preview-row-main a:hover {
-  color: var(--color-primary-deep);
+  color: var(--color-primary-hover);
 }
 .preview-row-main small {
   font-size: 11px;
@@ -460,7 +654,7 @@
     color var(--duration-base) var(--ease-out);
 }
 .preview-row-variants .badge:hover {
-  background: var(--color-gold);
+  background: var(--color-primary);
   color: var(--color-ink);
 }
 @media (max-width: 767px) {
@@ -484,7 +678,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   display: grid;
   place-items: center;
   font-size: 24px;
@@ -503,7 +697,7 @@
   transition: border-color var(--duration-base) var(--ease-out);
 }
 .wizard-steps .active {
-  border-color: var(--color-primary-deep);
+  border-color: var(--color-primary-hover);
 }
 .ticket-selector {
   padding: 20px;
@@ -520,11 +714,11 @@
     box-shadow var(--duration-base) var(--ease-out);
 }
 .ticket-selector:hover {
-  border-color: var(--color-gold);
+  border-color: var(--color-primary);
   box-shadow: var(--shadow-rest);
 }
 .ticket-selector[aria-pressed="true"] {
-  border-color: var(--color-primary-deep);
+  border-color: var(--color-primary-hover);
   background: var(--color-background);
 }
 .status-actions {

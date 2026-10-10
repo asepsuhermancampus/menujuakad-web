@@ -5,7 +5,8 @@ import { previewScreens, screenRecords, previewSourceGaps } from "../data/screen
 import type { PreviewAudience, PreviewScreen } from "../types";
 
 /*
- * Preview Studio — satu halaman untuk menavigasi 63 kode / 74 varian.
+ * Preview Studio — satu halaman untuk menavigasi seluruh kode layar sumber
+ * Stitch (snapshot 10 Oktober 2026: 86 kode / 120 varian).
  * Rancangan penggabungan: kartu per layar dihapus, diganti daftar ringkas
  * berkelompok per domain dengan pencarian, filter area, dan navigasi keyboard.
  * Route /preview-ui/{code} tetap dipertahankan agar tautan lama tidak putus.
@@ -20,7 +21,20 @@ const audiences: readonly Readonly<{ id: PreviewAudience | "all"; label: string 
   { id: "reference", label: "Referensi" },
 ];
 
-const domainOrder = ["PUB", "AUT", "CUS", "EDT", "GST", "INV", "ACC", "SUP", "ADM", "ERR", "DS"] as const;
+const domainOrder = [
+  "PUB",
+  "AUT",
+  "CUS",
+  "EDT",
+  "GST",
+  "INV",
+  "PLN",
+  "ACC",
+  "SUP",
+  "ADM",
+  "ERR",
+  "DS",
+] as const;
 const domainLabels: Readonly<Record<string, string>> = {
   PUB: "Halaman Publik",
   AUT: "Autentikasi",
@@ -28,6 +42,7 @@ const domainLabels: Readonly<Record<string, string>> = {
   EDT: "Editor Undangan",
   GST: "Manajemen Tamu",
   INV: "Undangan Tampil",
+  PLN: "Perencanaan Pernikahan",
   ACC: "Akun & Notifikasi",
   SUP: "Dukungan",
   ADM: "Superadmin",

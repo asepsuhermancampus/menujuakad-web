@@ -12,6 +12,7 @@ import {
   PlannerEmpty,
   PlannerModal,
   PlannerShell,
+  PlannerStat,
 } from "@/features/planner/components/planner-shell";
 import { formatIdrPlain } from "@/features/planner/lib/presentation";
 
@@ -95,21 +96,27 @@ export function PlannerExpensesView() {
   return (
     <PlannerShell title="Pengeluaran" code="PLN-05" subnav="/dashboard/planner/expenses">
       <div className="planner-summary">
-        <article>
-          <h2>Pengeluaran bulan ini</h2>
-          <strong>{formatIdrPlain(expensesThisMonthIdr)}</strong>
-          <small>Oktober 2026 (contoh)</small>
-        </article>
-        <article>
-          <h2>Rata-rata per hari</h2>
-          <strong>{formatIdrPlain(averagePerDay)}</strong>
-          <small>Perhitungan contoh dari 8 hari berjalan</small>
-        </article>
-        <article>
-          <h2>Jumlah transaksi</h2>
-          <strong>{expensesFixture.length}</strong>
-          <small>Seluruhnya contoh</small>
-        </article>
+        <PlannerStat
+          label="Pengeluaran bulan ini"
+          value={formatIdrPlain(expensesThisMonthIdr)}
+          note="Oktober 2026 (contoh)"
+          icon="receipt"
+          tone="primary"
+        />
+        <PlannerStat
+          label="Rata-rata per hari"
+          value={formatIdrPlain(averagePerDay)}
+          note="Perhitungan contoh dari 8 hari berjalan"
+          icon="payments"
+          tone="secondary"
+        />
+        <PlannerStat
+          label="Jumlah transaksi"
+          value={String(expensesFixture.length)}
+          note="Seluruhnya contoh"
+          icon="content"
+          tone="tertiary"
+        />
       </div>
 
       <div className="actions" style={{ marginBottom: 20 }}>

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { previewScreens, screenRecords } from "../../src/features/design-preview/data/screens";
 
-test("preview mencakup 63 kode, 74 varian, noindex dan tanpa overflow", async ({
+test("preview mencakup 86 kode, 120 varian, noindex dan tanpa overflow", async ({
   page,
 }, testInfo) => {
   test.setTimeout(180000);
@@ -114,7 +114,12 @@ test("wizard, bantuan, validasi auth dan slug asing", async ({ page }) => {
 
 test("galeri kuota dan selector token invalid mempertahankan state sumber", async ({ page }) => {
   const gallery = previewScreens.find((screen) => screen.code === "EDT-06")!;
-  const full = gallery.variants.find((variant) => variant.state.includes("Error"))!;
+  /*
+   * Cari varian non-default alih-alih mencocokkan nama state tertentu: judul
+   * sumber berbunyi "Kuota Penuh & Error Upload", sehingga penamaan state dapat
+   * bergeser tanpa mengubah maksud pengujian.
+   */
+  const full = gallery.variants.find((variant) => !variant.state.startsWith("Default"))!;
   await page.goto(`/preview-ui/edt-06?variant=${full.id}`);
   await expect(page.getByText("20 / 20 contoh", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Tambahkan ilustrasi contoh" }).click();

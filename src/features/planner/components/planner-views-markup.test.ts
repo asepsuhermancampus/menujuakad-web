@@ -32,6 +32,9 @@ import {
   AdminUpgradeRequestsView,
   AdminUserManagementView,
 } from "./admin-operational-views";
+import { AdminTemplateCatalogView } from "./admin-template-catalog-view";
+import { AdminInfrastructureView } from "./admin-infrastructure-view";
+import { PlannerAnnouncementView } from "./planner-announcement-view";
 
 /*
  * Kontrak markup modul perencanaan: setiap layar wajib memuat label data
@@ -97,6 +100,8 @@ const adminViews: readonly [string, () => React.ReactNode, string][] = [
   ["QRIS & Rekening", AdminPaymentSettingsView, "QRIS &amp; Rekening"],
   ["Audit Log", AdminAuditView, "Audit Log"],
   ["Pratinjau Landing", AdminLandingPreviewView, "Pratinjau Landing"],
+  ["Katalog Template", AdminTemplateCatalogView, "Katalog Template &amp; Kurasi Desain"],
+  ["Infrastruktur", AdminInfrastructureView, "Infrastruktur, Server Health &amp; Backup Data"],
 ];
 
 describe("markup layar admin operasional", () => {
@@ -121,5 +126,43 @@ describe("markup layar admin operasional", () => {
     const html = renderToStaticMarkup(createElement(AdminUserManagementView));
     expect(html).toContain("Aktivasi massal");
     expect(html).toContain("Hapus massal");
+  });
+
+  it("infrastruktur menolak menampilkan klaim uptime dan enkripsi rekaan", () => {
+    const html = renderToStaticMarkup(createElement(AdminInfrastructureView));
+    /* Angka dan jaminan pada gambar desain sumber tidak boleh muncul sebagai fakta. */
+    expect(html).not.toContain("99,99%");
+    expect(html).not.toContain("99.99%");
+    expect(html).not.toContain("AES-256");
+    expect(html).not.toContain("Kubernetes");
+    expect(html).not.toContain("Cloudflare");
+    /* Yang ditampilkan adalah status nyata + keterbatasan yang diakui. */
+    expect(html).toContain("/api/health");
+    expect(html).toContain("Belum pernah diuji");
+    expect(html).toContain("Restore basis data belum pernah diuji");
+  });
+
+  it("katalog template menandai angka adopsi sebagai contoh", () => {
+    const html = renderToStaticMarkup(createElement(AdminTemplateCatalogView));
+    expect(html).toContain("contoh");
+    expect(html).toContain("Terbitkan Desain Baru");
+    expect(html).not.toContain("berhasil diterbitkan");
+  });
+});
+
+describe("markup pengumuman rilis planner", () => {
+  it("menyebut modul nyata dan menolak klaim ekspor PDF serta 100% aman", () => {
+    const html = renderToStaticMarkup(createElement(PlannerAnnouncementView));
+    expect(html.match(/<h1\b/g)).toHaveLength(1);
+    expect(html).toContain("Kelola Perencanaan Pernikahan Lebih Terstruktur");
+    expect(html).toContain("Pembaruan Modul Perencanaan");
+    /* Klaim pada desain sumber yang belum benar tidak boleh ditampilkan. */
+    expect(html).not.toContain("300 DPI");
+    expect(html).not.toContain("100% Data Aman");
+    expect(html).not.toContain("Enkripsi Multi-Tingkat");
+    expect(html).not.toContain("end-to-end");
+    /* Batas nyata harus dinyatakan. */
+    expect(html).toContain("data contoh");
+    expect(html).toContain("belum aktif");
   });
 });

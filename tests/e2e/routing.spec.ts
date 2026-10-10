@@ -60,6 +60,7 @@ test("route workspace menolak akses tanpa sesi terverifikasi", async ({ page }) 
     "/dashboard/planner/wedding-kit",
     "/dashboard/planner/couple",
     "/dashboard/planner/onboarding",
+    "/dashboard/planner/announcements",
     "/admin",
     "/admin/payments",
     "/admin/webhooks",
@@ -69,6 +70,8 @@ test("route workspace menolak akses tanpa sesi terverifikasi", async ({ page }) 
     "/admin/payment-settings",
     "/admin/audit",
     "/admin/landing-preview",
+    "/admin/template-catalog",
+    "/admin/infrastructure",
   ];
   for (const path of protectedPaths) {
     await page.goto(path, { waitUntil: "domcontentloaded" });

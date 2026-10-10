@@ -10,6 +10,10 @@ import {
   adminUsersFixture,
   type AdminUserRowDto,
 } from "@/features/design-preview/data/planner-admin-fixtures";
+import {
+  AdminPageHeader,
+  AdminStatCard,
+} from "@/components/admin/admin-page-header";
 import { PlannerEmpty, PlannerModal, PlannerTabs } from "@/features/planner/components/planner-shell";
 import { auditResultLabels, upgradeStatusLabels } from "@/features/planner/lib/presentation";
 
@@ -90,17 +94,43 @@ export function AdminUserManagementView() {
 
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>Kelola Pengguna</h1>
-        </div>
-        <span className="badge">ADM-03</span>
-      </div>
+      <AdminPageHeader
+        title="Kelola Pengguna"
+        code="ADM-03"
+        breadcrumb="Manajemen Pengguna & Pasangan"
+        lead="Kelola hak akses, status langganan, kuota pernikahan aktif, dan investigasi akun pengguna pada data contoh."
+      />
       <p className="notice">
         Tabel contoh. Aktivasi, reset, dan penghapusan belum mengubah database; semua aksi destruktif
         wajib konfirmasi dan tercatat pada audit.
       </p>
+
+      <div className="admin-stat-grid">
+        <AdminStatCard
+          label="Total akun pengguna"
+          value={`${users.length} Akun`}
+          note="Data contoh"
+          hint={`${users.filter((user) => user.status === "ACTIVE").length} aktif`}
+          icon="group"
+          tone="primary"
+        />
+        <AdminStatCard
+          label="Menunggu tindakan"
+          value={`${users.filter((user) => user.status !== "ACTIVE").length} Akun`}
+          note="Perlu verifikasi"
+          hint="Konflik hak milik & status akun"
+          icon="shield"
+          tone="secondary"
+        />
+        <AdminStatCard
+          label="Hasil filter"
+          value={`${rows.length} Baris`}
+          note="Setelah pencarian & filter"
+          hint={statusFilter === "ALL" ? "Semua status" : statusFilter}
+          icon="content"
+          tone="tertiary"
+        />
+      </div>
 
       {notice && (
         <p className="notice" role="status">
@@ -266,13 +296,11 @@ export function AdminUpgradeRequestsView() {
 
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>Persetujuan Upgrade</h1>
-        </div>
-        <span className="badge">ADM-04</span>
-      </div>
+      <AdminPageHeader
+        title="Persetujuan Upgrade"
+        breadcrumb="Antrian Upgrade"
+        lead="Antrian permintaan peningkatan paket beserta bukti dan status email pada data contoh."
+      />
       <p className="notice">
         Antrian contoh. Persetujuan belum mengubah akses nyata dan email belum dikirim; status email
         ditampilkan terpisah dari keputusan.
@@ -387,13 +415,12 @@ export function AdminContentView() {
 
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>Kelola Konten</h1>
-        </div>
-        <span className="badge">ADM-05</span>
-      </div>
+      <AdminPageHeader
+        title="Kelola Konten"
+        code="ADM-05"
+        breadcrumb="Konten & Moderasi"
+        lead="Editor bagian halaman publik beserta riwayat draf dan publikasi pada data contoh."
+      />
       <p className="notice">
         Editor konten contoh. Simpan draf dan terbitkan belum mengubah halaman publik; publikasi
         nyata memerlukan backend konten.
@@ -551,13 +578,12 @@ export function AdminPaymentSettingsView() {
 
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>QRIS & Rekening</h1>
-        </div>
-        <span className="badge">ADM-06</span>
-      </div>
+      <AdminPageHeader
+        title="QRIS & Rekening"
+        code="ADM-07"
+        breadcrumb="Pengaturan Platform & Gateway"
+        lead="Pengaturan kanal pembayaran statis dan rekening penerima pada data contoh."
+      />
       <p className="notice">
         Pengaturan contoh. QRIS statis diberi label contoh dan tidak dapat dipakai untuk pembayaran;
         rekening ditampilkan tersamar.
@@ -644,17 +670,43 @@ export function AdminAuditView() {
 
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>Audit Log</h1>
-        </div>
-        <span className="badge">ADM-07</span>
-      </div>
+      <AdminPageHeader
+        title="Audit Log"
+        code="ADM-06"
+        breadcrumb="Audit Log Sistem & Keamanan"
+        lead="Riwayat aksi admin hanya-baca; tidak tersedia penghapusan entri."
+      />
       <p className="notice">
         Catatan audit hanya-baca. Tidak ada tombol hapus; entri dibuat oleh aksi admin pada
         implementasi nyata.
       </p>
+
+      <div className="admin-stat-grid">
+        <AdminStatCard
+          label="Total catatan audit"
+          value={`${adminAuditFixture.length} Entri`}
+          note="Data contoh"
+          hint="Seluruh aksi admin tercatat"
+          icon="monitor"
+          tone="primary"
+        />
+        <AdminStatCard
+          label="Berhasil"
+          value={`${adminAuditFixture.filter((row) => row.result === "SUCCESS").length} Entri`}
+          note="Hasil aksi"
+          hint="Tanpa galat pada data contoh"
+          icon="task-alt"
+          tone="tertiary"
+        />
+        <AdminStatCard
+          label="Perlu peninjauan"
+          value={`${adminAuditFixture.filter((row) => row.result !== "SUCCESS").length} Entri`}
+          note="Hasil tidak berhasil"
+          hint="Tidak ada penghapusan entri"
+          icon="error"
+          tone="danger"
+        />
+      </div>
 
       <div className="actions" style={{ marginBottom: 16 }}>
         <label>
@@ -712,13 +764,11 @@ export function AdminAuditView() {
 export function AdminLandingPreviewView() {
   return (
     <section className="planner-shell stack">
-      <div className="workspace-title">
-        <div>
-          <p className="eyebrow">SUPERADMIN · DATA CONTOH</p>
-          <h1>Pratinjau Landing</h1>
-        </div>
-        <span className="badge">ADM-08</span>
-      </div>
+      <AdminPageHeader
+        title="Pratinjau Landing"
+        breadcrumb="Pratinjau Halaman Publik"
+        lead="Pratinjau draf beranda publik dengan konten contoh; tidak diindeks."
+      />
       <p className="notice" role="status">
         DRAF — belum diterbitkan. Pratinjau memakai konten contoh; tidak diindeks.
       </p>

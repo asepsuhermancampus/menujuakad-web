@@ -35,7 +35,7 @@
   align-items: center;
 }
 .navigation > span {
-  border-bottom: 2px solid var(--color-gold);
+  border-bottom: 2px solid var(--color-primary);
   font-weight: 600;
 }
 .sectionHeading {
@@ -84,7 +84,7 @@
   font-size: 12px;
 }
 .attending {
-  border-color: var(--color-gold);
+  border-color: var(--color-primary);
 }
 .maybe {
   display: flex;
@@ -113,7 +113,7 @@
 }
 .sessionCard :global(.eyebrow) {
   font-size: 12px;
-  color: var(--color-primary-deep);
+  color: var(--color-primary-hover);
 }
 .capacity {
   display: flex;
@@ -124,7 +124,7 @@
   margin-block: 20px 12px;
 }
 .inset {
-  background: var(--color-paper);
+  background: var(--color-surface-low);
   padding: 20px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -173,7 +173,7 @@
   padding: 16px;
   border: 1px solid var(--color-border);
   border-top: 0;
-  background: var(--color-paper);
+  background: var(--color-surface-low);
 }
 .latestFooter a {
   min-height: 48px;

@@ -20,6 +20,8 @@ import { SpecialistPreviewPlaceholder } from "./specialist-preview-placeholder";
 import { DesignReference } from "./design-reference";
 import { ErrorPreview } from "./error-preview";
 import { BillingPreviewView, hasBillingPreview } from "./billing-preview-view";
+import { PlannerPreviewView, hasPlannerPreview } from "./planner-preview-view";
+import { AdminPreviewView, hasAdminPreview } from "./admin-preview-view";
 const customerViews = {
   "CUS-01": <CustomerOverview />,
   "CUS-02": <InvitationList />,
@@ -50,7 +52,17 @@ export function DesignPreviewView({ screen }: { screen: PreviewScreen }) {
       </AuthShell>
     );
   if (screen.code.startsWith("EDT-"))
-    return <EditorPreview code={screen.code} errorState={screen.state.includes("Error")} />;
+    return (
+      <EditorPreview
+        code={screen.code}
+        /*
+         * Judul varian sumber berbunyi "Editor Galeri — Kuota Penuh & Error
+         * Upload", sehingga state tersimpan sebagai "Kuota Penuh". Kedua kata
+         * kunci diperiksa agar state kritis tetap aktif bila penamaan bergeser.
+         */
+        errorState={/error|kuota/i.test(screen.state)}
+      />
+    );
   if (screen.audience === "invitation")
     return (
       <main id="main">
@@ -62,7 +74,13 @@ export function DesignPreviewView({ screen }: { screen: PreviewScreen }) {
     );
   if (screen.code === "ERR-404" || screen.code === "ERR-500")
     return <ErrorPreview code={screen.code} />;
-  if (screen.code === "DS-01") return <DesignReference />;
+  if (screen.code === "DS-01" || screen.code === "DS-02") return <DesignReference />;
+  if (hasAdminPreview(screen.code))
+    return (
+      <AdminShell code={screen.code}>
+        <AdminPreviewView code={screen.code} state={screen.state} />
+      </AdminShell>
+    );
   if (screen.audience === "admin")
     return (
       <AdminShell code={screen.code}>
@@ -72,6 +90,12 @@ export function DesignPreviewView({ screen }: { screen: PreviewScreen }) {
           <SpecialistPreviewPlaceholder screen={screen} />
         )}
       </AdminShell>
+    );
+  if (hasPlannerPreview(screen.code))
+    return (
+      <CustomerPreviewLayout screen={screen}>
+        <PlannerPreviewView code={screen.code} />
+      </CustomerPreviewLayout>
     );
   if (screen.audience === "customer")
     return (

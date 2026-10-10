@@ -37,7 +37,7 @@ test("expired state displays a banner above both columns without reopening its o
   page,
 }) => {
   const calls = trackWrites(page);
-  await page.goto("/preview-ui/cus-08?variant=741bf2dc293243f29a02bea0b8546ed6");
+  await page.goto("/preview-ui/cus-08?variant=f7fd619e534f4854ac346df684c94792");
   await expect(page.getByLabel("Sesi pembayaran kedaluwarsa")).toBeVisible();
   await expect(page.getByLabel("Sisa waktu contoh")).toHaveText("00:00");
   await page.getByRole("button", { name: "Lihat status contoh" }).click();

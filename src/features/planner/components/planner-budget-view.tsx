@@ -11,6 +11,7 @@ import {
   PlannerEmpty,
   PlannerModal,
   PlannerShell,
+  PlannerStat,
 } from "@/features/planner/components/planner-shell";
 import {
   budgetStatusLabels,
@@ -34,25 +35,38 @@ export function PlannerBudgetView() {
   });
 
   const remaining = budgetTotalIdr - budgetActualTotalIdr;
+  const usedPercent = Math.round((budgetActualTotalIdr / budgetTotalIdr) * 100);
+  const overBudgetCount = budgetCategoriesFixture.filter(
+    (category) => budgetStatus(category) === "OVER_BUDGET",
+  ).length;
 
   return (
     <PlannerShell title="Anggaran" code="PLN-04" subnav="/dashboard/planner/budget">
       <div className="planner-summary">
-        <article>
-          <h2>Total anggaran</h2>
-          <strong>{formatIdrPlain(budgetTotalIdr)}</strong>
-          <small>{budgetCategoriesFixture.length} kategori contoh</small>
-        </article>
-        <article>
-          <h2>Terpakai</h2>
-          <strong>{formatIdrPlain(budgetActualTotalIdr)}</strong>
-          <small>{formatPercent(budgetActualTotalIdr, budgetTotalIdr)} dari anggaran</small>
-        </article>
-        <article>
-          <h2>Sisa anggaran</h2>
-          <strong>{formatIdrPlain(remaining)}</strong>
-          <small>1 kategori lewat batas (contoh)</small>
-        </article>
+        <PlannerStat
+          label="Total anggaran"
+          value={formatIdrPlain(budgetTotalIdr)}
+          note={`${budgetCategoriesFixture.length} kategori contoh`}
+          icon="wallet"
+          tone="primary"
+          progressPercent={usedPercent}
+        />
+        <PlannerStat
+          label="Terpakai"
+          value={formatIdrPlain(budgetActualTotalIdr)}
+          note={`${formatPercent(budgetActualTotalIdr, budgetTotalIdr)} dari anggaran`}
+          icon="receipt"
+          tone="secondary"
+          progressPercent={usedPercent}
+        />
+        <PlannerStat
+          label="Sisa anggaran"
+          value={formatIdrPlain(remaining)}
+          note={`${overBudgetCount} kategori lewat batas (contoh)`}
+          icon="task-alt"
+          tone="tertiary"
+          progressPercent={100 - usedPercent}
+        />
       </div>
 
       <div className="actions" style={{ marginBottom: 20 }}>

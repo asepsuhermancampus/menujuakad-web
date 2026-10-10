@@ -1,13 +1,20 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Brand } from "./brand";
+
+/*
+ * Kerangka halaman publik sesuai desain PUB-01…13 "Horizon Modern Style":
+ * latar aura mesh, header kaca melayang (pill), catatan data contoh, dan footer
+ * tiga kolom. Header tidak memakai kelas `.container` karena `.site-header`
+ * sudah mengatur lebar dan margin sendiri sebagai bilah pill.
+ */
 export function PublicShell({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className="public-canvas">
       <a className="skip-link" href="#main">
         Langsung ke konten
       </a>
-      <header className="site-header container">
+      <header className="site-header">
         <Brand />
         <nav aria-label="Navigasi utama">
           <Link href="/templates">Katalog Desain</Link>
@@ -17,7 +24,9 @@ export function PublicShell({ children }: { children: ReactNode }) {
           <Link href="/faq">FAQ</Link>
         </nav>
         <div className="actions">
-          <Link href="/login">Masuk akun uji</Link>
+          <Link className="header-link" href="/login">
+            Masuk akun uji
+          </Link>
           <Link className="button" href="/register">
             Simulasi Pendaftaran
           </Link>
@@ -42,6 +51,6 @@ export function PublicShell({ children }: { children: ReactNode }) {
         </nav>
         <small>© 2026 Menuju Akad · Sebuah awal yang indah.</small>
       </footer>
-    </>
+    </div>
   );
 }

@@ -15,29 +15,35 @@ import {
 
 describe("kontrak preview sintetis", () => {
   it("screen_codes_are_unique_and_views_whitelisted", () => {
-    expect(previewScreens).toHaveLength(63);
-    expect(new Set(previewScreens.map((screen) => screen.code)).size).toBe(63);
-    expect(screenRecords).toHaveLength(74);
-    expect(new Set(screenRecords.map((screen) => screen.id)).size).toBe(74);
-    expect(previewScreens.flatMap((screen) => screen.variants)).toHaveLength(74);
+    // Snapshot Stitch 10 Oktober 2026: 86 kode / 120 varian sumber.
+    expect(previewScreens).toHaveLength(86);
+    expect(new Set(previewScreens.map((screen) => screen.code)).size).toBe(86);
+    expect(screenRecords).toHaveLength(120);
+    expect(new Set(screenRecords.map((screen) => screen.id)).size).toBe(120);
+    expect(previewScreens.flatMap((screen) => screen.variants)).toHaveLength(120);
     expect(getPreviewScreen("pub-01")?.logicalRoute).toBe("/");
     expect(getPreviewScreen("PUB-05")?.logicalRoute).toBe("/pricing");
     expect(getPreviewScreen("ADM-01")?.audience).toBe("admin");
     for (const [code, id, height] of [
-      ["CUS-05", "741ba152a6c54dc487f5e282c58ff753", 2048],
-      ["CUS-06", "d5aadc0f2aa546a2ae5d854d59e147c5", 4540],
+      ["CUS-05", "61139739fb3c4c33b03bfdfbecd99c52", 2048],
+      ["CUS-06", "bcb43b8dd3f94746ace5cbab77003ee7", 4392],
     ] as const) {
       expect(getPreviewScreen(code)).toMatchObject({
         id,
         audience: "customer",
         sourceStatus: "screenshot",
-        visualInspected: true,
         width: 2560,
         height,
       });
     }
     expect(getPreviewScreen("DS-01")?.audience).toBe("reference");
-    expect(getPreviewScreen("INV-01")?.state).toBe("Default (data contoh Sarah & Dimas)");
+    expect(getPreviewScreen("DS-02")?.audience).toBe("reference");
+    // Kode modul perencanaan dan admin operasional kini tersedia di Stitch.
+    for (const code of ["PLN-01", "PLN-02", "PLN-17", "ADM-03", "ADM-08"]) {
+      expect(getPreviewScreen(code)?.audience).toBe(
+        code.startsWith("PLN") ? "customer" : "admin",
+      );
+    }
     for (const code of [
       "__proto__",
       "constructor",
@@ -56,28 +62,22 @@ describe("kontrak preview sintetis", () => {
     expect(
       screenRecords
         .filter((record) => record.sourceStatus === "metadata-only")
-        .map((record) => record.code)
-        .sort(),
-    ).toEqual(["CUS-01", "CUS-02"]);
-    expect(screenRecords.filter((record) => record.sourceStatus === "screenshot")).toHaveLength(72);
+        .map((record) => record.code),
+    ).toEqual([]);
+    expect(screenRecords.filter((record) => record.sourceStatus === "screenshot")).toHaveLength(120);
     expect(getPreviewScreen("CUS-01")?.sourceStatus).toBe("screenshot");
-    expect(getPreviewScreen("CUS-02")?.sourceStatus).toBe("metadata-only");
-    expect(getPreviewScreen("CUS-08")?.state).toBe("Default");
-    expect(getPreviewScreen("CUS-08")?.variants.map((variant) => variant.state)).toEqual([
-      "Expired",
-      "Default",
-    ]);
+    expect(getPreviewScreen("CUS-02")?.sourceStatus).toBe("screenshot");
+    expect(getPreviewScreen("CUS-08")?.variants.map((variant) => variant.state)).toContain(
+      "Sesi Expired",
+    );
     expect(getPreviewScreen("EDT-06")?.variants.map((variant) => variant.state)).toContain(
-      "Error & Kuota",
+      "Kuota Penuh",
     );
-    expect(getPreviewScreen("PUB-01")?.variants.map((variant) => variant.device)).toEqual([
-      "DESKTOP",
-      "MOBILE",
-      "TABLET",
-    ]);
-    expect(getPreviewVariant("3f8be25ae0eb4ba9b5190d593d7a967a")?.sourceStatus).toBe(
-      "metadata-only",
-    );
+    // Urutan varian mengikuti urutan sumber Stitch; perbandingan memakai
+    // himpunan agar tidak bergantung pada urutan balikan API.
+    expect(
+      new Set(getPreviewScreen("PUB-01")?.variants.map((variant) => variant.device)),
+    ).toEqual(new Set(["DESKTOP", "MOBILE"]));
     expect(getPreviewVariant("../../secrets")).toBeUndefined();
   });
 

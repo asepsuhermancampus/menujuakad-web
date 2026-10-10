@@ -1,22 +1,107 @@
+/*
+ * Kanvas autentikasi (AUT-01…06): latar aura tiga lingkaran lembut dengan
+ * grid titik halus, sesuai desain Horizon. Semua elemen dekoratif diberi
+ * `pointer-events: none` agar tidak menahan klik.
+ */
+.auth-canvas {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+.auth-aura {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-image: radial-gradient(rgba(95, 58, 221, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.auth-aura span {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+}
+.auth-aura-top {
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 850px;
+  height: 550px;
+  background: rgba(230, 222, 255, 0.6);
+}
+.auth-aura-left {
+  top: 10%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: rgba(212, 227, 255, 0.35);
+}
+.auth-aura-right {
+  top: 20%;
+  right: -10%;
+  width: 550px;
+  height: 550px;
+  background: rgba(255, 219, 208, 0.4);
+}
+.auth-canvas > header,
+.auth-canvas > main,
+.auth-canvas > footer {
+  position: relative;
+  z-index: 1;
+}
 .auth-header,
 .auth-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-block: 28px;
+  width: min(var(--container-max), calc(100% - 80px));
+  margin-inline: auto;
+  padding-block: 24px;
+}
+.auth-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.auth-header-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out);
+}
+.auth-header-nav a:hover {
+  color: var(--color-primary);
 }
 .auth-header a,
 .auth-footer a {
-  font-size: 12px;
+  font-size: 13px;
 }
 .auth-footer {
-  border-top: 1px solid var(--color-border);
-  font-size: 11px;
+  border-top: 1px solid var(--hairline-outline);
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  margin-top: auto;
 }
 .auth-footer nav {
   display: flex;
   gap: 20px;
+}
+@media (max-width: 767px) {
+  .auth-header,
+  .auth-footer {
+    width: calc(100% - 40px);
+  }
+  .auth-header-nav span {
+    display: none;
+  }
 }
 .wizard-layout {
   display: grid;
@@ -54,7 +139,7 @@
     color var(--duration-base) var(--ease-out);
 }
 .account-settings-nav button:hover {
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
 }
 .account-settings-nav button[aria-pressed="true"] {
   background: var(--color-primary-soft);
@@ -121,7 +206,7 @@
   place-items: center;
   margin: 0 auto;
   font-size: 38px;
-  color: var(--color-primary-deep);
+  color: var(--color-primary-hover);
 }
 .auth-instructions {
   padding-left: 20px;

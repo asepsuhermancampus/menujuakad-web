@@ -1,6 +1,48 @@
 # Inventaris dan Handoff Visual Stitch Menuju Akad
 
-## Snapshot terbaru — 13 layar baru selesai (10 Oktober 2026, pembaruan kedua)
+## Snapshot terbaru — desain lengkap, registry disinkronkan (10 Oktober 2026, pembaruan ketiga)
+
+`list_screens` dibaca ulang dan **seluruh 113 HTML desain diunduh** ke `/home/ubuntu/stitch-horizon/html/` untuk dianalisis langsung (bukan dari metadata). Proyek `MENUJU-AKAD-UIUX` kini memuat **115 entri / 76 kode desain**, dengan **120 varian** setelah layar gabungan (`PLN-01/02`, `PUB-10/11`, `ERR-404/500`) dipetakan ke masing-masing kodenya.
+
+**Perubahan status penting:** modul perencanaan (**PLN-01…17**) dan admin operasional (**ADM-03…08**) ternyata **sudah digambar semua** pada snapshot ini. Catatan "belum digambar" pada bagian historis di bawah sudah tidak berlaku.
+
+| Kelompok                   | Jumlah kode | Keterangan                                                                    |
+| -------------------------- | ----------- | ----------------------------------------------------------------------------- |
+| Publik (PUB)               | 13          | PUB-04/09/12/13 hanya ada di registry aplikasi (tidak ada di snapshot Stitch) |
+| Auth (AUT)                 | 6           | —                                                                             |
+| Customer (CUS)             | 8           | CUS-08 punya varian Sesi Expired                                              |
+| Editor (EDT)               | 20          | EDT-06 punya varian Kuota Penuh                                               |
+| Tamu/RSVP (GST)            | 6           | GST-01 punya varian Empty State                                               |
+| Undangan (INV)             | 2           | INV-01 3 varian, INV-02 5 varian                                              |
+| Akun & dukungan (ACC/SUP)  | 3           | —                                                                             |
+| Perencanaan (PLN)          | 16          | + varian mobile; **baru masuk registry**                                      |
+| Admin (ADM)                | 8           | + varian mobile; **ADM-03…08 baru masuk registry**                            |
+| Error & referensi (ERR/DS) | 4           | DS-02 (spesifikasi hand-off) baru masuk registry                              |
+
+**Verifikasi tema:** seluruh 113 HTML memuat palet `#FAF8FF`/`#5F3ADD`/`#131B2E` dan font **Plus Jakarta Sans**; blok `tailwind.config` di setiap layar memuat kunci warna identik sehingga nilai token dapat diambil langsung dari sumber, bukan ditebak.
+
+**Yang sudah di-slicing pada increment ini:**
+
+- **PLN-01/02** (Shell & Ringkasan Perencanaan) — tata letak penuh: kartu metrik, hitung mundur, alokasi anggaran, blok perhatian.
+- **PLN-03…16** — seluruh modul memakai kerangka Horizon baru (bilah modul berikon, kepala halaman, kartu `PlannerStat`).
+- **ADM-03/05/06/07** — kepala halaman Horizon + kartu metrik (ADM-03, ADM-06).
+- **PUB-01** — hero terpusat, kartu pratinjau, keunggulan fungsional, showcase.
+- **CUS-01** — kartu sambutan dengan daftar langkah kesiapan, tiga kartu status berikon/berbilah progres, undangan aktif.
+- **GST-01** — kepala halaman baru (judul + lencana jumlah tamu) dan kartu ringkasan gaya Horizon; struktur 4 kartu dipertahankan karena dikunci E2E.
+- **INV-01** — cover undangan: kanvas aura berbingkai, kartu sampul kaca, blok "Kepada Yth." dengan lencana alokasi, tombol Buka Undangan. Dua klaim sumber diganti sadar ("Terenkripsi" → "Pratinjau · data contoh"; "Musik Latar: Clair de Lune" → audio belum disertakan).
+- Infrastruktur pendukung: `horizon.css` (utility aura/kaca), `icon.tsx` (35 ikon lokal), `admin-page-header.tsx`, `admin.css`.
+
+**Sengaja menyimpang dari desain sumber (bukan placeholder lagi):**
+
+- **ADM-08** Infrastruktur, Server Health & Backup Data — desain sumber memuat klaim yang tidak dapat dibuktikan (uptime 99,99%, Kubernetes, mTLS, Cloudflare Enterprise, AES-256-GCM, snapshot 14,8 GB). Layar ini hanya menampilkan hasil health check nyata dari `/api/health` dan keterbatasan yang diakui.
+- **PLN-17** Pengumuman Rilis & Fitur Baru Planner — klaim "ekspor PDF 300 DPI", "enkripsi multi-tingkat", dan "100% data aman" diganti pernyataan status penyimpanan yang jujur.
+- Tes `planner-views-markup.test.ts` **menolak** kemunculan frasa klaim tersebut pada markup, sehingga tidak dapat masuk kembali tanpa sengaja.
+
+**Sudah punya komponen:** ADM-04 Katalog Template (`/admin/template-catalog`), ADM-08 Infrastruktur (`/admin/infrastructure`), PLN-17 Pengumuman (`/dashboard/planner/announcements`) — ketiganya juga dipetakan di Preview Studio.
+
+**Batas jujur:** slicing ini bersumber dari HTML desain yang diunduh, **bukan** perbandingan piksel per layar terhadap PNG. Fidelity visual per layar belum diverifikasi dan tidak diklaim. Layar ACC/SUP dan modul editor lanjutan masih memakai shell bersama yang sudah di-restyle ke Horizon; komposisi detail per layarnya belum dirombak satu per satu.
+
+## Snapshot — 13 layar baru selesai (10 Oktober 2026, pembaruan kedua)
 
 `list_screens` dibaca ulang: proyek `MENUJU-AKAD-UIUX` kini memuat **69 layar** (dari 56). **13 layar baru** selesai, semuanya terverifikasi memakai tema Luminous Aura Minimal + Plus Jakarta Sans (HTML diunduh dan diperiksa langsung, nol sisa Ivory & Gold):
 

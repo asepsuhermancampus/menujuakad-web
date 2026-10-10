@@ -3,6 +3,13 @@ import { expect, test } from "@playwright/test";
 const routes = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
 
 test("auth reflow, reduced motion dan bukti visual 320/390/768/1440", async ({ page }) => {
+  /*
+   * Tes ini memuat 20 halaman (4 viewport × 5 rute) dan mengambil 20 screenshot
+   * fullPage. Pada proyek mobile itu melebihi batas bawaan 30 detik — kegagalan
+   * sebelumnya adalah timeout saat screenshot, bukan kegagalan assertion.
+   * Anggaran waktu dinaikkan agar seluruh kombinasi terverifikasi.
+   */
+  test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });

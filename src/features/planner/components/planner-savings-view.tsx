@@ -12,6 +12,7 @@ import {
   PlannerEmpty,
   PlannerModal,
   PlannerShell,
+  PlannerStat,
 } from "@/features/planner/components/planner-shell";
 import {
   formatIdrPlain,
@@ -101,21 +102,29 @@ export function PlannerSavingsView() {
   return (
     <PlannerShell title="Tabungan" code="PLN-03" subnav="/dashboard/planner/savings">
       <div className="planner-summary">
-        <article>
-          <h2>Total saldo semua rekening</h2>
-          <strong>{formatIdrPlain(savingsTotalBalanceIdr)}</strong>
-          <small>{savingsAccountsFixture.length} rekening contoh</small>
-        </article>
-        <article>
-          <h2>Target dana</h2>
-          <strong>{formatIdrPlain(savingsTargetFixture.targetIdr)}</strong>
-          <small>Sisa {formatIdrPlain(remaining)} hingga 18 Oktober 2026</small>
-        </article>
-        <article>
-          <h2>Progres</h2>
-          <strong>{formatPercent(savingsTotalBalanceIdr, savingsTargetFixture.targetIdr)}</strong>
-          <small>Estimasi menabung Rp4.575.000 per bulan (estimasi contoh)</small>
-        </article>
+        <PlannerStat
+          label="Total saldo semua rekening"
+          value={formatIdrPlain(savingsTotalBalanceIdr)}
+          note={`${savingsAccountsFixture.length} rekening contoh`}
+          icon="savings"
+          tone="primary"
+          progressPercent={progress}
+        />
+        <PlannerStat
+          label="Target dana"
+          value={formatIdrPlain(savingsTargetFixture.targetIdr)}
+          note={`Sisa ${formatIdrPlain(remaining)} hingga 18 Oktober 2026`}
+          icon="wallet"
+          tone="secondary"
+        />
+        <PlannerStat
+          label="Progres"
+          value={formatPercent(savingsTotalBalanceIdr, savingsTargetFixture.targetIdr)}
+          note="Estimasi menabung Rp4.575.000 per bulan (estimasi contoh)"
+          icon="task-alt"
+          tone="tertiary"
+          progressPercent={progress}
+        />
       </div>
 
       <div className="planner-progress" aria-hidden="true" style={{ marginBottom: 24 }}>

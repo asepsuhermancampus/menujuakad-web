@@ -13,6 +13,7 @@ import { edtSources } from "./sources/edt";
 import { errSources } from "./sources/err";
 import { gstSources } from "./sources/gst";
 import { invSources } from "./sources/inv";
+import { plnSources } from "./sources/pln";
 import { pubSources } from "./sources/pub";
 import { supSources } from "./sources/sup";
 
@@ -49,7 +50,7 @@ function toRecords(
   );
 }
 
-/** Semua 66 varian sumber, termasuk dua desktop yang hanya punya metadata. */
+/** Seluruh varian sumber Stitch (snapshot 10 Oktober 2026, tema Horizon). */
 export const screenRecords: readonly PreviewScreenVariant[] = Object.freeze([
   ...toRecords(accSources, "customer"),
   ...toRecords(admSources, "admin"),
@@ -60,6 +61,7 @@ export const screenRecords: readonly PreviewScreenVariant[] = Object.freeze([
   ...toRecords(errSources, "public"),
   ...toRecords(gstSources, "customer"),
   ...toRecords(invSources, "invitation"),
+  ...toRecords(plnSources, "customer"),
   ...toRecords(pubSources, "public"),
   ...toRecords(supSources, "customer"),
 ]);

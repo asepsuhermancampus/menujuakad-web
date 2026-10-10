@@ -1,0 +1,153 @@
+/*
+ * Utility Horizon — lapisan efek Luminous Aura Minimal.
+ *
+ * Setiap kelas di sini adalah port langsung dari blok <style> layar Stitch
+ * "Horizon Modern Style" (proyek MENUJU-AKAD-UIUX, snapshot 10 Oktober 2026).
+ * Nilai warna/shadow/blur disalin apa adanya ke token di tokens.css, lalu
+ * dipakai di sini — jadi komponen React memakai efek yang sama dengan desain,
+ * bukan versi yang mendekati.
+ *
+ * Nama kelas sengaja sama dengan sumber (`.aura-bg`, `.frosted-glass`,
+ * `.aura-glow`, `.glass-card`, …) agar pencarian silang ke HTML desain mudah.
+ *
+ * Kelas di sini bersifat presentasional murni: tidak ada logika, tidak ada
+ * data, dan tidak mengubah struktur. Aman dipakai lintas area (publik,
+ * customer, admin).
+ */
+
+/* --- Latar aura --- */
+/* Aura mesh tiga lapis: violet (kiri atas), peach (kanan atas), lavender (tengah). */
+.aura-bg {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(124, 92, 252, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 88% 28%, rgba(253, 136, 99, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(120, 87, 248, 0.05) 0%, transparent 55%);
+  background-repeat: no-repeat;
+}
+/* Aura radial tunggal dari tengah atas — dipakai hero dan header halaman. */
+.aura-backdrop {
+  background: radial-gradient(
+    circle at 50% 18%,
+    rgba(120, 87, 248, 0.08) 0%,
+    rgba(218, 226, 253, 0.25) 45%,
+    rgba(250, 248, 255, 0) 75%
+  );
+}
+.aura-glow {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(202, 190, 255, 0.35) 0%,
+    rgba(254, 219, 208, 0.2) 45%,
+    rgba(250, 248, 255, 0) 75%
+  );
+}
+.aura-glow-primary {
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(120, 87, 248, 0.14) 0%,
+    rgba(250, 248, 255, 0) 70%
+  );
+}
+.aura-glow-peach {
+  background: radial-gradient(circle, rgba(253, 136, 99, 0.1) 0%, rgba(253, 136, 99, 0) 70%);
+}
+/* Bulatan aura dekoratif; selalu pointer-events: none supaya tidak menahan klik. */
+.aura-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  pointer-events: none;
+}
+
+/* --- Kaca buram --- */
+.frosted-glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow);
+}
+.frosted-badge {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--aura-card-shadow);
+}
+.glass-panel {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline-outline);
+}
+
+/* --- Kartu dan bayangan aura --- */
+.aura-card {
+  background: var(--color-surface);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--aura-card-shadow);
+}
+.aura-card-border {
+  border: 1px solid rgba(124, 92, 252, 0.12);
+  box-shadow: var(--aura-card-shadow);
+}
+/* Kartu terpilih: ring violet tipis + dua lapis glow. */
+.aura-ring {
+  box-shadow: var(--aura-ring-shadow);
+}
+.aura-glow-shadow {
+  box-shadow: var(--aura-glow-shadow);
+}
+/* Kartu interaktif: naik halus dengan easing sumber (0.16, 1, 0.3, 1). */
+.glass-card-interactive {
+  background: #ffffff;
+  border: 1px solid var(--hairline);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--aura-card-shadow);
+  border-color: rgba(124, 92, 252, 0.22);
+}
+
+/* --- Label dan angka --- */
+/* Label mikro: 11–12px, tracking lebar, uppercase — pola "eyebrow" sumber. */
+.aura-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Kontainer gulir tanpa scrollbar terlihat --- */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Grid kartu ringkasan: 1 kolom mobile, 2 tablet, 3–4 desktop.
+ * Dipakai kartu statistik di dashboard, planner, dan admin.
+ */
+.aura-stat-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card-interactive:hover {
+    transform: none;
+  }
+}

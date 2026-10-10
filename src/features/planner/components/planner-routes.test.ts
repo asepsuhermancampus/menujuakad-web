@@ -27,7 +27,11 @@ it("navigasi customer memuat pintu masuk Perencanaan", () => {
 
 it("navigasi admin memuat menu operasional baru", () => {
   const html = renderToStaticMarkup(
-    createElement(AdminWorkspaceShell, { identity } as Parameters<typeof AdminWorkspaceShell>[0], null),
+    createElement(
+      AdminWorkspaceShell,
+      { identity } as Parameters<typeof AdminWorkspaceShell>[0],
+      null,
+    ),
   );
   for (const href of [
     "/admin/user-management",
@@ -42,7 +46,9 @@ it("navigasi admin memuat menu operasional baru", () => {
 });
 
 it("sub-navigasi planner hanya menautkan rute resmi", () => {
-  const html = renderToStaticMarkup(createElement(PlannerSubNav, { current: "/dashboard/planner" }));
+  const html = renderToStaticMarkup(
+    createElement(PlannerSubNav, { current: "/dashboard/planner" }),
+  );
   expect(html).toContain('href="/dashboard/planner/savings"');
   expect(html).toContain('href="/dashboard/planner/wedding-kit"');
   expect(html).not.toContain("/preview-ui/");
@@ -64,6 +70,7 @@ it("resolver planner mengenali seluruh modul dan menolak path asing", () => {
       "wedding-kit",
       "couple",
       "onboarding",
+      "announcements",
     ]),
   );
   expect(resolvePlannerRoute(["guests"])).toBeNull();

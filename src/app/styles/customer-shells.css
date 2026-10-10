@@ -32,11 +32,11 @@
     border-color var(--duration-base) var(--ease-out);
 }
 .domain-tabs a:hover {
-  color: var(--color-primary-deep);
-  border-bottom: 2px solid var(--color-gold);
+  color: var(--color-primary-hover);
+  border-bottom: 2px solid var(--color-primary);
 }
 .domain-tabs a[aria-current="page"] {
-  border-bottom: 2px solid var(--color-primary-deep);
+  border-bottom: 2px solid var(--color-primary-hover);
   font-weight: 600;
 }
 .customer-settings-main h1,
@@ -55,7 +55,7 @@
   height: 90px;
   width: 75px;
   border-radius: 50px 50px 0 0;
-  background: var(--color-accent-soft);
+  background: var(--color-surface-low);
   display: grid;
   place-items: center;
   margin: 12px auto;
@@ -118,6 +118,182 @@
     white-space: nowrap;
   }
 }
+/*
+ * Dashboard customer (CUS-01): kartu sambutan dengan aura, tiga kartu status
+ * berikon, dan penyesuaian tata letak dashboard pada layar sempit.
+ */
+.welcome-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 28px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
+  overflow: hidden;
+}
+/* Aura lembut di sudut kanan atas, mengikuti desain CUS-01. */
+.welcome-card::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 320px;
+  height: 260px;
+  border-radius: 999px;
+  background: rgba(230, 222, 255, 0.5);
+  filter: blur(70px);
+  pointer-events: none;
+}
+.welcome-body {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  max-width: 62ch;
+}
+.welcome-body h1 {
+  margin: 6px 0 8px;
+}
+.welcome-lead {
+  margin: 0 0 16px;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+.welcome-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+.welcome-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-on-surface-variant);
+}
+.welcome-steps li[data-done="true"] {
+  color: var(--color-success);
+}
+.welcome-steps li[data-done="false"] {
+  color: var(--color-warning);
+}
+.welcome-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 260px;
+}
+.dashboard-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.dashboard-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border: 1px solid var(--hairline-outline);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--aura-card-shadow);
+  transition: border-color var(--duration-base) var(--ease-out);
+}
+.dashboard-status-card:hover {
+  border-color: rgba(124, 92, 252, 0.3);
+}
+.dashboard-status-card header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline-outline);
+  font-size: 13px;
+  font-weight: 500;
+}
+.dashboard-status-card header > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.dashboard-status-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  flex: none;
+}
+.dashboard-status-card[data-tone="secondary"] .dashboard-status-icon {
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary);
+}
+.dashboard-status-card[data-tone="tertiary"] .dashboard-status-icon {
+  background: var(--color-tertiary-soft);
+  color: var(--color-tertiary);
+}
+.dashboard-status-card strong {
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+}
+.dashboard-status-card p {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+.dashboard-status-card .planner-bar {
+  margin-top: auto;
+}
+.dashboard-status-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairline-outline);
+  font-size: 12px;
+}
+.dashboard-status-foot small {
+  color: var(--color-outline);
+}
+.dashboard-status-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.dashboard-status-foot a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 1023px) {
+  .dashboard-status-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .welcome-actions {
+    width: 100%;
+    min-width: 0;
+  }
+}
+@media (max-width: 767px) {
+  .welcome-card {
+    padding: 20px;
+  }
+}
+
 @media (max-width: 767px) {
   .dashboard-layout .workspace-nav {
     display: none;
@@ -144,7 +320,7 @@
     transition: color var(--duration-base) var(--ease-out);
   }
   .customer-bottom-nav a[aria-current="page"] {
-    color: var(--color-primary-deep);
+    color: var(--color-primary-hover);
     font-weight: 700;
   }
   .domain-breadcrumb {

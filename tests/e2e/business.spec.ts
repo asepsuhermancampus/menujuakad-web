@@ -91,7 +91,7 @@ test("tamu kosong dan kartu mobile menjaga label, kursi dan tombol pagination", 
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.goto("/preview-ui/gst-01?variant=f51fb5404c334e16b7e0e3763ae4b56c");
+  await page.goto("/preview-ui/gst-01?variant=b0e90f9cdfef471093bb75009f1521ad");
   const summary = page.getByRole("region", { name: "Ringkasan tamu contoh" });
   await expect(summary.getByRole("article")).toHaveCount(4);
   await expect(summary).toContainText("0 / 0");

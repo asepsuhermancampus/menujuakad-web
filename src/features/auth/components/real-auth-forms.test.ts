@@ -14,7 +14,11 @@ import { PasswordSettings } from "@/features/account/components/password-setting
 import { AuthForm } from "./auth-form";
 import type { SecurityDto } from "@/features/account/types/account-contracts";
 vi.mock("server-only", () => ({}));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
+  // Shell workspace kini memakai usePathname untuk menandai halaman aktif.
+  usePathname: () => "/dashboard",
+}));
 const render = (component: ReturnType<typeof createElement>) => renderToStaticMarkup(component);
 describe("formulir nyata dan aksesibilitas", () => {
   it("akun baru tidak dianggap sudah terverifikasi atau sudah menerima email", () => {

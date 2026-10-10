@@ -13,6 +13,8 @@ import {
   AdminUpgradeRequestsView,
   AdminUserManagementView,
 } from "@/features/planner/components/admin-operational-views";
+import { AdminTemplateCatalogView } from "@/features/planner/components/admin-template-catalog-view";
+import { AdminInfrastructureView } from "@/features/planner/components/admin-infrastructure-view";
 import { BillingPreviewView } from "@/features/design-preview/components/billing-preview-view";
 import type { PreviewScreen } from "@/features/design-preview/types";
 export const dynamic = "force-dynamic";
@@ -88,6 +90,8 @@ export default async function Page({
     if (path[0] === "user-management") return <AdminUserManagementView />;
     if (path[0] === "upgrades") return <AdminUpgradeRequestsView />;
     if (path[0] === "content") return <AdminContentView />;
+    if (path[0] === "template-catalog") return <AdminTemplateCatalogView />;
+    if (path[0] === "infrastructure") return <AdminInfrastructureView />;
     if (path[0] === "payment-settings") return <AdminPaymentSettingsView />;
     if (path[0] === "audit") return <AdminAuditView />;
     if (path[0] === "landing-preview") return <AdminLandingPreviewView />;

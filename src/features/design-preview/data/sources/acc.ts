@@ -1,29 +1,30 @@
 import type { SourceScreenTuple } from "../../types";
 
-// Snapshot metadata Stitch 2026-10-07; bukan URL/aset runtime.
+/* Snapshot metadata Stitch 2026-10-10 (tema Horizon Modern Style).
+ * Hanya metadata build-time: tanpa URL aset, path lokal, atau data provider. */
 export const accSources = [
   [
-    "fac73b6ed2f346b6a52cb1234a27f5cf",
+    "fada0faeb7644253abf32fd6736e4cd3",
     "ACC-01",
-    "ACC-01 — Akun & Keamanan — Default",
-    "/dashboard/profile",
+    "ACC-01 — Akun & Keamanan — Horizon",
+    "/account",
     "Default",
     "DESKTOP",
     "screenshot",
     2560,
-    5878,
-    true,
+    3666,
+    false,
   ],
   [
-    "c1f6fe8a7010482fa053e30ba9cd9ea4",
+    "4a44244391c640d88deb0a9104dcdc56",
     "ACC-02",
-    "ACC-02 — Notifikasi — Default",
+    "ACC-02 — Notifikasi — Horizon",
     "/dashboard/notifications",
     "Default",
     "DESKTOP",
     "screenshot",
     2560,
-    3736,
+    2590,
     false,
   ],
 ] as const satisfies readonly SourceScreenTuple[];

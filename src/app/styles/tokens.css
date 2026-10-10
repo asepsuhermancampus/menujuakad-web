@@ -188,4 +188,27 @@
   --tracking-display: -0.03em;
   --tracking-heading: -0.02em;
   --tracking-label: 0.02em;
+
+  /*
+   * --- Utility Horizon (Luminous Aura Minimal) ---
+   * Nilai diambil langsung dari blok <style> 113 layar Stitch bertema
+   * "Horizon Modern Style" (snapshot 10 Oktober 2026) supaya komponen React
+   * memakai efek yang sama, bukan mendekati. Semua nama kelas utility-nya
+   * (`.aura-bg`, `.frosted-glass`, `.aura-glow`, …) dipertahankan sama
+   * dengan sumber agar mudah ditelusuri.
+   */
+  --aura-lavender-soft: rgba(120, 87, 248, 0.12);
+  --aura-sky-soft: rgba(218, 226, 253, 0.25);
+  --aura-peach-soft: rgba(253, 136, 99, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-bg-soft: rgba(255, 255, 255, 0.82);
+  --glass-border-strong: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 16px 40px -8px rgba(19, 27, 46, 0.08);
+  --aura-card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 12px 32px -4px rgba(124, 92, 252, 0.05);
+  --aura-glow-shadow: 0 12px 32px -4px rgba(95, 58, 221, 0.15);
+  --aura-ring-shadow:
+    0 0 0 1px rgba(120, 87, 248, 0.35), 0 16px 48px -8px rgba(95, 58, 221, 0.18),
+    0 32px 64px -16px rgba(124, 92, 252, 0.12);
+  --hairline: rgba(19, 27, 46, 0.06);
+  --hairline-outline: rgba(201, 196, 216, 0.45);
 }

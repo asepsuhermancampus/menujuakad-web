@@ -1,5 +1,6 @@
 @import "./styles/tokens.css";
 @import "./styles/base.css";
+@import "./styles/horizon.css";
 @import "./styles/primitives.css";
 @import "./styles/marketing.css";
 @import "./styles/workspace.css";
@@ -8,6 +9,7 @@
 @import "./styles/account.css";
 @import "./styles/customer-shells.css";
 @import "./styles/editor-controls.css";
+@import "./styles/admin.css";
 @import "../features/billing/styles.css";
 @import "../features/guests/styles.css";
 @import "../features/planner/styles.css";
