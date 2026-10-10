@@ -89,5 +89,6 @@ hanya karena UI tampil.
 
 Prompt Stitch gelombang 2 untuk seluruh modul baru: lihat
 `../menujuakad-rancangan/docs/13-uiux-prompt-stitch-gelombang2.txt`. Prompt memakai RULESET
-Ivory & Gold aktif (Noto Serif + Manrope, token `docs/design-system.md`) tanpa menambah warna,
+aktif **Luminous Aura Minimal** (Plus Jakarta Sans tunggal, palet violet `#5F3ADD` + lavender
+`#FAF8FF`, token `../menujuakad-rancangan/docs/design-system.md`) tanpa menambah warna,
 font, atau dekorasi baru.
