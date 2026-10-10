@@ -15,6 +15,7 @@ const multimethodMigrations = [
   "20261009001000_auth_multimethod",
   "20261009002000_auth_sms_policy",
   "20261010000000_role_client_superadmin",
+  "20261011000000_planner_domain",
 ];
 
 async function main() {
