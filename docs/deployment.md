@@ -1,5 +1,54 @@
 # Deployment VPS Menuju Akad
 
+## Rilis `preview-20261011-slicing`: deploy build main & tutup drift Neon — 11 Oktober 2026
+
+**Status fase 8: `preview-20261011-slicing` aktif di produksi.** Produksi https://menujuakad.com memakai BUILD_ID **`akkq33nEqd8ENqvZ9-wvv`**, image `menujuakad-web:preview-20261011-slicing` (`sha256:72e1434b9f7f7772a88730a3515d62319732b1dbd417cb48ea03206eba680cf2`), container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Rilis `preview-20261010-roles` menjadi image rollback terdekat.
+
+### Mengapa rilis ini diperlukan
+
+Produksi sebelumnya menjalankan build yang **lebih tua dari `main`**: image `preview-20261010-roles` (BUILD_ID `epeqWqDd6FN43imUrFlKy`) belum memuat `482cc9b` (logo SVG, registry 86 kode, slicing PLN/ADM/CUS/GST/INV). Buktinya `/brand/logo-menujuakad.svg`, `/icon.svg`, dan `/fonts/pjs-800.ttf` mengembalikan **404**, dan font yang disajikan masih Manrope/Noto Serif alih-alih Plus Jakarta Sans. Selain itu `prisma migrate diff` menemukan **21 tabel + 15 enum** di `schema.prisma` yang belum pernah dimigrasikan ke Neon (seluruh domain perencanaan PLN + admin operasional), meskipun `migrate status` melaporkan *up to date* — status hanya memeriksa tabel `_prisma_migrations`, bukan kesetaraan schema.
+
+### Migrasi dan backup
+
+- Backup pra-migrasi `/tmp/menujuakad-drift-20261011/`: `schema-before.sql` (844 baris) dan `data-before.sql` (180 baris) via `pg_dump` image `postgres:18-bookworm` (server PostgreSQL 18.6).
+- Migrasi `20261011000000_planner_domain` **dibuat dari keluaran `prisma migrate diff`**, 511 baris, **nol `DROP`/`TRUNCATE`/`DELETE`** — murni aditif (15 enum, 21 tabel, 24 indeks, 24 foreign key).
+- **Diuji lebih dulu pada PostgreSQL terisolasi** yang dimuati `schema-before.sql` + `data-before.sql`: hasil 16→37 tabel, 8→23 enum, dan `User` tetap utuh. Kontainer uji dihapus sesudahnya.
+- `prisma migrate deploy` ke Neon sukses; `migrate status` = **Database schema is up to date!** (8 migrasi) dan `migrate diff --from-config-datasource --to-schema` = **No difference detected** (nol drift). Neon kini 37 tabel / 23 enum, `User` tetap 2.
+- **Grant runtime tidak berubah dan sengaja tidak diperluas.** `scripts/database/verify-auth-runtime-grants.ts` lulus seluruhnya (INSERT `CLIENT`/`ACTIVE` OK, trigger menolak `SUPERADMIN`, escalation role/DDL/`DELETE` `User` ditolak). Tabel planner baru **tanpa** hak untuk `menujuakad_runtime_preproduction` karena belum ada kode server yang mengaksesnya — grant diberikan bersama kode persistence-nya, bukan lebih awal.
+
+### Rilis, kandidat, dan switch
+
+- Gate pada source final: `db:validate`, `typecheck`, `lint` exit 0; unit **671/671 (76 file)**; `build` exit 0 (**51 halaman**) dengan `NEXT_PUBLIC_APP_URL=https://menujuakad.com`. CI GitHub Actions run `38088049088` (sha `56800da`) **hijau pada kedua job** (quality + E2E Playwright).
+- Artifact dari build tervalidasi via [package-standalone.sh](../deploy/scripts/package-standalone.sh); BUILD_ID `akkq33nEqd8ENqvZ9-wvv` cocok pada `.next`, standalone, artifact, kandidat, dan container produksi.
+- Kandidat terisolasi `menujuakad-candidate` di `127.0.0.1:3101`: healthy, `/app/.env` **tidak ada**, dan seluruh aset baru mengembalikan 200 — diuji **sebelum** menyentuh produksi. Port 3101 kembali kosong setelah `compose down`.
+- Switch produksi sukses; pointer `/srv/menujuakad/deploy/release.env` diperbarui atomik (root `0600`) memuat `MENUJUAKAD_IMAGE=menujuakad-web:preview-20261011-slicing`. Hash tiga berkas konfigurasi (Caddyfile + dua Compose) **identik** sebelum dan sesudah switch, sehingga tidak ada perubahan infrastruktur.
+- Rollback manual bila diperlukan:
+```bash
+sudo -n env MENUJUAKAD_IMAGE=menujuakad-web:preview-20261010-roles docker compose \
+  --env-file /srv/menujuakad/backups/before-preview-20261011-slicing/release.env \
+  --project-name menujuakad \
+  -f /srv/menujuakad/deploy/compose.yaml \
+  -f /srv/menujuakad/deploy/compose.neon.yaml \
+  up -d --wait --wait-timeout 90 web
+```
+  Catatan: rollback image **tidak** membalikkan migrasi aditif; tabel/enum baru hanya berisi data yang ditulis aplikasi.
+
+### Bukti produksi sesudah switch
+
+- `/brand/logo-menujuakad.svg`, `/icon.svg`, `/fonts/pjs-800.ttf` → **200** (sebelumnya 404). Readiness `/api/health` `database ok`.
+- Halaman publik 200 (`/`, `/login`, `/register`, `/templates`, `/pricing`, `/how-it-works`, `/faq`, `/contact`, `/privacy`, `/terms`, `/about`, `/blog`, `/robots.txt`, `/sitemap.xml`); rute tidak ada → 404.
+- Alias 307 (`/dashboard/settings` → `/account`, `/dashboard/settings/security` → `/account/security`, `/dashboard/account` → `/account`) benar; `/vendor` **404** (rute dihapus bersama role `VENDOR`); apex & www **308**; `breadwinner.my.id` 302 dan harikita 200 tetap hidup.
+- **Pengujian dua role di HTTPS produksi dengan akun nyata di Neon:** CLIENT login 200 → `/dashboard` (H1 "Dashboard"), `/dashboard/planner/announcements` (H1 "Kelola Perencanaan Pernikahan Lebih Terstruktur"), `/account`, `/account/security`; SUPERADMIN login 200 → `/admin` (H1 "Workspace Superadmin"), `/admin/template-catalog` (H1 "Katalog Template & Kurasi Desain"), `/admin/infrastructure` (H1 "Infrastruktur, Server Health & Backup Data"). Guard terbukti: CLIENT menuju `/admin` **tidak** menerima konten admin.
+- Kredensial akun uji hanya ada di file privat `0600` di luar repository dan tidak pernah masuk dokumen, log, atau transkrip.
+
+### Batas yang masih terbuka
+
+- Provider Google/Resend/Twilio belum dikonfigurasi; verifikasi email, OTP SMS, dan OAuth belum dapat diuji end-to-end. `capabilities` melaporkan `false` secara jujur.
+- Slicing berbasis HTML desain, **bukan** perbandingan piksel per layar; fidelity seluruh layar belum diklaim.
+- Tabel planner baru sudah ada di database tetapi **belum dipakai** kode server mana pun (UI-nya masih fixture berlabel contoh); grant runtime dan persistence-nya menyusul bersama implementasinya.
+- Mayar/persistence bisnis dan restore database teruji tetap terbuka.
+- Akun uji `client@menujuakad.test` dan `superadmin@menujuakad.test` **sengaja dibiarkan aktif** untuk pengujian user; hapus dengan `scripts/database/cleanup-test-accounts.ts` bila sudah tidak diperlukan.
+
 ## Penyederhanaan role: dua role saja — 10 Oktober 2026
 
 **Status fase 7: `preview-20261010-roles` aktif di produksi.** `UserRole` kini hanya **`CLIENT` dan `SUPERADMIN`**; `CUSTOMER` digabung ke `CLIENT` dan `VENDOR` dihapus beserta halaman `/vendor`. Produksi https://menujuakad.com memakai BUILD_ID **`epeqWqDd6FN43imUrFlKy`**, image `menujuakad-web:preview-20261010-roles` (`sha256:c1c6ce90e108e3a07636073543b4feacd3d762abe3055bd0edc0f60350bceff7`), artifact SHA256 `a05698d6a2d81eb9f0c86147cfa40a7e9524e3a618098e6807ccdcf623d383dd`, container `menujuakad-web-1` healthy.
