@@ -10,6 +10,52 @@ import {
   whatsappHref,
 } from "../lib/guest-domain-labels";
 
+/*
+ * Tombol salin tautan + WhatsApp untuk satu tamu. Tautan diambil dari token
+ * personal tamu; WhatsApp hanya membuka aplikasi pengguna, aplikasi ini tidak
+ * pernah mengirim pesan otomatis.
+ *
+ * Origin dibaca saat interaksi (bukan saat render) supaya aman pada SSR.
+ */
+function ShareActions({ guest }: { guest: GuestDto }) {
+  const [copied, setCopied] = useState(false);
+  const token = guest.personalToken;
+  if (!token) return null;
+  const url = () => `${window.location.origin}/u/${token}`;
+  return (
+    <>
+      <Button
+        className="secondary"
+        onClick={() => {
+          void navigator.clipboard
+            .writeText(url())
+            .then(() => {
+              setCopied(true);
+              window.setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(() => setCopied(false));
+        }}
+      >
+        {copied ? "Tersalin ✓" : "Salin tautan"}
+      </Button>
+      {guest.phone && (
+        <Button
+          className="secondary"
+          onClick={() => {
+            const wa = whatsappHref(
+              guest.phone,
+              `Assalamualaikum ${guest.name}, ini tautan konfirmasi kehadiran Anda: ${url()}`,
+            );
+            if (wa) window.open(wa, "_blank", "noopener,noreferrer");
+          }}
+        >
+          WhatsApp
+        </Button>
+      )}
+    </>
+  );
+}
+
 /* Form pencatatan respons RSVP per tamu (PUT .../guests/[guestId]/rsvp). */
 function RsvpForm({ invitationId, guest }: { invitationId: string; guest: GuestDto }) {
   const mutation = useWorkspaceMutation();
@@ -166,10 +212,6 @@ export function GuestManagementView({
             </thead>
             <tbody>
               {filtered.map((guest) => {
-                const wa = whatsappHref(
-                  guest.phone,
-                  `Assalamualaikum ${guest.name}, kami mengundang Anda ke pernikahan kami.`,
-                );
                 return (
                   <tr key={guest.id}>
                     <td>{guest.name}</td>
@@ -179,11 +221,7 @@ export function GuestManagementView({
                     <td>
                       <div className="actions">
                         <RsvpForm invitationId={invitationId} guest={guest} />
-                        {wa && (
-                          <a className="button secondary" href={wa} target="_blank" rel="noreferrer">
-                            WhatsApp
-                          </a>
-                        )}
+                        <ShareActions guest={guest} />
                       </div>
                     </td>
                   </tr>

@@ -1,5 +1,16 @@
 # Changelog Implementasi Menuju Akad
 
+## RSVP publik lewat tautan personal tamu (`/u/[token]`) — 13 Oktober 2026
+
+- **Increment:** tamu kini dapat mengonfirmasi kehadiran sendiri tanpa login lewat tautan personal `/u/[token]`; pemilik undangan membagikan tautan dari tab Tamu (tombol Salin tautan + WhatsApp berisi tautan personal). Tidak ada schema/migrasi baru — memakai tabel `Guest`, `GuestInvitation.personalToken`, dan `RsvpResponse` yang sudah ada.
+- **Jalur publik (tanpa sesi):** identitas tamu HANYA dari token 43 karakter base64url yang cocok persis (regex `^[A-Za-z0-9_-]{43}$`); body tidak bisa menimpanya (skema `.strict()`, mass-assignment ditolak 400). Hanya undangan `isPublished` yang dilayani; tamu `ARCHIVED` dan token tak dikenal → 404 netral tanpa membocorkan keberadaan token.
+- **Kontrak data publik minimal:** halaman publik hanya menerima nama tamu, judul undangan, tanggal, alokasi kursi, dan respons milik tamu itu sendiri — catatan privat pemilik dan kontak tamu tidak pernah ikut. Jumlah hadir dibatasi alokasi kursi (400 bila melebihi); status non-ATTENDING menyimpan `guestCount: 0`.
+- **API `PUT /api/public/rsvp/[token]`:** gate origin terpercaya, body ≤4 KiB, batas laju per token (10/15 menit) + per IP (300/15 menit) memakai tabel throttle auth yang ada (token di-HMAC, bukan disimpan mentah), respons selalu `no-store`, error internal → 503 tanpa detail.
+- **Bukti dibuka:** membuka tautan mengisi `openedAt` (pertama kali) dan `lastOpenedAt`; `sentAt` tetap berarti "sudah dikirim" dan tidak diubah jalur publik. DTO pemilik kini memuat `personalToken` + `lastOpenedAt` agar tautan dapat dibagikan ulang dari tab Tamu.
+- **Routing/SEO:** prefix `/u` ditambahkan ke `RESERVED_SLUGS`; format token divalidasi di proxy (`/^[A-Za-z0-9_-]{43}$/`) sehingga tautan berformat salah mendapat **404 asli sebelum streaming** (bukan soft-404 shell 200); halaman selalu `noindex` dan tidak masuk sitemap. Token berformat benar tetapi DB bermasalah menampilkan "Layanan Konfirmasi Belum Tersedia", bukan 404, agar tautan tamu tidak dikira rusak.
+- **Gate lokal:** `db:validate` + `typecheck` + `lint` exit 0, **unit 718/718 (82 file) lulus** (+28 tes: service publik, HTTP publik, proxy token, integrasi PGlite RSVP publik), build exit 0 (`wfesC65Q0Un7sRNp2nELk`), E2E penuh termasuk `tests/e2e/public-rsvp.spec.ts` (10 tes).
+- **Batas jujur:** tetap belum diterapkan ke Neon (migrasi `guests_rsvp` + grant masih menunggu keputusan); E2E berjalan tanpa `DATABASE_URL` sehingga hanya menguji kontrak fail-closed — alur penuh baru teruji di PGlite. Ucapan/hadiah/analitik masih fixture; pengiriman tautan otomatis (email/WA API) belum ada — tautan dibagikan manual oleh pemilik.
+
 ## Backend Tamu & RSVP tersimpan di database + gerbang migrasi Neon — 13 Oktober 2026
 
 - **Increment:** domain tamu & RSVP naik dari fixture contoh menjadi data nyata di database: tab `/dashboard/invitations/[id]/guests` memakai daftar/ringkasan dari DB, form tambah satu tamu, dan impor massal; RSVP dicatat pemilik undangan lewat upsert satu respons per tamu.

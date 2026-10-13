@@ -33,3 +33,25 @@ describe("batas HTTP rute preview dan slug contoh", () => {
     ).toBe("1");
   });
 });
+
+describe("batas format token personal RSVP /u/[token]", () => {
+  it.each([
+    "/u/token-pendek",
+    "/u/terlalu-panjang-sekali-dan-tidak-43-karakter",
+    `/u/${"a".repeat(42)}`,
+    `/u/${"a".repeat(44)}`,
+    "/u/token dengan spasi",
+    /* Traversal ter-encode: tetap satu segmen setelah parsing URL, ditolak regex. */
+    "/u/%2e%2e%2fpasswd",
+    "/u/abc/def",
+  ])("menolak %s dengan 404 sebelum streaming", (path) => {
+    expect(proxy(new NextRequest(`https://menujuakad.com${path}`)).status).toBe(404);
+  });
+  it("meneruskan token 43 karakter base64url", () => {
+    expect(
+      proxy(new NextRequest(`https://menujuakad.com/u/${"a".repeat(43)}`)).headers.get(
+        "x-middleware-next",
+      ),
+    ).toBe("1");
+  });
+});

@@ -21,6 +21,8 @@ export const RESERVED_SLUGS = [
   "contact",
   "api",
   "invitation",
+  /* Prefix tautan personal RSVP tamu: /u/[token]. */
+  "u",
   "_next",
   "images",
   "icons",

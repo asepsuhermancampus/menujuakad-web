@@ -7,6 +7,8 @@
 | `GET /`                | Beranda pengantar sementara dalam route group `(public)`.                                                      |
 | `GET /api/health/live` | Liveness aplikasi, 200 tanpa bergantung database.                                                              |
 | `GET /api/health`      | Kesiapan aplikasi + probe database; 200 jika berhasil, 503 jika konfigurasi belum tersedia atau koneksi gagal. |
+| `GET /u/[token]`       | RSVP publik lewat tautan personal tamu (43 karakter base64url). Hanya undangan `isPublished` yang dilayani; token tidak valid menghasilkan 404 netral; selalu noindex dan di luar sitemap. |
+| `PUT /api/public/rsvp/[token]` | Mencatat respons tamu (status, jumlah hadir, kontak, ucapan) dari token; gate origin, batas laju per token/IP, body ≤4 KiB; identitas tamu hanya dari token. |
 | Rute lain              | Boundary 404; belum ada dashboard/auth/undangan publik yang aktif.                                             |
 
 Respons kesehatan tidak dicache dan tidak menampilkan URL koneksi atau detail exception. Liveness bukan bukti database siap.
@@ -18,7 +20,7 @@ Respons kesehatan tidak dicache dan tidak menampilkan URL koneksi atau detail ex
 - Customer: `/dashboard`, `/dashboard/invitations`, `/dashboard/invitations/new`, `/dashboard/invitations/[invitationId]`, lalu `editor`, `preview`, `guests`, `rsvp`, `wishes`, `gifts`, `analytics`, dan `settings`.
 - Billing: `/dashboard/billing/packages`, `checkout/[orderId]`, `payment/[paymentId]`, `transactions`, `transactions/[transactionId]`, `invoices/[invoiceId]`, `renew/[invitationId]`.
 - Akun dan dukungan: `/dashboard/notifications`, `/dashboard/profile`, `/dashboard/settings`, `/dashboard/support`, `/dashboard/support/[ticketId]`.
-- Undangan: `/invitation/[slug]`, dengan resolver URL publik `/{slug}` setelah domain undangan tersedia.
+- Undangan: `/invitation/[slug]`, dengan resolver URL publik `/{slug}` setelah domain undangan tersedia. Tautan personal RSVP tamu memakai prefix `/u/[token]` yang kini reserved (tidak bisa dipakai sebagai slug undangan).
 - Admin: `/admin`, `customers`, `customers/[id]`, `invitations`, `invitations/[id]`, `templates`, `templates/[id]`, `packages`, `orders`, `transactions`, `transactions/[id]`, `payments`, `payments/[id]`, `qris`, `webhooks`, `coupons`, `content`, `blog`, `analytics`, `support`, `moderation`, `audit-logs`, `system`, `system/health`, `system/features`, `settings`.
 - Webhook: `POST /api/webhooks/mayar`.
 

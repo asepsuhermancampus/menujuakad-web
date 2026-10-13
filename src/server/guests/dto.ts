@@ -4,6 +4,9 @@ import type { Prisma } from "@/generated/prisma/client";
 /*
  * DTO tamu: bentuk yang dikirim ke UI. `rsvp` dinormalisasi menjadi objek
  * ringkas (status + jumlah hadir) agar UI tidak perlu tahu bentuk baris DB.
+ * `personalToken` ikut karena hanya pemilik undangan yang menerima DTO ini
+ * (rute customer ber-guard) dan pemilik memang harus dapat membagikan ulang
+ * tautan RSVP personal tamunya. Jalur publik tidak memakai DTO ini.
  */
 export const guestSelect = {
   id: true,
@@ -17,7 +20,9 @@ export const guestSelect = {
   createdAt: true,
   updatedAt: true,
   rsvpResponse: { select: { status: true, guestCount: true, respondedAt: true } },
-  guestInvitation: { select: { personalToken: true, sentAt: true, openedAt: true } },
+  guestInvitation: {
+    select: { personalToken: true, sentAt: true, openedAt: true, lastOpenedAt: true },
+  },
 } satisfies Prisma.GuestSelect;
 
 type GuestRecord = Prisma.GuestGetPayload<{ select: typeof guestSelect }>;
@@ -41,10 +46,17 @@ export function guestDto(row: GuestRecord) {
           respondedAt: row.rsvpResponse.respondedAt?.toISOString() ?? null,
         }
       : null,
-    /* Token personal tidak dikirim ke klien; hanya status pengiriman. */
+    /*
+     * Tautan RSVP personal dibutuhkan pemilik untuk dibagikan ulang. Hanya
+     * rute customer ber-guard yang menerima DTO ini; jalur publik memakai
+     * payload minimal sendiri.
+     */
+    personalToken: row.guestInvitation?.personalToken ?? null,
+    /* Status pengiriman/pembukaan tautan oleh tamu. */
     delivery: {
       sent: Boolean(row.guestInvitation?.sentAt),
       opened: Boolean(row.guestInvitation?.openedAt),
+      lastOpenedAt: row.guestInvitation?.lastOpenedAt?.toISOString() ?? null,
     },
   };
 }
