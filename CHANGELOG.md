@@ -1,5 +1,16 @@
 # Changelog Implementasi Menuju Akad
 
+## Backend Tamu & RSVP tersimpan di database + gerbang migrasi Neon — 13 Oktober 2026
+
+- **Increment:** domain tamu & RSVP naik dari fixture contoh menjadi data nyata di database: tab `/dashboard/invitations/[id]/guests` memakai daftar/ringkasan dari DB, form tambah satu tamu, dan impor massal; RSVP dicatat pemilik undangan lewat upsert satu respons per tamu.
+- **Skema:** tiga model baru `Guest`, `GuestInvitation`, `RsvpResponse` + enum `GuestCategory` (FAMILY/FRIEND/WORK/VIP/VENDOR/OTHER), `GuestStatus` (ACTIVE/ARCHIVED), `RsvpStatus` (ATTENDING/NOT_ATTENDING/MAYBE/PENDING). `guestCountAllowed` = alokasi kursi dari pemilik, terpisah dari `RsvpResponse.guestCount` yang dicatat saat RSVP. Token personal tamu acak 32 byte base64url (bukan ID berurutan) agar URL personal tidak dapat ditebak.
+- **Server:** `src/server/guests` (input zod, service, repository, dto) — setiap operasi dimulai dari sesi CLIENT terverifikasi dan kepemilikan undangan diperiksa lagi di repository (`invitation.ownerUserId` + role/status ACTIVE); impor massal satu transaksi dengan dedupe nama (dilaporkan `created`/`skipped`); arsip lunak mempertahankan riwayat RSVP; respons RSVP melebihi alokasi kursi ditolak 400.
+- **API:** `GET/POST/PUT /api/customer/invitations/[id]/guests`, `PATCH/DELETE .../guests/[guestId]`, `PUT .../guests/[guestId]/rsvp` — mutasi lewat gate origin terpercaya, body JSON dibatasi 256 KiB, `Cache-Control: private, no-store`.
+- **UI:** `GuestManagementView` (daftar + ringkasan), `GuestCreateForm`, `GuestImportForm` + `guest-domain-labels`; tab Tamu di detail undangan kini data nyata, tab RSVP/ucapan/hadiah tetap fixture berlabel contoh.
+- **Migrasi & grant:** `prisma/migrations/20261011010000_guests_rsvp` (105 baris, tanpa DROP/TRUNCATE/DELETE; replay PGlite membuktikan 36 → 39 tabel). Grant runtime `auth-runtime-grants.sql` menambah SELECT/INSERT/UPDATE/DELETE untuk ketiga tabel tamu; kontraknya dikunci di `tests/database/auth-runtime-grants.test.ts`. Konstanta tabel `auth-preproduction-inspect.ts` diselaraskan 15 → 39 dan kontrak migrasi tes 8 → 9 mengikuti migrasi baru.
+- **Gate lokal pada source final:** `db:validate` + `typecheck` + `lint` exit 0, **unit 690/690 (79 file) lulus**, `build` exit 0 (BUILD_ID `F1SzyM-kPPeu7AiOi6K0I`, tiga route API tamu terdaftar), **E2E 140/140 PASS satu run** (desktop + mobile, termasuk `business.spec`, `responsive-guests.spec`, `routing.spec`).
+- **Batas jujur:** migrasi `20261011010000_guests_rsvp` **belum diterapkan ke Neon** (`prisma migrate status`: not yet applied); grant tamu juga belum diterapkan ke role runtime di Neon. E2E berjalan tanpa `DATABASE_URL` (mode fixture) — alur tamu berbasis DB baru teruji di level unit/integrasi PGlite, belum verifikasi end-to-end terhadap Neon. Tab RSVP/ucapan/hadiah/analitik masih fixture; RSVP publik oleh tamu (tanpa sesi pemilik) belum dibuka.
+
 ## Rilis produksi `preview-20261011-slicing`: deploy build main + tutup drift Neon — 11 Oktober 2026
 
 - **Instruksi user:** pastikan semua sudah di-slicing untuk refactor seluruh halaman, sudah di-push ke repo terbaru, sudah di-build CI, memakai migrasi ke Neon untuk testing kedua role (client & superadmin), dapat diakses dari https://menujuakad.com secara update, serta tidak ada branch tertinggal yang belum menyatu ke `main`.

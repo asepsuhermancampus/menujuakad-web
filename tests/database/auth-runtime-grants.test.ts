@@ -39,6 +39,11 @@ describe("grant runtime auth/CRUD minimal", () => {
         for (const permission of ["SELECT", "INSERT", "UPDATE", "DELETE"])
           expect(await privilege(table, permission)).toBe(true);
       }
+      /* Domain tamu & RSVP membutuhkan CRUD penuh; kepemilikan dijaga di server. */
+      for (const table of ['"Guest"', '"GuestInvitation"', '"RsvpResponse"']) {
+        for (const permission of ["SELECT", "INSERT", "UPDATE", "DELETE"])
+          expect(await privilege(table, permission)).toBe(true);
+      }
       expect(await privilege('"UserSession"', "INSERT")).toBe(true);
       expect(await privilege('"UserSession"', "DELETE")).toBe(true);
       expect(await privilege('"UserSession"', "UPDATE")).toBe(false);

@@ -54,4 +54,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
   TO menujuakad_runtime_preproduction;
 -- QRIS TEST request/review; tidak membutuhkan DELETE atau akses model komersial.
 GRANT SELECT, INSERT, UPDATE ON TABLE public."PaymentTestRequest" TO menujuakad_runtime_preproduction;
+-- Domain tamu & RSVP: CRUD penuh dibutuhkan (tambah/ubah, arsip lunak, upsert
+-- respons, hapus saat undangan dihapus cascade). Kepemilikan undangan tetap
+-- diverifikasi di setiap operasi server sebelum menyentuh tabel ini.
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
+  public."Guest", public."GuestInvitation", public."RsvpResponse"
+  TO menujuakad_runtime_preproduction;
 COMMIT;

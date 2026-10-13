@@ -8,7 +8,7 @@ export function useWorkspaceMutation() {
   const [failed, setFailed] = useState(false);
   async function mutate(
     path: string,
-    method: "POST" | "PATCH" | "DELETE",
+    method: "POST" | "PATCH" | "PUT" | "DELETE",
     data: unknown,
     redirectTo?: string,
   ) {

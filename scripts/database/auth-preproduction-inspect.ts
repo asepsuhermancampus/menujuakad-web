@@ -16,6 +16,7 @@ const multimethodMigrations = [
   "20261009002000_auth_sms_policy",
   "20261010000000_role_client_superadmin",
   "20261011000000_planner_domain",
+  "20261011010000_guests_rsvp",
 ];
 
 async function main() {
@@ -38,7 +39,7 @@ async function main() {
     const tables = await db.$queryRaw<{ name: string }[]>`
       SELECT tablename::text AS name FROM pg_tables WHERE schemaname='public' AND tablename<>'_prisma_migrations' ORDER BY tablename
     `;
-    if (tables.length !== (before ? 9 : multimethod ? 15 : 13))
+    if (tables.length !== (before ? 9 : multimethod ? 39 : 13))
       throw new Error("Table count salah");
     const records = await db.$queryRaw<
       {

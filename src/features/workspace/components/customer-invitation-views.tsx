@@ -11,7 +11,10 @@ import { InvitationEditorForm } from "./invitation-editor-form";
 import { InvitationSettingsForm } from "./invitation-settings-form";
 import { PrivateInvitationPreview } from "./private-invitation-preview";
 import { PendingFeature, PreviewOnlyFeature } from "./data-boundary";
-import { GuestManagementPreview } from "@/features/guests/components/guest-management-preview";
+import { GuestManagementView } from "@/features/guests/components/guest-management-view";
+import { GuestCreateForm } from "@/features/guests/components/guest-create-form";
+import { GuestImportForm } from "@/features/guests/components/guest-import-form";
+import { listGuests } from "@/server/guests/service";
 import { RsvpPreview } from "@/features/guests/components/rsvp-preview";
 import { WishesPreview } from "@/features/wishes/components/wishes-preview";
 import { GiftsPreview } from "@/features/gifts/components/gifts-preview";
@@ -70,16 +73,32 @@ const sections = [
 const pending: Record<string, [string, string]> = {
   analytics: ["Analitik", "gst-06"],
 };
-/*
- * Tab domain undangan yang UI-nya sudah di-slicing dipasang langsung pada route
- * resmi undangan. Data tetap fixture contoh; backend tamu/RSVP belum aktif.
- */
+/* Tab yang masih memakai fixture contoh; tamu sudah tersimpan di database. */
 const domainViews: Record<string, { title: string; code: string; render: () => ReactNode }> = {
-  guests: { title: "Daftar Tamu", code: "gst-01", render: () => <GuestManagementPreview /> },
   rsvp: { title: "Konfirmasi RSVP", code: "gst-03", render: () => <RsvpPreview /> },
   wishes: { title: "Buku Ucapan", code: "gst-04", render: () => <WishesPreview /> },
   gifts: { title: "Hadiah", code: "gst-05", render: () => <GiftsPreview /> },
 };
+/*
+ * Tab Tamu memakai data NYATA dari database (bukan fixture): daftar, ringkasan,
+ * dan form tambah. Guard sesi & kepemilikan undangan diverifikasi di service.
+ */
+async function GuestsTab({ id, title }: { id: string; title: string }) {
+  const { guests, summary } = await listGuests(id);
+  return (
+    <div className="stack">
+      <GuestManagementView
+        invitationId={id}
+        guests={guests}
+        summary={summary}
+        invitationTitle={title}
+      />
+      <GuestCreateForm invitationId={id} />
+      <GuestImportForm invitationId={id} />
+    </div>
+  );
+}
+
 export async function InvitationDetailView({ id, tab }: { id: string; tab: string }) {
   const invitation = await getCustomerInvitation(id);
   const base = `/dashboard/invitations/${invitation.id}`;
@@ -108,6 +127,8 @@ export async function InvitationDetailView({ id, tab }: { id: string; tab: strin
         </>
       ) : tab === "preview" ? (
         <PrivateInvitationPreview invitation={invitation} />
+      ) : tab === "guests" ? (
+        <GuestsTab id={invitation.id} title={invitation.title} />
       ) : domainViews[tab] ? (
         <PreviewOnlyFeature
           title={domainViews[tab].title}

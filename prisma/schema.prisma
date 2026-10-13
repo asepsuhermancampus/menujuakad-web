@@ -70,6 +70,27 @@ enum InvitationSectionType {
   CLOSING
 }
 
+enum GuestCategory {
+  FAMILY
+  FRIEND
+  WORK
+  VIP
+  VENDOR
+  OTHER
+}
+
+enum GuestStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum RsvpStatus {
+  ATTENDING
+  NOT_ATTENDING
+  MAYBE
+  PENDING
+}
+
 model User {
   id              String     @id @default(cuid())
   email           String?    @unique
@@ -172,10 +193,80 @@ model Invitation {
   members             InvitationMember[]
   coupleProfile       CoupleProfile?
   sections            InvitationSection[]
+  guests              Guest[]
+  guestInvitations    GuestInvitation[]
+  rsvpResponses       RsvpResponse[]
   paymentTestRequests PaymentTestRequest[]
 
   @@index([ownerUserId, createdAt])
   @@index([status, expiresAt])
+}
+
+/*
+ * Tamu per undangan. `guestCountAllowed` adalah alokasi kursi yang diberikan
+ * pemilik kepada tamu (bukan jumlah orang yang benar-benar hadir); nilai hadir
+ * dicatat terpisah pada RsvpResponse.guestCount.
+ */
+model Guest {
+  id                String        @id @default(cuid())
+  invitationId      String
+  name              String        @db.VarChar(120)
+  phone             String?       @db.VarChar(32)
+  email             String?       @db.VarChar(254)
+  category          GuestCategory @default(OTHER)
+  guestCountAllowed Int           @default(1)
+  notes             String?       @db.VarChar(500)
+  status            GuestStatus   @default(ACTIVE)
+  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
+
+  invitation      Invitation       @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  guestInvitation GuestInvitation?
+  rsvpResponse    RsvpResponse?
+
+  @@index([invitationId, createdAt])
+  @@index([invitationId, phone])
+}
+
+/*
+ * Tautan personal per tamu. `personalToken` adalah token acak berkekuatan
+ * kapabilitas (bukan ID berurutan) sehingga URL personal tidak dapat ditebak
+ * dan tidak membocorkan ID database.
+ */
+model GuestInvitation {
+  id            String    @id @default(cuid())
+  guestId       String    @unique
+  invitationId  String
+  personalToken String    @unique @db.VarChar(64)
+  sentAt        DateTime? @db.Timestamptz(3)
+  openedAt      DateTime? @db.Timestamptz(3)
+  lastOpenedAt  DateTime? @db.Timestamptz(3)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @db.Timestamptz(3)
+
+  guest      Guest      @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId])
+}
+
+/* Satu respons RSVP per tamu per undangan (unique invitationId+guestId sesuai master spec). */
+model RsvpResponse {
+  id           String     @id @default(cuid())
+  invitationId String
+  guestId      String     @unique
+  status       RsvpStatus @default(PENDING)
+  guestCount   Int        @default(0)
+  phone        String?    @db.VarChar(32)
+  message      String?    @db.VarChar(1000)
+  respondedAt  DateTime?  @db.Timestamptz(3)
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(3)
+
+  guest      Guest      @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId, status])
 }
 
 model InvitationMember {

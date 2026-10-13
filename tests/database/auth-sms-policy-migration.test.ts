@@ -105,7 +105,7 @@ describe("kebijakan SMS OTP permanen PostgreSQL", () => {
     ).toEqual([{ smsOtpEnabled: false, phone: null, phoneVerifiedAt: null }]);
   });
 
-  it("kontrak inspect multimethod mencakup delapan migrasi dan dua belas CHECK terkini", async () => {
+  it("kontrak inspect multimethod mencakup sembilan migrasi dan dua belas CHECK terkini", async () => {
     const source = await readFile(
       new URL("../../scripts/database/auth-preproduction-inspect.ts", import.meta.url),
       "utf8",
@@ -114,7 +114,7 @@ describe("kebijakan SMS OTP permanen PostgreSQL", () => {
     expect(listedMigrations).toEqual(
       (await readdir(migrations)).filter((name) => name !== "migration_lock.toml").sort(),
     );
-    expect(listedMigrations).toHaveLength(8);
+    expect(listedMigrations).toHaveLength(9);
     const checksBlock = source.slice(
       source.indexOf("const expectedChecks = ["),
       source.indexOf("    if (\n      checks.length"),
