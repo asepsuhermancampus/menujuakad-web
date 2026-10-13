@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build && node scripts/prepare-standalone.mjs",
+    "deploy": "bash deploy/scripts/launch.sh",
     "start": "node scripts/start.mjs",
     "typecheck": "prisma generate && tsc --noEmit",
     "lint": "eslint .",
@@ -51,5 +52,9 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "5.0.3"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.6"
   }
 }
