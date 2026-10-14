@@ -1,0 +1,9 @@
+# Gunakan bersama compose.yaml DAN compose.neon.yaml.
+# !override menghapus port dan lokasi env_file root lama dari konfigurasi gabungan.
+services:
+  web:
+    ports: !override
+      - "127.0.0.1:${MENUJUAKAD_PORT:-3100}:3000"
+    env_file: !override
+      - path: /home/kebeletwebdev/.local/share/menujuakad/runtime.env
+        required: true

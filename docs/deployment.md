@@ -1,5 +1,45 @@
 # Deployment VPS Menuju Akad
 
+## Deploy dari akun SSH `kebeletwebdev` — 14 Oktober 2026
+
+**Status aktif:** https://menujuakad.com berjalan lewat **Docker rootless akun UID1002/GID1003**, upstream `127.0.0.1:3100 → 3000`, BUILD_ID **`akkq33nEqd8ENqvZ9-wvv`**. Migrasi engine ini memakai image rilis `preview-20261011-slicing` yang sama; tidak membangun kode terbaru atau menerapkan migrasi/grant/database. Bagian rilis di bawah merupakan riwayat; perintah rootful di sana bukan jalur deploy harian.
+
+Dari SSH sebagai `kebeletwebdev`, build dan launch kode dalam proyek sendiri:
+
+```bash
+cd ~/menujuakad-web
+npm run deploy
+```
+
+Skrip menjalankan `NEXT_PUBLIC_APP_URL=https://menujuakad.com npm run build`, packaging standalone existing tanpa berkas rahasia, build Docker **pada engine sendiri**, kandidat loopback3101, health/readiness/aset/guard autentikasi, lalu switch loopback3100 dan verifikasi HTTPS. Kegagalan kandidat tidak mengganti produksi; kegagalan setelah switch mengembalikan image rootless sebelumnya. Lock menolak launch bersamaan. Migrasi SQL/grant tidak otomatis dijalankan; perubahan schema tetap memerlukan prosedur terpisah.
+
+Perintah operasional tanpa sudo:
+
+```bash
+# Pemeriksaan konfigurasi dan prasyarat build tanpa build/switch.
+npm run deploy -- --dry-run
+
+# Launch ulang image yang sudah dimiliki engine akun, tanpa rebuild kode.
+npm run deploy -- --image menujuakad-web:preview-20261011-slicing
+
+# Setelah berhasil merilis image berbeda, kembali ke release sebelumnya.
+npm run deploy -- --rollback
+
+systemctl --user status docker.service
+systemctl --user restart docker.service
+docker ps
+```
+
+**Konfigurasi akun:** [launch.sh](../deploy/scripts/launch.sh) selalu menetapkan `DOCKER_HOST=unix:///run/user/1002/docker.sock`, menguji UID/socket/data-root/rootless, dan berhenti bila engine akun tidak tersedia. Context Docker akun bernama `menujuakad-rootless`. Penyimpanan engine `~/.local/share/docker`; systemd user unit `~/.config/systemd/user/docker.service` **enabled**, `Linger=yes` sehingga tidak bergantung pada sesi SSH. Tidak ada grup Docker root atau sudo pada akun. Rootlesskit memakai slirp4netns sandbox/seccomp dan `--disable-host-loopback`; helper root-owned `/opt/account-runtime-prepared/menujuakad-rootless-child.py` memvalidasi pemetaan1002/1003 sebelum cleanup symlink copy-up socket host.
+
+**Compose dan rahasia:** dua Compose existing dipertahankan, ditambah [compose.rootless.yaml](../deploy/compose.rootless.yaml) yang mengganti lokasi `env_file` dan port kandidat dengan `!override`. Environment runtime khusus proyek berada di `~/.local/share/menujuakad/runtime.env` (pemilik1002:1003,0600), berisi hanya `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_PROXY` dengan nilai **identik** dari source produksi lama; nilai tidak dicetak atau di-hash per rahasia. `~/menujuakad-web/.env` tetap privat dan terpisah. Runtime file tidak dimount ke aplikasi; filesystem aplikasi read-only, hanya tmpfs cache dan /tmp, user `node`, cap-dropALL, no-new-privileges, tanpa privileged/mount socket Docker.
+
+Pointer release atomik `~/.local/share/menujuakad/release.env` menyimpan immutable config image ID **`sha256:99034c5429b1d77e8c4a56f67d0c0841b8e42eb7e47d8c905695a5e762f88fba`**. Engine rootful lama memakai OCI index **`sha256:72e1434b9f7f7772a88730a3515d62319732b1dbd417cb48ea03206eba680cf2`**; perbedaan ID berasal dari image store, bukan rebuild. Konfigurasi image dan **7 layer RootFS identik**, serta BUILD_ID cocok pada container lama, kandidat, dan rootless produksi. Archive transfer privat disimpan di `~/.local/share/menujuakad/bootstrap/preview-20261011-slicing.tar`. Release build berikutnya berada di `~/.local/share/menujuakad/releases/`; `previous.env` baru tersedia setelah image benar-benar berubah.
+
+**Bukti verifikasi:** kandidat dan produksi healthy; readiness `database ok`; apex HTTPS200, www308→HTTPS200; logo/font200; /dashboard, /admin dan /account anonim mengirim redirect streaming Next.js ke login (HTTP200 berisi meta `__next-page-redirect`, bukan konten akun); POST login tanpa CSRF403. Batas cgroup kernel benar-benar `memory.max=805306368`, `pids.max=256`, `cpu.max=100000 100000`. UID0 container dipetakan ke1002; user `node` UID1000 dipetakan ke232071 (subuid231072:65536). Socket rootful/socket akun containerops dan enam home akun lain ditolak; probe TCP gateway8788/8795 ditolak dari akun dan jaringan aplikasi. Daemon restart dan redeploy **image sama** dilakukan sebagai UID1002, tanpa sudo di dalam alur. Persistensi didukung unit enabled+linger; logout seluruh sesi dan reboot host belum diuji. Bukti metadata tanpa rahasia disimpan di `~/.local/share/menujuakad/verification.json`.
+
+**Pemulihan dan layanan lain:** container rootful lama `menujuakad-web-1` masih tersimpan pada engine rootful, **stopped/restart=no**, bersama image dan env source lama. Rollback admin lintas engine perlu menghentikan hanya web rootless dahulu agar3100 kosong, lalu mengaktifkan kembali container lama; bukan tindakan akun SSH sehari-hari. Caddy tetap memakai upstream3100, file hash/PID Caddy tidak berubah; SSH dan Figma tetap aktif dengan PID sama. Tidak ada perubahan Caddy/SSH/Figma/HariKita atau schema/data autentikasi. Provider dan fitur bisnis yang belum aktif tetap mengikuti keterbatasan rilis sebelumnya. Monitor kapasitas disk/storage akun dan health aplikasi; dukungan cpuset/I/O throttle serta uji backup/restore/host-reboot tidak diklaim.
+
 ## Rilis `preview-20261011-slicing`: deploy build main & tutup drift Neon — 11 Oktober 2026
 
 **Status fase 8: `preview-20261011-slicing` aktif di produksi.** Produksi https://menujuakad.com memakai BUILD_ID **`akkq33nEqd8ENqvZ9-wvv`**, image `menujuakad-web:preview-20261011-slicing` (`sha256:72e1434b9f7f7772a88730a3515d62319732b1dbd417cb48ea03206eba680cf2`), container `menujuakad-web-1` healthy pada `127.0.0.1:3100`. Rilis `preview-20261010-roles` menjadi image rollback terdekat.
