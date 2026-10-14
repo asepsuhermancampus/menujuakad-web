@@ -1,5 +1,20 @@
 # Changelog Implementasi Menuju Akad
 
+## Keamanan dependency: override mysql2 & deepmerge-ts + SECURITY.md — 14 Oktober 2026
+
+- **Audit:** `npm audit` melaporkan 9 high — 4 paparan tree produksi via `@prisma/client`→`prisma` CLI (`mysql2` 3.15.3, `deepmerge-ts` 7.1.5) dan 5 dev-only satu rantai `braces` (`eslint-config-next`→`fast-glob`→`micromatch`, tanpa patch upstream).
+- **Perbaikan:** blok `overrides` di `package.json` — `mysql2 ^3.24.6` (menutup GHSA-3f6p-5ww8-9rcr + GHSA-rgwj-5xj2-c3m3) dan `deepmerge-ts ^8.0.2` (menutup GHSA-ggr8-5vv4-36mx / CVE-2026-40345). `SECURITY.md` baru mencatat advisory `braces` yang diterima sadar (dev-only, tidak reachable di produksi) + larangan `npm audit fix --force` karena menyarankan downgrade breaking.
+- **Bukti:** `npm audit --omit=dev` **0**; sisa 5 high dev-only `braces`; `prisma validate`/`generate` lulus; `lint` lulus; `npm audit signatures` 536/536 terverifikasi; lockfile 100% `registry.npmjs.org`.
+- **Commit:** `c63101c` (deps) + `2544f72` (SECURITY.md); belum di-push ke `origin/main`.
+- **Batas jujur:** belum push/deploy/CI; advisory `braces` hanya dapat ditutup setelah patch upstream tersedia.
+
+## Deploy mandiri akun SSH dengan Docker rootless — 14 Oktober 2026
+
+- `npm run deploy` → `deploy/scripts/launch.sh` membangun/packaging standalone di akun `kebeletwebdev`, menguji kandidat3101, beralih ke produksi3100 dan melakukan rollback image saat switch gagal; engine/socket selalu milik UID1002, tanpa sudo.
+- Overlay `deploy/compose.rootless.yaml` mempertahankan dua Compose existing dan mengganti env runtime ke lokasi privat akun. Secrets produksi tiga kunci dipindahkan identik tanpa mencetak nilai.
+- Produksi dipindahkan memakai image `preview-20261011-slicing` yang sama; config+7 layer dan BUILD_ID identik. Tidak membangun kode terbaru, menjalankan migrasi/grant, atau mengubah autentikasi/layanan lain.
+- Kandidat+HTTPS produksi/readiness/guard/aset lulus; cgroup768MiB/256PID/1CPU berlaku. Rootful lama stopped/restart=no disimpan untuk rollback admin. Unit user enabled+linger; restart daemon dan redeploy image yang sama diverifikasi. Panduan operasional terbaru di [deployment](docs/deployment.md).
+
 ## RSVP publik lewat tautan personal tamu (`/u/[token]`) — 13 Oktober 2026
 
 - **Increment:** tamu kini dapat mengonfirmasi kehadiran sendiri tanpa login lewat tautan personal `/u/[token]`; pemilik undangan membagikan tautan dari tab Tamu (tombol Salin tautan + WhatsApp berisi tautan personal). Tidak ada schema/migrasi baru — memakai tabel `Guest`, `GuestInvitation.personalToken`, dan `RsvpResponse` yang sudah ada.
