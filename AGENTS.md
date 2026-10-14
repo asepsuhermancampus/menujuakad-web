@@ -10,10 +10,10 @@
 ## Konteks dan sumber kebenaran
 
 - Komunikasi dan dokumentasi menggunakan Bahasa Indonesia.
-- Proyek implementasi aktif berada di `/home/ubuntu/menujuakad-web`. Folder `/home/ubuntu/menujuakad-rancangan` menyimpan rancangan, brief, aset sumber, dan ingatan proyek. Jangan menganggap `MenujuAkad.com` atau `HariKita-Web` sebagai folder proyek ini; keduanya disebut pada panduan global, bukan target pekerjaan ini.
+- Proyek implementasi aktif berada di `/home/kebeletwebdev/menujuakad-web`. Folder `/home/kebeletwebdev/menujuakad-rancangan` menyimpan rancangan, brief, aset sumber, dan ingatan proyek. Jangan menganggap `MenujuAkad.com` atau `HariKita-Web` sebagai folder proyek ini; keduanya disebut pada panduan global, bukan target pekerjaan ini.
 - Baca `../menujuakad-rancangan/MENUJU_AKAD_AGENT_MASTER_SPEC.txt` sebagai spesifikasi teknis dan produk utama. Jangan mengubahnya tanpa kebutuhan yang jelas.
 - Acuan visual aktif adalah proyek Stitch `MENUJU-AKAD-UIUX` (`12559574101879777472`), design system Editorial Ivory & Gold, dengan Noto Serif untuk display dan Manrope untuk UI/body, sesuai keputusan user 7 Oktober 2026. Snapshot token berada di `../menujuakad-rancangan/docs/design-system.md`. Figma V4 dan Cormorant adalah riwayat; jangan mengarang hasil inspeksi desain. User telah memberikan izin eksplisit pada 7 Oktober 2026 untuk melanjutkan slicing seluruh UI/UX Stitch yang tersedia dan publikasi ke `menujuakad.com`; izin ini menggantikan batas brainstorming sebelumnya. Slicing frontend tetap berlaku; instruksi sesi9 Oktober memperluas increment lokal ke autentikasi multimethod/akun. Backend bisnis lainnya belum lengkap; layanan aktif/produksi dibedakan dari kode lokal. Rencana pelaksanaan berada di `docs/03-pm-rencana-slicing.md`.
-- Panduan role tersedia di `/home/ubuntu/.dev-tools/app-dev-template/roles/`.
+- Panduan role tersedia di `/home/kebeletwebdev/.dev-tools/app-dev-template/roles/`.
 
 ## Protokol memulai dan melanjutkan
 
@@ -26,7 +26,7 @@
 
 ## Batas folder dan dokumentasi
 
-- Jalankan perintah aplikasi dari `/home/ubuntu/menujuakad-web`. Jangan membuat scaffold ulang.
+- Jalankan perintah aplikasi dari `/home/kebeletwebdev/menujuakad-web`. Jangan membuat scaffold ulang.
 - Master spec, dokumen bernomor 00–12, seluruh brief Stitch, design system lengkap, dan aset sumber tetap di `../menujuakad-rancangan`. Jangan menduplikasi sumber tersebut.
 - Perbarui progres bersama di `../menujuakad-rancangan/docs/00-progres-proyek.md`. Catat perubahan aplikasi pada `CHANGELOG.md` di folder ini; perubahan rancangan pada `../menujuakad-rancangan/CHANGELOG.md`.
 - Dokumentasi teknis aplikasi berada di `docs/`; `docs/design-system.md` menjadi panduan handoff menuju sumber rancangan.
