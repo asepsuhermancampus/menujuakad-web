@@ -1,5 +1,14 @@
 # Changelog Implementasi Menuju Akad
 
+## Tab RSVP & Buku Ucapan pakai data database, bukan fixture — 14 Oktober 2026
+
+- **Increment:** dua tab undangan yang sebelumnya hanya menampilkan fixture di rute resmi kini membaca database:
+  - **Tab RSVP (GST-03)** — ringkasan (respons masuk, hadir pasti + kursi terpakai, berhalangan, belum menjawab, masih ragu) dihitung dari baris `Guest` + `RsvpResponse` undangan tersebut, ditambah daftar respons terbaru per tamu (status, jumlah orang, waktu respons zona Asia/Jakarta).
+  - **Tab Buku Ucapan (GST-04)** — daftar ucapan nyata dari `RsvpResponse.message` (hanya pesan non-kosong, tamu aktif, maksimum 200 baris, terbaru dahulu).
+- **Server:** `repository.listOwnedWishes` + `service.listWishes` mengikuti pola yang ada — sesi CLIENT diverifikasi lebih dulu dan kepemilikan undangan diperiksa lagi di repository, tanpa jalur lintas akun. Tipe `WishDto` ditambahkan di `dto.ts`; `guestSelect` tidak diubah agar kontrak DTO tab Tamu tetap.
+- **Batas jujur:** halaman RSVP bersifat **laporan** — pencatatan respons tetap lewat tab Tamu (form per tamu) dan tautan personal tamu `/u/[token]`, halaman ini tidak menyimpan apa pun. **Moderasi ucapan belum ada** karena skema belum menyimpan status visibilitas; halaman menyatakannya alih-alih menampilkan tombol yang seolah menyimpan. Tab Hadiah (GST-05) masih `PreviewOnlyFeature`, sedangkan Analitik (GST-06), Notifikasi (ACC-02), dan Pusat Bantuan (SUP-01) belum diubah pada increment ini.
+- **Verifikasi:** `typecheck` lulus, `lint` lulus, **unit 718/718 (82 file)**, `build` lulus; bentuk query ucapan diuji terhadap PostgreSQL Neon secara read-only (0 baris — database produksi memang belum punya undangan nyata).
+
 ## Rilis produksi build `c3fb10f` + migrasi & grant domain tamu ke Neon — 14 Oktober 2026
 
 - **Push & CI:** lima commit yang tertahan (`c63101c`, `2544f72`, `39c1e70`, `b32f3a2`, `c3fb10f`) di-push ke `origin/main`; CI run `38544284308` **sukses pada kedua job** (Kualitas: db/typecheck/lint/unit/build, dan E2E Playwright). Working tree bersih dan `main` = `origin/main`.
