@@ -89,3 +89,18 @@ export function summarizeGuests(rows: GuestRecord[]) {
 }
 
 export type GuestSummaryDto = ReturnType<typeof summarizeGuests>;
+
+/*
+ * Ucapan/doa yang tersimpan bersama respons tamu (`RsvpResponse.message`).
+ * Skema belum punya kolom visibilitas, jadi daftar ini hanya-baca: tidak ada
+ * tindakan menyembunyikan/menghapus yang bisa diklaim.
+ */
+export type WishDto = {
+  guestId: string;
+  guestName: string;
+  category: GuestDto["category"];
+  message: string;
+  status: NonNullable<GuestDto["rsvp"]>["status"];
+  guestCount: number;
+  respondedAt: string | null;
+};

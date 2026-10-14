@@ -14,9 +14,9 @@ import { PendingFeature, PreviewOnlyFeature } from "./data-boundary";
 import { GuestManagementView } from "@/features/guests/components/guest-management-view";
 import { GuestCreateForm } from "@/features/guests/components/guest-create-form";
 import { GuestImportForm } from "@/features/guests/components/guest-import-form";
-import { listGuests } from "@/server/guests/service";
-import { RsvpPreview } from "@/features/guests/components/rsvp-preview";
-import { WishesPreview } from "@/features/wishes/components/wishes-preview";
+import { listGuests, listWishes } from "@/server/guests/service";
+import { RsvpView } from "@/features/guests/components/rsvp-view";
+import { WishesView } from "@/features/wishes/components/wishes-view";
 import { GiftsPreview } from "@/features/gifts/components/gifts-preview";
 export async function InvitationListView() {
   const invitations = await listCustomerInvitations();
@@ -73,10 +73,8 @@ const sections = [
 const pending: Record<string, [string, string]> = {
   analytics: ["Analitik", "gst-06"],
 };
-/* Tab yang masih memakai fixture contoh; tamu sudah tersimpan di database. */
+/* Tab yang masih memakai fixture contoh; tamu, RSVP, dan ucapan sudah dari database. */
 const domainViews: Record<string, { title: string; code: string; render: () => ReactNode }> = {
-  rsvp: { title: "Konfirmasi RSVP", code: "gst-03", render: () => <RsvpPreview /> },
-  wishes: { title: "Buku Ucapan", code: "gst-04", render: () => <WishesPreview /> },
   gifts: { title: "Hadiah", code: "gst-05", render: () => <GiftsPreview /> },
 };
 /*
@@ -97,6 +95,20 @@ async function GuestsTab({ id, title }: { id: string; title: string }) {
       <GuestImportForm invitationId={id} />
     </div>
   );
+}
+
+/*
+ * Tab RSVP dan Ucapan memakai data NYATA dari database (Guest + RsvpResponse).
+ * Ringkasan, daftar respons, dan ucapan dihitung dari baris milik undangan ini.
+ */
+async function RsvpTab({ id }: { id: string }) {
+  const { guests, summary } = await listGuests(id);
+  return <RsvpView invitationId={id} guests={guests} summary={summary} />;
+}
+
+async function WishesTab({ id }: { id: string }) {
+  const wishes = await listWishes(id);
+  return <WishesView invitationId={id} wishes={wishes} />;
 }
 
 export async function InvitationDetailView({ id, tab }: { id: string; tab: string }) {
@@ -129,6 +141,10 @@ export async function InvitationDetailView({ id, tab }: { id: string; tab: strin
         <PrivateInvitationPreview invitation={invitation} />
       ) : tab === "guests" ? (
         <GuestsTab id={invitation.id} title={invitation.title} />
+      ) : tab === "rsvp" ? (
+        <RsvpTab id={invitation.id} />
+      ) : tab === "wishes" ? (
+        <WishesTab id={invitation.id} />
       ) : domainViews[tab] ? (
         <PreviewOnlyFeature
           title={domainViews[tab].title}

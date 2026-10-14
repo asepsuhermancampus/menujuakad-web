@@ -25,6 +25,9 @@ async function customerOperation<T>(operation: (userId: string) => Promise<T>): 
 export const listGuests = (invitationId: string) =>
   customerOperation((userId) => repository.listOwnedGuests(userId, invitationId));
 
+export const listWishes = (invitationId: string) =>
+  customerOperation((userId) => repository.listOwnedWishes(userId, invitationId));
+
 export function createGuest(invitationId: string, raw: unknown) {
   return customerOperation((userId) => {
     const input = createGuestSchema.safeParse(raw);

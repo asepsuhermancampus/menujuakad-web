@@ -4,6 +4,7 @@ import { getPrisma } from "@/server/db/client";
 import type { Prisma } from "@/generated/prisma/client";
 import { WorkspaceError } from "@/server/invitations/errors";
 import { guestDto, guestSelect, summarizeGuests } from "./dto";
+import type { WishDto } from "./dto";
 import type { BulkGuestInput, CreateGuestInput, UpdateGuestInput, UpdateRsvpInput } from "./input";
 
 /*
@@ -34,6 +35,47 @@ export async function listOwnedGuests(userId: string, invitationId: string) {
     take: 500,
   });
   return { guests: rows.map(guestDto), summary: summarizeGuests(rows) };
+}
+
+/*
+ * Ucapan tamu untuk undangan milik pengguna. Hanya respons yang benar-benar
+ * punya pesan (setelah trim) yang dikembalikan; tamu yang diarsipkan tidak
+ * ikut. Terbaru lebih dahulu, dibatasi 200 agar halaman tetap ringan.
+ */
+export async function listOwnedWishes(userId: string, invitationId: string): Promise<WishDto[]> {
+  await assertOwnedInvitation(userId, invitationId);
+  const rows = await getPrisma().rsvpResponse.findMany({
+    where: {
+      invitationId,
+      message: { not: null },
+      guest: { is: { invitationId, status: "ACTIVE" } },
+    },
+    select: {
+      guestId: true,
+      message: true,
+      status: true,
+      guestCount: true,
+      respondedAt: true,
+      guest: { select: { name: true, category: true } },
+    },
+    orderBy: [{ respondedAt: "desc" }, { createdAt: "desc" }],
+    take: 200,
+  });
+  return rows.flatMap((row) => {
+    const message = (row.message ?? "").trim();
+    if (!message) return [];
+    return [
+      {
+        guestId: row.guestId,
+        guestName: row.guest.name,
+        category: row.guest.category,
+        message,
+        status: row.status,
+        guestCount: row.guestCount,
+        respondedAt: row.respondedAt?.toISOString() ?? null,
+      },
+    ];
+  });
 }
 
 /*
